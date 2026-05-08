@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>RussiaSoulRP | RSRP — Форум криминальной Москвы</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0B0C10;
+            font-family: 'Inter', sans-serif;
+            color: #E0E4F0;
+            line-height: 1.5;
+            padding: 24px 20px;
+        }
+
+        .forum-container {
+            max-width: 1320px;
+            margin: 0 auto;
+            background: #0F1117;
+            border-radius: 28px;
+            box-shadow: 0 25px 45px -12px rgba(0,0,0,0.7);
+            overflow: hidden;
+            border: 1px solid rgba(255,215,0,0.15);
+        }
+
+        .forum-header {
+            background: linear-gradient(135deg, #0A0C12 0%, #11141C 100%);
+            padding: 28px 32px 20px 32px;
+            border-bottom: 2px solid #FFD700;
+            position: relative;
+        }
+        .header-top {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: flex-end;
+            gap: 20px;
+        }
+        .logo-area h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #FFD966, #FFB347);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            letter-spacing: -0.5px;
+        }
+        .logo-area p {
+            font-size: 0.85rem;
+            color: #9AA4BF;
+            margin-top: 6px;
+            letter-spacing: 0.3px;
+        }
+        .badge-rp {
+            background: #1E1F2C;
+            padding: 6px 16px;
+            border-radius: 60px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #FFD966;
+            border: 1px solid rgba(255,215,0,0.3);
+        }
+        .forum-nav {
+            padding: 16px 32px;
+            background: #0C0E14;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 28px;
+            border-bottom: 1px solid #20232E;
+        }
+        .forum-nav a {
+            color: #C0C9E0;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .forum-nav a i {
+            font-size: 1rem;
+            color: #FFD966;
+        }
+        .forum-nav a:hover {
+            color: #FFD966;
+        }
+
+        .forum-main {
+            display: flex;
+            flex-wrap: wrap;
+            padding: 28px 32px;
+            gap: 32px;
+        }
+        .content-left {
+            flex: 2.2;
+            min-width: 260px;
+        }
+        .content-right {
+            flex: 1.2;
+            min-width: 260px;
+        }
+
+        .section-card {
+            background: #13161F;
+            border-radius: 20px;
+            margin-bottom: 28px;
+            border: 1px solid #232732;
+            overflow: hidden;
+        }
+        .section-title {
+            background: #1A1E2A;
+            padding: 14px 22px;
+            font-weight: 700;
+            font-size: 1.2rem;
+            border-left: 4px solid #FFD700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .section-title i {
+            color: #FFD966;
+        }
+        .category-list {
+            padding: 6px 0;
+        }
+        .category-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 22px;
+            border-bottom: 1px solid #20232F;
+            transition: 0.1s;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .category-item:hover {
+            background: #191E2B;
+        }
+        .cat-info h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        .cat-info p {
+            font-size: 0.75rem;
+            color: #8A94B0;
+        }
+        .cat-stats {
+            font-size: 0.75rem;
+            color: #B9C3E0;
+            background: #0C0F18;
+            padding: 4px 12px;
+            border-radius: 40px;
+        }
+        .subforums {
+            padding: 0 22px 12px 22px;
+            font-size: 0.7rem;
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            color: #FFD966;
+        }
+        .subforums span {
+            background: #1E232F;
+            padding: 4px 12px;
+            border-radius: 20px;
+            cursor: default;
+        }
+
+        .empty-topics {
+            padding: 28px 22px;
+            text-align: center;
+            color: #8A94B0;
+        }
+        .empty-topics i {
+            font-size: 2.2rem;
+            margin-bottom: 12px;
+            opacity: 0.5;
+        }
+        .empty-topics p {
+            font-size: 0.85rem;
+        }
+
+        .stats-card {
+            background: #13161F;
+            border-radius: 20px;
+            border: 1px solid #232732;
+            text-align: center;
+            padding: 20px;
+            margin-bottom: 28px;
+        }
+        .stats-number {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #FFD966;
+        }
+        .voice-card {
+            background: #13161F;
+            border-radius: 20px;
+            padding: 18px;
+            border: 1px solid #2C3040;
+        }
+
+        .forum-footer {
+            background: #090B10;
+            padding: 20px 32px;
+            border-top: 1px solid #20232E;
+            font-size: 0.75rem;
+            text-align: center;
+            color: #6F7A98;
+        }
+
+        @media (max-width: 800px) {
+            .forum-main {
+                flex-direction: column;
+            }
+            .forum-header {
+                padding: 20px;
+            }
+            .forum-nav {
+                overflow-x: auto;
+            }
+        }
+        .server-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 10px;
+        }
+        .server-badge {
+            background: #1A1E2C;
+            padding: 6px 14px;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        .server-badge i {
+            margin-right: 6px;
+            color: #FFD966;
+        }
+        hr {
+            border-color: #232732;
+            margin: 12px 0;
+        }
+        a {
+            text-decoration: none;
+        }
+        .empty-voice {
+            text-align: center;
+            padding: 10px 0;
+            color: #8A94B0;
+            font-size: 0.8rem;
+        }
+        .info-placeholder {
+            background: #13161F;
+            border-radius: 20px;
+            border: 1px solid #232732;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 28px;
+        }
+        .info-placeholder i {
+            font-size: 2rem;
+            color: #FFD96680;
+            margin-bottom: 10px;
+        }
+        .info-placeholder p {
+            font-size: 0.8rem;
+            color: #8E99B5;
+        }
+        /* один сервер выделим */
+        .single-server {
+            border-left: 3px solid #FFD966;
+        }
+    </style>
+</head>
+<body>
+<div class="forum-container">
+    <div class="forum-header">
+        <div class="header-top">
+            <div class="logo-area">
+                <h1><i class="fas fa-city"></i> RUSSIA SOUL RP <span style="font-size:1.1rem;">| RSRP</span></h1>
+                <p>Криминальная Москва · GTA 5 RolePlay · Реализм 24/7</p>
+            </div>
+            <div class="badge-rp">
+                <i class="fas fa-shield-alt"></i> Официальный форум
+            </div>
+        </div>
+    </div>
+    
+    <div class="forum-nav">
+        <a href="#"><i class="fas fa-gavel"></i> Правила проекта</a>
+        <a href="#"><i class="fas fa-skull"></i> Криминальным</a>
+        <a href="#"><i class="fas fa-balance-scale"></i> Гос. организациям</a>
+        <a href="#"><i class="fas fa-book"></i> Законодательство</a>
+        <a href="#"><i class="fas fa-headset"></i> Тех. поддержка</a>
+    </div>
+
+    <div class="forum-main">
+        <!-- Левая колонка: разделы сервера -->
+        <div class="content-left">
+            <!-- Игровой сервер только №1 Химки -->
+            <div class="section-card">
+                <div class="section-title">
+                    <i class="fas fa-server"></i> RSRP · Игровой сервер
+                </div>
+                <div class="category-list">
+                    <div class="category-item single-server">
+                        <div class="cat-info"><h3><i class="fas fa-star-of-life" style="font-size: 0.8rem;"></i> Сервер №1 | Химки</h3><p>Основной проект · Криминальная Москва, высокий реализм</p></div>
+                        <div class="cat-stats"><i class="fas fa-signal"></i> Статус: онлайн</div>
+                    </div>
+                    <div class="subforums">
+                        <span><i class="fas fa-comment"></i> Общий чат</span>
+                        <span><i class="fas fa-building"></i> Государство</span>
+                        <span><i class="fas fa-mask"></i> Криминал</span>
+                        <span><i class="fas fa-car"></i> Автосалон</span>
+                        <span><i class="fas fa-store"></i> Бизнесы</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Техническая поддержка -->
+            <div class="section-card">
+                <div class="section-title">
+                    <i class="fas fa-wrench"></i> Техническая поддержка
+                </div>
+                <div class="category-list">
+                    <div class="category-item">
+                        <div class="cat-info"><h3>Сообщить о баге / инциденте</h3><p>Опишите проблему, прикрепите скриншот</p></div>
+                        <div class="cat-stats"><i class="fas fa-clock"></i> Ответ: до 24ч</div>
+                    </div>
+                    <div class="subforums"><span><i class="fas fa-bug"></i> Баг-трекер</span><span><i class="fas fa-ticket-alt"></i> Заявки на разбан</span></div>
+                    <div class="category-item">
+                        <div class="cat-info"><h3>Финансовые вопросы / донат</h3><p>Бонусы, привилегии, проверка платежей</p></div>
+                        <div class="cat-stats">offline-тикеты</div>
+                    </div>
+                    <div class="subforums"><span><i class="fas fa-coins"></i> Донат-поддержка</span></div>
+                </div>
+            </div>
+
+            <!-- Новые сообщения - пусто, сервер новый -->
+            <div class="section-card">
+                <div class="section-title">
+                    <i class="fas fa-comments"></i> Последние обсуждения
+                </div>
+                <div class="empty-topics">
+                    <i class="fas fa-inbox"></i>
+                    <p>На форуме пока нет ни одного сообщения.</p>
+                    <p style="font-size: 0.75rem; margin-top: 6px;">Станьте первым, кто начнёт обсуждение!</p>
+                </div>
+                <div class="subforums" style="padding-bottom: 16px; justify-content: center;">
+                    <span><i class="fas fa-plus-circle"></i> Создать тему</span>
+                    <span><i class="fas fa-rules"></i> Правила раздела</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Правая колонка: без команды, с пустыми блоками -->
+        <div class="content-right">
+            <!-- Статистика решений (пустая для нового сервера) -->
+            <div class="stats-card">
+                <div><i class="fas fa-chalkboard-user"></i> <strong style="letter-spacing:1px;">РЕШЕНИЯ АДМИНИСТРАЦИИ</strong></div>
+                <div style="display: flex; justify-content: space-around; margin: 16px 0;">
+                    <div><span class="stats-number">0</span><br>баг-репортов</div>
+                    <div><span class="stats-number">0</span><br>принято решений</div>
+                </div>
+                <div style="background:#1E2436; border-radius: 30px; padding: 8px; font-size:0.7rem;">
+                    <i class="fas fa-database"></i> Баг опыта: ожидает исправления
+                </div>
+            </div>
+
+            <!-- Голосовое объединение - заглушка -->
+            <div class="voice-card">
+                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+                    <i class="fas fa-microphone-alt" style="font-size: 1.4rem;"></i>
+                    <span style="font-weight: 700;">Голосовое объединение</span>
+                    <span style="background:#212937; padding: 2px 8px; border-radius: 16px; font-size:0.7rem;">🟢 активно</span>
+                </div>
+                <div class="empty-voice">
+                    <i class="fas fa-headset"></i> Нет активных спикеров
+                </div>
+                <hr>
+                <div style="font-size:0.75rem; color:#9AA4BF; display: flex; justify-content: space-between;">
+                    <span><i class="fas fa-user-friends"></i> На странице: 1 посетитель</span>
+                    <span><i class="fas fa-lock-open"></i> Открытый канал</span>
+                </div>
+            </div>
+
+            <!-- Криминальная хроника - пусто -->
+            <div class="stats-card" style="margin-top: 12px;">
+                <div><i class="fas fa-hand-fist"></i> Криминальная хроника</div>
+                <div class="server-list" style="justify-content: center; margin-top: 10px;">
+                    <div class="server-badge"><i class="fas fa-hourglass-start"></i> Нет активных группировок</div>
+                </div>
+                <div style="font-size:0.7rem; margin-top: 12px;">⚡ Ожидайте первых событий</div>
+            </div>
+
+            <!-- Информационный блок о составе команды (скрыт/заглушка) -->
+            <div class="info-placeholder">
+                <i class="fas fa-users-slash"></i>
+                <p>Состав команды проекта не опубликован</p>
+                <p style="font-size: 0.7rem; margin-top: 6px;">Информация появится позже</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Нижний блок: законы -->
+    <div style="padding: 5px 32px 10px 32px;">
+        <div style="background: #13161F; border-radius: 20px; border: 1px solid #2A2F40; padding: 16px 22px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center;">
+            <div><i class="fas fa-balance-scale"></i> <strong>Общее законодательство RSRP (проект):</strong> Глава I — основополагающие принципы ролевой игры, система наказаний.</div>
+            <div><i class="fas fa-file-pdf"></i> Скоро: полный свод законов</div>
+        </div>
+    </div>
+
+    <div class="forum-footer">
+        <i class="fas fa-globe"></i> RussiaSoul RP · Криминальная Москва 2026 · Все права защищены · Сервер «Химки»  
+        <span style="color:#FFD966;">Официальный форум RSRP · Добро пожаловать!</span>
+    </div>
+</div>
+
+<script>
+    // Заглушка для всех ссылок
+    const allLinks = document.querySelectorAll('a[href="#"]');
+    allLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            alert('🌇 RussiaSoul RP | Добро пожаловать! Раздел будет доступен после открытия форума.');
+        });
+    });
+    const fakeNavs = document.querySelectorAll('.forum-nav a');
+    fakeNavs.forEach(nav => {
+        nav.addEventListener('click', (e) => {
+            if(nav.getAttribute('href') === '#') {
+                e.preventDefault();
+                alert('📜 Раздел в разработке. Следите за новостями RSRP.');
+            }
+        });
+    });
+    // Превентивные сообщения для кнопок "Создать тему"
+    const createBtns = document.querySelectorAll('.subforums span');
+    createBtns.forEach(btn => {
+        if(btn.innerText.includes('Создать тему')) {
+            btn.style.cursor = 'pointer';
+            btn.addEventListener('click', () => {
+                alert('✍️ Функция создания тем появится после регистрации на форуме. Следите за анонсами!');
+            });
+        }
+    });
+</script>
+</body>
+</html>
