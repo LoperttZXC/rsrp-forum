@@ -31,15 +31,19 @@
         .cat-info p { font-size: 0.75rem; color: #8A94B0; }
         .cat-stats { font-size: 0.75rem; background: #0C0F18; padding: 4px 12px; border-radius: 40px; }
         .topics-list { padding: 0 22px; }
-        .topic-item { padding: 12px 0; border-bottom: 1px solid #20232F; cursor: pointer; transition: 0.1s; }
+        .topic-item { padding: 12px 0; border-bottom: 1px solid #20232F; cursor: pointer; transition: 0.1s; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; }
         .topic-item:hover { background: #191E2B; margin: 0 -22px; padding: 12px 22px; }
         .topic-title { font-weight: 700; margin-bottom: 4px; color: #FFD966; }
         .topic-meta { font-size: 0.7rem; color: #8A94B0; }
+        .topic-actions { display: flex; gap: 10px; }
+        .topic-actions i { cursor: pointer; color: #8A94B0; transition: 0.2s; font-size: 0.9rem; }
+        .topic-actions i:hover { color: #FFD966; }
         .empty-topics { padding: 28px 22px; text-align: center; color: #8A94B0; }
         .forum-footer { background: #090B10; padding: 20px 32px; border-top: 1px solid #20232E; font-size: 0.75rem; text-align: center; color: #6F7A98; }
         .thread-view { background: #13161F; border-radius: 20px; padding: 24px; margin-bottom: 28px; }
         .thread-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 16px; color: #FFD966; }
-        .thread-meta { font-size: 0.8rem; color: #8A94B0; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid #232732; }
+        .thread-meta { font-size: 0.8rem; color: #8A94B0; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid #232732; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+        .thread-content { color: #C0C9E0; line-height: 1.6; margin-bottom: 24px; }
         .back-btn { background: #1E232F; border: none; color: #FFD966; padding: 8px 16px; border-radius: 20px; cursor: pointer; margin-bottom: 20px; display: inline-block; }
         .back-btn:hover { background: #2A3040; }
         .create-topic-btn { background: #FFD96620; border: 1px solid #FFD966; color: #FFD966; padding: 10px 20px; border-radius: 30px; cursor: pointer; margin-top: 16px; font-weight: 600; display: inline-block; }
@@ -47,7 +51,8 @@
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); justify-content: center; align-items: center; z-index: 1000; }
         .modal-content { background: #13161F; padding: 28px; border-radius: 24px; width: 90%; max-width: 500px; border: 1px solid #FFD966; }
         .modal-content input, .modal-content textarea { width: 100%; padding: 10px; margin: 10px 0; background: #1E232F; border: 1px solid #232732; border-radius: 12px; color: white; font-family: 'Inter', sans-serif; }
-        .modal-content button { background: #FFD966; color: #0B0C10; border: none; padding: 10px 20px; border-radius: 30px; cursor: pointer; font-weight: bold; margin-top: 10px; }
+        .modal-content button { background: #FFD966; color: #0B0C10; border: none; padding: 10px 20px; border-radius: 30px; cursor: pointer; font-weight: bold; margin-top: 10px; margin-right: 10px; }
+        .modal-content button.cancel { background: #3A3F55; color: white; }
         .close-modal { float: right; font-size: 28px; cursor: pointer; color: #FFD966; }
         .server-card { background: linear-gradient(135deg, #1A1E2A, #13161F); border-radius: 16px; padding: 20px; margin-bottom: 16px; border: 1px solid #FFD96640; cursor: pointer; transition: 0.2s; }
         .server-card:hover { border-color: #FFD966; background: #1E2436; transform: translateY(-2px); }
@@ -57,6 +62,7 @@
         .server-subforums { display: flex; gap: 12px; margin-top: 16px; flex-wrap: wrap; }
         .server-sub { background: #0C0F18; padding: 8px 16px; border-radius: 30px; font-size: 0.8rem; cursor: pointer; border: 1px solid #FFD96640; transition: 0.2s; }
         .server-sub:hover { background: #FFD96620; border-color: #FFD966; }
+        .voice-card { background: #13161F; border-radius: 20px; padding: 18px; border: 1px solid #2C3040; margin-bottom: 28px; text-align: center; }
         @media (max-width: 800px) { .forum-main { flex-direction: column; } }
     </style>
 </head>
@@ -73,8 +79,7 @@
     </div>
     <div class="forum-nav">
         <a data-page="main"><i class="fas fa-home"></i> Главная</a>
-        <a data-page="rules_page"><i class="fas fa-gavel"></i> Правила</a>
-        <a data-page="support"><i class="fas fa-headset"></i> Техподдержка</a>
+        <a data-page="support_tech"><i class="fas fa-headset"></i> Техподдержка</a>
         <a data-page="complaints"><i class="fas fa-file-alt"></i> Жалобы и заявления</a>
     </div>
     
@@ -85,34 +90,39 @@
     </div>
 </div>
 
-<!-- Модальное окно -->
-<div id="createTopicModal" class="modal">
+<!-- Модальное окно для создания/редактирования темы -->
+<div id="topicModal" class="modal">
     <div class="modal-content">
         <span class="close-modal">&times;</span>
-        <h3 style="color:#FFD966;">Создать новую тему</h3>
-        <input type="text" id="newTopicTitle" placeholder="Название темы">
-        <textarea id="newTopicContent" rows="4" placeholder="Текст сообщения..."></textarea>
-        <button id="submitTopicBtn">Создать тему</button>
+        <h3 style="color:#FFD966;" id="modalTitle">Создать новую тему</h3>
+        <input type="text" id="topicTitle" placeholder="Название темы">
+        <textarea id="topicContent" rows="5" placeholder="Текст сообщения..."></textarea>
+        <button id="submitTopicBtn">Сохранить</button>
+        <button id="cancelModalBtn" class="cancel">Отмена</button>
     </div>
 </div>
 
 <script>
     var DISQUS_SHORTNAME = "rsrp-forum";
+    var currentEditCategory = null;
+    var currentEditTopicId = null;
     
     // Структура форума
     var forumData = {
-        // Разделы форума (3 подраздела)
         forumSections: [
             { id: "rules_common", name: "Общие правила проекта", desc: "Основные правила поведения на сервере", icon: "fas fa-gavel" },
             { id: "rules_criminal", name: "Общие правила криминальных организаций", desc: "Правила для банд, мафии и криминала", icon: "fas fa-skull" },
             { id: "rules_gov", name: "Общие правила государственных организаций", desc: "Правила для полиции, мэрии, госструктур", icon: "fas fa-building" }
         ],
-        // Подразделы сервера Химки
         serverKhimkiSubs: [
             { id: "khimki_criminal", name: "Криминальные организации", desc: "Банды, мафия, криминальные семьи", icon: "fas fa-mask" },
             { id: "khimki_gov", name: "Государственные организации", desc: "Полиция, мэрия, скорая, пожарные", icon: "fas fa-landmark" }
         ],
-        // Жалобы и заявления
+        techSupport: [
+            { id: "tech_help", name: "Помощь", desc: "Вопросы по игре, помощь новичкам", icon: "fas fa-question-circle" },
+            { id: "tech_bugs", name: "Сообщить о баге", desc: "Ошибки, глитчи, проблемы с сервером", icon: "fas fa-bug" },
+            { id: "tech_support", name: "Техподдержка", desc: "Связь с администрацией по тех. вопросам", icon: "fas fa-headset" }
+        ],
         complaints: [
             { id: "complaint_admin", name: "Жалобы на администрацию", desc: "Нарушения со стороны админов", icon: "fas fa-user-shield" },
             { id: "complaint_players", name: "Жалобы на игроков", desc: "Нарушения правил игроками", icon: "fas fa-users" },
@@ -125,28 +135,21 @@
     };
     
     function loadTopicsFromStorage() {
-        var saved = localStorage.getItem("rsrp_forum_topics_final");
+        var saved = localStorage.getItem("rsrp_forum_topics_edit");
         if (saved) {
             forumData.topics = JSON.parse(saved);
         } else {
             forumData.topics = {
-                rules_common: [],
-                rules_criminal: [],
-                rules_gov: [],
-                khimki_criminal: [],
-                khimki_gov: [],
-                complaint_admin: [],
-                complaint_players: [],
-                complaint_leaders: [],
-                amnesty: [],
-                moderator_app: [],
-                leader_app: []
+                rules_common: [], rules_criminal: [], rules_gov: [],
+                khimki_criminal: [], khimki_gov: [],
+                tech_help: [], tech_bugs: [], tech_support: [],
+                complaint_admin: [], complaint_players: [], complaint_leaders: [], amnesty: [], moderator_app: [], leader_app: []
             };
         }
     }
     
     function saveTopicsToStorage() {
-        localStorage.setItem("rsrp_forum_topics_final", JSON.stringify(forumData.topics));
+        localStorage.setItem("rsrp_forum_topics_edit", JSON.stringify(forumData.topics));
     }
     
     function loadDisqus(threadId, threadTitle) {
@@ -168,25 +171,47 @@
         }
     }
     
-    // Главная страница
+    function deleteTopic(categoryId, topicId) {
+        if (confirm('Вы уверены, что хотите удалить эту тему? Отменить будет невозможно.')) {
+            var index = forumData.topics[categoryId].findIndex(t => t.id == topicId);
+            if (index !== -1) {
+                forumData.topics[categoryId].splice(index, 1);
+                saveTopicsToStorage();
+                showCategory(categoryId);
+            }
+        }
+    }
+    
+    function editTopic(categoryId, topicId) {
+        var topic = forumData.topics[categoryId].find(t => t.id == topicId);
+        if (topic) {
+            currentEditCategory = categoryId;
+            currentEditTopicId = topicId;
+            document.getElementById('modalTitle').innerText = 'Редактировать тему';
+            document.getElementById('topicTitle').value = topic.title;
+            document.getElementById('topicContent').value = topic.content;
+            document.getElementById('topicModal').style.display = 'flex';
+        }
+    }
+    
     function showMainPage() {
         loadTopicsFromStorage();
         var container = document.getElementById('main-content');
         var html = '<div class="content-left">';
         
-        // Кликабельная карточка сервера Химки
+        // Сервер Химки
         html += '<div class="section-card">';
         html += '<div class="section-title"><i class="fas fa-server"></i> Игровые сервера</div>';
         html += '<div class="server-card" id="khimkiServerBtn">';
         html += '<div class="server-name"><i class="fas fa-star-of-life"></i> Сервер №1 | Химки</div>';
-        html += '<div class="server-status"><i class="fas fa-circle" style="color:#4CAF50; font-size:0.6rem;"></i> Онлайн · 128 игроков</div>';
+        html += '<div class="server-status"><i class="fas fa-circle" style="color:#4CAF50; font-size:0.6rem;"></i> Онлайн</div>';
         html += '<div class="server-desc">Основной сервер проекта. Криминальная Москва, высокий реализм.</div>';
         html += '<div class="server-subforums">';
         html += '<div class="server-sub" data-sub="khimki_criminal"><i class="fas fa-mask"></i> Криминальные организации</div>';
         html += '<div class="server-sub" data-sub="khimki_gov"><i class="fas fa-landmark"></i> Государственные организации</div>';
         html += '</div></div></div>';
         
-        // Разделы форума (3 подраздела)
+        // Разделы форума
         html += '<div class="section-card">';
         html += '<div class="section-title"><i class="fas fa-layer-group"></i> Разделы форума</div>';
         html += '<div class="category-list">';
@@ -199,80 +224,34 @@
         });
         html += '</div></div>';
         
-        // Последние темы
-        html += '<div class="section-card">';
-        html += '<div class="section-title"><i class="fas fa-clock"></i> Последние темы</div>';
-        html += '<div class="topics-list">';
-        var allTopics = [];
-        for (var cat in forumData.topics) {
-            if (forumData.topics[cat] && forumData.topics[cat].length) {
-                forumData.topics[cat].forEach(function(topic) {
-                    allTopics.push({category: cat, topic: topic});
-                });
-            }
-        }
-        allTopics.reverse();
-        if (allTopics.length === 0) {
-            html += '<div class="empty-topics"><i class="fas fa-inbox"></i><p>Нет тем. Создайте первую!</p></div>';
-        } else {
-            allTopics.slice(0, 5).forEach(function(item) {
-                html += '<div class="topic-item" data-category="' + item.category + '" data-topic="' + item.topic.id + '" data-title="' + item.topic.title + '">';
-                html += '<div class="topic-title">' + item.topic.title + '</div>';
-                html += '<div class="topic-meta"><i class="fas fa-user"></i> ' + item.topic.author + ' · <i class="fas fa-clock"></i> ' + item.topic.date + ' · <i class="fas fa-reply"></i> ' + item.topic.replies + ' ответов</div>';
-                html += '</div>';
-            });
-        }
-        html += '</div><div style="padding: 16px 22px;"><button class="create-topic-btn" id="globalCreateBtn"><i class="fas fa-plus"></i> Создать тему</button></div>';
-        html += '</div></div>';
-        
-        // Правая колонка
-        html += '<div class="content-right">';
-        html += '<div class="stats-card"><div><i class="fas fa-chart-line"></i> <strong>Статистика</strong></div>';
-        var total = 0;
-        for (var c in forumData.topics) total += forumData.topics[c].length;
-        html += '<div style="margin-top: 16px;">Всего тем: ' + total + '<br>Разделов: ' + (forumData.forumSections.length + 2 + forumData.complaints.length) + '</div></div>';
+        html += '</div><div class="content-right">';
         html += '<div class="voice-card"><i class="fas fa-microphone-alt"></i> <strong>Голосовое объединение</strong><div style="margin-top: 10px; color:#8A94B0;">Подключитесь к Discord</div></div>';
         html += '</div>';
         
         container.innerHTML = html;
         
-        // Обработчики
         document.querySelectorAll('.category-item[data-category]').forEach(el => {
             el.addEventListener('click', () => showCategory(el.dataset.category));
         });
-        document.querySelectorAll('.topic-item').forEach(el => {
-            el.addEventListener('click', () => showThread(el.dataset.category, el.dataset.topic, el.dataset.title));
-        });
         document.querySelectorAll('.server-sub').forEach(el => {
-            el.addEventListener('click', (e) => {
-                e.stopPropagation();
-                showServerSub(el.dataset.sub);
-            });
+            el.addEventListener('click', (e) => { e.stopPropagation(); showServerSub(el.dataset.sub); });
         });
         document.getElementById('khimkiServerBtn')?.addEventListener('click', () => showServerPage());
-        document.getElementById('globalCreateBtn')?.addEventListener('click', () => openCreateModal(null));
     }
     
-    // Страница сервера Химки с двумя подразделами
     function showServerPage() {
         var container = document.getElementById('main-content');
         var html = '<div class="content-left" style="width:100%">';
         html += '<button class="back-btn" onclick="showMainPage()"><i class="fas fa-arrow-left"></i> Назад</button>';
-        html += '<div class="section-card">';
-        html += '<div class="section-title"><i class="fas fa-server"></i> Сервер №1 | Химки</div>';
-        html += '<div class="category-list">';
-        
+        html += '<div class="section-card"><div class="section-title"><i class="fas fa-server"></i> Сервер №1 | Химки</div><div class="category-list">';
         forumData.serverKhimkiSubs.forEach(function(sub) {
             var topicCount = forumData.topics[sub.id] ? forumData.topics[sub.id].length : 0;
             html += '<div class="category-item" data-sub="' + sub.id + '">';
             html += '<div class="cat-info"><h3><i class="' + sub.icon + '"></i> ' + sub.name + '</h3><p>' + sub.desc + '</p></div>';
-            html += '<div class="cat-stats"><i class="fas fa-file-alt"></i> Тем: ' + topicCount + '</div>';
-            html += '</div>';
+            html += '<div class="cat-stats"><i class="fas fa-file-alt"></i> Тем: ' + topicCount + '</div></div>';
         });
-        
         html += '</div></div></div>';
         container.innerHTML = html;
-        
         document.querySelectorAll('.category-item[data-sub]').forEach(el => {
             el.addEventListener('click', () => showServerSub(el.dataset.sub));
         });
@@ -280,49 +259,35 @@
     
     function showServerSub(subId) {
         var sub = forumData.serverKhimkiSubs.find(s => s.id == subId);
-        var topics = forumData.topics[subId] || [];
-        var container = document.getElementById('main-content');
-        var html = '<div class="content-left" style="width:100%">';
-        html += '<button class="back-btn" onclick="showServerPage()"><i class="fas fa-arrow-left"></i> Назад к серверу</button>';
-        html += '<div class="section-card"><div class="section-title"><i class="' + sub.icon + '"></i> ' + sub.name + '<span style="font-size:0.8rem; margin-left:12px;">Сервер Химки</span></div>';
-        html += '<div class="topics-list">';
-        if (topics.length === 0) {
-            html += '<div class="empty-topics"><i class="fas fa-inbox"></i><p>Нет тем в этом разделе</p></div>';
-        } else {
-            topics.forEach(topic => {
-                html += '<div class="topic-item" data-topic="' + topic.id + '" data-title="' + topic.title + '">';
-                html += '<div class="topic-title">' + topic.title + '</div><div class="topic-meta"><i class="fas fa-user"></i> ' + topic.author + ' · ' + topic.date + ' · ответов: ' + topic.replies + '</div></div>';
-            });
-        }
-        html += '</div><div style="padding:16px 22px;"><button class="create-topic-btn" data-cat="' + subId + '"><i class="fas fa-plus"></i> Создать тему</button></div></div></div>';
-        container.innerHTML = html;
-        document.querySelectorAll('.topic-item').forEach(el => {
-            el.addEventListener('click', () => showThread(subId, el.dataset.topic, el.dataset.title));
-        });
-        document.querySelector('.create-topic-btn')?.addEventListener('click', (e) => openCreateModal(e.target.dataset.cat));
+        renderTopicsList(subId, sub.name + ' - Сервер Химки', () => showServerPage());
     }
     
     function showCategory(categoryId) {
         var cat = forumData.forumSections.find(c => c.id == categoryId);
-        var topics = forumData.topics[categoryId] || [];
+        renderTopicsList(categoryId, cat.name, () => showMainPage());
+    }
+    
+    function showTechSupportPage() {
         var container = document.getElementById('main-content');
         var html = '<div class="content-left" style="width:100%">';
         html += '<button class="back-btn" onclick="showMainPage()"><i class="fas fa-arrow-left"></i> Назад</button>';
-        html += '<div class="section-card"><div class="section-title"><i class="' + cat.icon + '"></i> ' + cat.name + '</div><div class="topics-list">';
-        if (topics.length === 0) {
-            html += '<div class="empty-topics"><i class="fas fa-inbox"></i><p>Нет тем в этом разделе</p></div>';
-        } else {
-            topics.forEach(topic => {
-                html += '<div class="topic-item" data-topic="' + topic.id + '" data-title="' + topic.title + '">';
-                html += '<div class="topic-title">' + topic.title + '</div><div class="topic-meta"><i class="fas fa-user"></i> ' + topic.author + ' · ' + topic.date + ' · ответов: ' + topic.replies + '</div></div>';
-            });
-        }
-        html += '</div><div style="padding:16px 22px;"><button class="create-topic-btn" data-cat="' + categoryId + '"><i class="fas fa-plus"></i> Создать тему</button></div></div></div>';
-        container.innerHTML = html;
-        document.querySelectorAll('.topic-item').forEach(el => {
-            el.addEventListener('click', () => showThread(categoryId, el.dataset.topic, el.dataset.title));
+        html += '<div class="section-card"><div class="section-title"><i class="fas fa-headset"></i> Техническая поддержка</div><div class="category-list">';
+        forumData.techSupport.forEach(function(tech) {
+            var topicCount = forumData.topics[tech.id] ? forumData.topics[tech.id].length : 0;
+            html += '<div class="category-item" data-tech="' + tech.id + '">';
+            html += '<div class="cat-info"><h3><i class="' + tech.icon + '"></i> ' + tech.name + '</h3><p>' + tech.desc + '</p></div>';
+            html += '<div class="cat-stats"><i class="fas fa-file-alt"></i> Тем: ' + topicCount + '</div></div>';
         });
-        document.querySelector('.create-topic-btn')?.addEventListener('click', (e) => openCreateModal(e.target.dataset.cat));
+        html += '</div></div></div>';
+        container.innerHTML = html;
+        document.querySelectorAll('.category-item[data-tech]').forEach(el => {
+            el.addEventListener('click', () => showTechCategory(el.dataset.tech));
+        });
+    }
+    
+    function showTechCategory(techId) {
+        var tech = forumData.techSupport.find(t => t.id == techId);
+        renderTopicsList(techId, tech.name, () => showTechSupportPage());
     }
     
     function showComplaints() {
@@ -330,7 +295,7 @@
         var html = '<div class="content-left" style="width:100%">';
         html += '<button class="back-btn" onclick="showMainPage()"><i class="fas fa-arrow-left"></i> Назад</button>';
         html += '<div class="section-card"><div class="section-title"><i class="fas fa-file-alt"></i> Жалобы и заявления</div><div class="category-list">';
-        forumData.complaints.forEach(comp => {
+        forumData.complaints.forEach(function(comp) {
             var topicCount = forumData.topics[comp.id] ? forumData.topics[comp.id].length : 0;
             html += '<div class="category-item" data-complaint="' + comp.id + '">';
             html += '<div class="cat-info"><h3><i class="' + comp.icon + '"></i> ' + comp.name + '</h3><p>' + comp.desc + '</p></div>';
@@ -345,101 +310,127 @@
     
     function showComplaintCategory(compId) {
         var comp = forumData.complaints.find(c => c.id == compId);
-        var topics = forumData.topics[compId] || [];
+        renderTopicsList(compId, comp.name, () => showComplaints());
+    }
+    
+    function renderTopicsList(categoryId, title, backCallback) {
+        var topics = forumData.topics[categoryId] || [];
         var container = document.getElementById('main-content');
         var html = '<div class="content-left" style="width:100%">';
-        html += '<button class="back-btn" onclick="showComplaints()"><i class="fas fa-arrow-left"></i> Назад</button>';
-        html += '<div class="section-card"><div class="section-title"><i class="' + comp.icon + '"></i> ' + comp.name + '</div><div class="topics-list">';
+        html += '<button class="back-btn" onclick="(' + backCallback.toString() + ')()"><i class="fas fa-arrow-left"></i> Назад</button>';
+        html += '<div class="section-card"><div class="section-title"><i class="fas fa-folder-open"></i> ' + title + '</div><div class="topics-list">';
+        
         if (topics.length === 0) {
-            html += '<div class="empty-topics"><i class="fas fa-inbox"></i><p>Нет заявлений</p></div>';
+            html += '<div class="empty-topics"><i class="fas fa-inbox"></i><p>Нет тем в этом разделе</p></div>';
         } else {
-            topics.forEach(topic => {
+            topics.forEach(function(topic) {
                 html += '<div class="topic-item" data-topic="' + topic.id + '" data-title="' + topic.title + '">';
-                html += '<div class="topic-title">' + topic.title + '</div><div class="topic-meta">' + topic.author + ' · ' + topic.date + ' · ответов: ' + topic.replies + '</div></div>';
+                html += '<div style="flex:1"><div class="topic-title">' + topic.title + '</div>';
+                html += '<div class="topic-meta"><i class="fas fa-user"></i> ' + topic.author + ' · ' + topic.date + ' · ответов: ' + topic.replies + '</div></div>';
+                html += '<div class="topic-actions">';
+                html += '<i class="fas fa-edit" title="Редактировать" data-action="edit"></i>';
+                html += '<i class="fas fa-trash-alt" title="Удалить" data-action="delete"></i>';
+                html += '</div></div>';
             });
         }
-        html += '</div><div style="padding:16px 22px;"><button class="create-topic-btn" data-cat="' + compId + '"><i class="fas fa-plus"></i> Подать заявление</button></div></div></div>';
+        
+        html += '</div><div style="padding:16px 22px;"><button class="create-topic-btn" data-cat="' + categoryId + '"><i class="fas fa-plus"></i> Создать тему</button></div></div></div>';
         container.innerHTML = html;
+        
         document.querySelectorAll('.topic-item').forEach(el => {
-            el.addEventListener('click', () => showThread(compId, el.dataset.topic, el.dataset.title));
+            var topicId = el.dataset.topic;
+            var topicTitle = el.dataset.title;
+            el.querySelector('.topic-title')?.addEventListener('click', (e) => {
+                e.stopPropagation();
+                showThread(categoryId, topicId, topicTitle);
+            });
+            el.querySelector('[data-action="edit"]')?.addEventListener('click', (e) => {
+                e.stopPropagation();
+                editTopic(categoryId, topicId);
+            });
+            el.querySelector('[data-action="delete"]')?.addEventListener('click', (e) => {
+                e.stopPropagation();
+                deleteTopic(categoryId, topicId);
+            });
         });
         document.querySelector('.create-topic-btn')?.addEventListener('click', (e) => openCreateModal(e.target.dataset.cat));
     }
     
-    function showRulesPage() {
-        var container = document.getElementById('main-content');
-        container.innerHTML = '<div class="content-left" style="width:100%"><button class="back-btn" onclick="showMainPage()"><i class="fas fa-arrow-left"></i> Назад</button><div class="thread-view"><div class="thread-title"><i class="fas fa-gavel"></i> Общие правила проекта RSRP</div><div style="color:#C0C9E0; line-height:1.8;"><br><strong>1. Уважение к игрокам</strong><br>Запрещены оскорбления, дискриминация, токсичность.<br><br><strong>2. Игровой процесс</strong><br>Запрещен грифер, читы, эксплойты, дм без причины.<br><br><strong>3. Ролевая игра</strong><br>Соблюдение PVP/PVE правил, отыгрыш характера.<br><br><strong>4. Администрация</strong><br>Решения администрации обязательны к исполнению.<br><br><strong>5. Наказания</strong><br>От предупреждения до блокировки сервера.</div></div></div>';
-    }
-    
-    function showTechSupport() {
-        showCategory('rules_common');
-    }
-    
     function showThread(categoryId, threadId, threadTitle) {
-        var topic = null;
-        if (forumData.topics[categoryId]) topic = forumData.topics[categoryId].find(t => t.id == threadId);
+        var topic = forumData.topics[categoryId]?.find(t => t.id == threadId);
         var container = document.getElementById('main-content');
         var html = '<div class="content-left" style="width:100%">';
         html += '<button class="back-btn" onclick="location.reload()"><i class="fas fa-arrow-left"></i> Назад</button>';
         html += '<div class="thread-view">';
-        if (topic && topic.content) {
-            html += '<div style="background:#1A1E2A; padding:16px; border-radius:16px; margin-bottom:24px;">';
+        if (topic) {
             html += '<div class="thread-title">' + topic.title + '</div>';
-            html += '<div class="thread-meta"><i class="fas fa-user"></i> ' + topic.author + ' · ' + topic.date + '</div>';
-            html += '<div style="color:#C0C9E0;">' + topic.content.replace(/\n/g, '<br>') + '</div></div>';
+            html += '<div class="thread-meta">';
+            html += '<span><i class="fas fa-user"></i> ' + topic.author + ' · ' + topic.date + '</span>';
+            html += '<div class="topic-actions">';
+            html += '<i class="fas fa-edit" title="Редактировать" id="editThreadBtn" style="cursor:pointer;"></i>';
+            html += '<i class="fas fa-trash-alt" title="Удалить" id="deleteThreadBtn" style="cursor:pointer; margin-left:12px;"></i>';
+            html += '</div></div>';
+            html += '<div class="thread-content">' + topic.content.replace(/\n/g, '<br>') + '</div>';
         }
         html += '<div id="disqus_thread"></div></div></div>';
         container.innerHTML = html;
+        
+        if (topic) {
+            document.getElementById('editThreadBtn')?.addEventListener('click', () => editTopic(categoryId, threadId));
+            document.getElementById('deleteThreadBtn')?.addEventListener('click', () => deleteTopic(categoryId, threadId));
+        }
         loadDisqus(threadId, threadTitle);
     }
     
     function openCreateModal(categoryId) {
-        var modal = document.getElementById('createTopicModal');
-        var currentCategory = categoryId;
-        modal.style.display = 'flex';
-        document.getElementById('newTopicTitle').value = '';
-        document.getElementById('newTopicContent').value = '';
-        var submitBtn = document.getElementById('submitTopicBtn');
-        var newSubmit = submitBtn.cloneNode(true);
-        submitBtn.parentNode.replaceChild(newSubmit, submitBtn);
-        newSubmit.onclick = function() {
-            var title = document.getElementById('newTopicTitle').value.trim();
-            var content = document.getElementById('newTopicContent').value.trim();
-            if (!title || !content) { alert('Заполните все поля'); return; }
-            var targetCat = currentCategory;
-            if (!targetCat) targetCat = 'rules_common';
-            if (!forumData.topics[targetCat]) forumData.topics[targetCat] = [];
-            var newId = 'topic_' + Date.now();
-            var newTopic = { id: newId, title: title, author: 'Игрок', date: new Date().toLocaleDateString(), replies: 0, content: content };
-            forumData.topics[targetCat].push(newTopic);
-            saveTopicsToStorage();
-            modal.style.display = 'none';
-            showMainPage();
-        };
+        currentEditCategory = categoryId;
+        currentEditTopicId = null;
+        document.getElementById('modalTitle').innerText = 'Создать новую тему';
+        document.getElementById('topicTitle').value = '';
+        document.getElementById('topicContent').value = '';
+        document.getElementById('topicModal').style.display = 'flex';
     }
     
-    window.showMainPage = showMainPage;
-    window.showCategory = showCategory;
-    window.showThread = showThread;
-    window.showComplaints = showComplaints;
-    window.showComplaintCategory = showComplaintCategory;
-    window.showRulesPage = showRulesPage;
-    window.showTechSupport = showTechSupport;
-    window.showServerSub = showServerSub;
-    window.showServerPage = showServerPage;
-    window.openCreateModal = openCreateModal;
-    
-    document.querySelector('.close-modal').onclick = () => document.getElementById('createTopicModal').style.display = 'none';
-    window.onclick = (e) => { if (e.target == document.getElementById('createTopicModal')) document.getElementById('createTopicModal').style.display = 'none'; };
+    function closeModal() {
+        document.getElementById('topicModal').style.display = 'none';
+        currentEditCategory = null;
+        currentEditTopicId = null;
+    }
     
     // Навигация
     document.querySelectorAll('.forum-nav a').forEach(btn => {
         btn.addEventListener('click', () => {
             if (btn.dataset.page === 'main') showMainPage();
-            if (btn.dataset.page === 'rules_page') showRulesPage();
-            if (btn.dataset.page === 'support') showCategory('rules_common');
+            if (btn.dataset.page === 'support_tech') showTechSupportPage();
             if (btn.dataset.page === 'complaints') showComplaints();
         });
+    });
+    
+    // Модальное окно
+    document.querySelector('.close-modal')?.addEventListener('click', closeModal);
+    document.getElementById('cancelModalBtn')?.addEventListener('click', closeModal);
+    window.onclick = (e) => { if (e.target == document.getElementById('topicModal')) closeModal(); };
+    
+    document.getElementById('submitTopicBtn')?.addEventListener('click', function() {
+        var title = document.getElementById('topicTitle').value.trim();
+        var content = document.getElementById('topicContent').value.trim();
+        if (!title || !content) { alert('Заполните все поля'); return; }
+        if (!currentEditCategory) return;
+        
+        if (currentEditTopicId) {
+            var topic = forumData.topics[currentEditCategory].find(t => t.id == currentEditTopicId);
+            if (topic) {
+                topic.title = title;
+                topic.content = content;
+            }
+        } else {
+            var newId = 'topic_' + Date.now();
+            var newTopic = { id: newId, title: title, author: 'Игрок', date: new Date().toLocaleDateString(), replies: 0, content: content };
+            forumData.topics[currentEditCategory].push(newTopic);
+        }
+        saveTopicsToStorage();
+        closeModal();
+        showMainPage();
     });
     
     loadTopicsFromStorage();
