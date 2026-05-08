@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>RussiaSoulRP | RSRP — Официальный форум (Google Sheets БД)</title>
+    <title>RussiaSoulRP | RSRP — Официальный форум</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
@@ -43,7 +43,7 @@
         .thread-view { background: #13161F; border-radius: 20px; padding: 24px; margin-bottom: 28px; }
         .thread-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 16px; color: #FFD966; }
         .thread-meta { font-size: 0.8rem; color: #8A94B0; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid #232732; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
-        .thread-content { color: #C0C9E0; line-height: 1.6; margin-bottom: 24px; }
+        .thread-content { color: #C0C9E0; line-height: 1.6; margin-bottom: 24px; white-space: pre-wrap; }
         .back-btn { background: #1E232F; border: none; color: #FFD966; padding: 8px 16px; border-radius: 20px; cursor: pointer; margin-bottom: 20px; display: inline-block; }
         .back-btn:hover { background: #2A3040; }
         .create-topic-btn { background: #FFD96620; border: 1px solid #FFD966; color: #FFD966; padding: 10px 20px; border-radius: 30px; cursor: pointer; margin-top: 16px; font-weight: 600; display: inline-block; }
@@ -63,7 +63,6 @@
         .server-sub { background: #0C0F18; padding: 8px 16px; border-radius: 30px; font-size: 0.8rem; cursor: pointer; border: 1px solid #FFD96640; transition: 0.2s; }
         .server-sub:hover { background: #FFD96620; border-color: #FFD966; }
         .voice-card { background: #13161F; border-radius: 20px; padding: 18px; border: 1px solid #2C3040; margin-bottom: 28px; text-align: center; }
-        .loading { text-align: center; padding: 50px; color: #FFD966; }
         @media (max-width: 800px) { .forum-main { flex-direction: column; } }
     </style>
 </head>
@@ -84,13 +83,14 @@
         <a data-page="complaints"><i class="fas fa-file-alt"></i> Жалобы и заявления</a>
     </div>
     
-    <div id="main-content" class="forum-main"><div class="loading"><i class="fas fa-spinner fa-pulse"></i> Загрузка...</div></div>
+    <div id="main-content" class="forum-main"></div>
     
     <div class="forum-footer">
         RussiaSoul RP · Криминальная Москва 2026 · <span style="color:#FFD966;">Официальный форум RSRP</span>
     </div>
 </div>
 
+<!-- Модальное окно -->
 <div id="topicModal" class="modal">
     <div class="modal-content">
         <span class="close-modal">&times;</span>
@@ -103,16 +103,10 @@
 </div>
 
 <script>
-    // ⚠️ ВАЖНО: ЗАМЕНИТЕ ЭТИ ЗНАЧЕНИЯ НА ВАШИ!
-    // Ваш Google Sheet ID (из ссылки: docs.google.com/spreadsheets/d/ВАШ_ID_ТАБЛИЦЫ/edit)
-    const SPREADSHEET_ID = 'ВАШ_ID_ТАБЛИЦЫ';  // <--- СЮДА ВСТАВЬТЕ ID ВАШЕЙ ТАБЛИЦЫ
-    
-    // Имя листа (по умолчанию 'Лист1' или 'Sheet1')
-    const SHEET_NAME = 'Лист1';
-    
     var DISQUS_SHORTNAME = "rsrp-forum";
     var currentEditCategory = null;
     var currentEditTopicId = null;
+    var currentBackCallback = null;
     
     // Структура форума
     var forumSections = [
@@ -141,124 +135,74 @@
         { id: "leader_app", name: "Заявление на пост лидера", desc: "Подать заявку на лидерство", icon: "fas fa-chart-line" }
     ];
     
-    // Функция для загрузки данных из Google Sheets
-    async function loadTopicsFromSheet() {
-        try {
-            const url = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&sheet=${SHEET_NAME}`;
-            const response = await fetch(url);
-            const text = await response.text();
-            const jsonText = text.substring(47).slice(0, -2);
-            const data = JSON.parse(jsonText);
-            
-            const rows = data.table.rows;
-            const topics = {};
-            
-            // Инициализируем пустые массивы для всех категорий
-            const allCategories = [...forumSections, ...serverKhimkiSubs, ...techSupport, ...complaints];
-            allCategories.forEach(cat => { topics[cat.id] = []; });
-            
-            // Парсим строки (начиная с 1, так как строка 0 - заголовки)
-            for (let i = 1; i < rows.length; i++) {
-                const row = rows[i].c;
-                if (!row || !row[0] || !row[0].v) continue;
-                
-                const topic = {
-                    id: row[0]?.v || '',
-                    category: row[1]?.v || '',
-                    title: row[2]?.v || 'Без названия',
-                    author: row[3]?.v || 'Аноним',
-                    date: row[4]?.v || new Date().toLocaleDateString(),
-                    content: row[5]?.v || '',
-                    replies: row[6]?.v || 0
-                };
-                
-                if (topics[topic.category]) {
-                    topics[topic.category].push(topic);
-                }
-            }
-            
-            return topics;
-        } catch (error) {
-            console.error('Ошибка загрузки:', error);
-            return {};
-        }
-    }
+    // Хранилище тем
+    var forumTopics = {};
     
-    // Сохранение темы в Google Sheets (через Google Apps Script)
-    async function saveTopicToSheet(category, topicId, title, author, content, isEdit = false, oldTopicId = null) {
-        // Для работы записи нужен Google Apps Script (Web App)
-        // Временно показываем сообщение
-        alert('Для сохранения тем необходимо настроить Google Apps Script. Сейчас темы сохраняются только локально.\n\nИнструкцию я напишу ниже!');
-        
-        // Возвращаем заглушку
-        return false;
-    }
-    
-    // Временное локальное хранилище (пока не настроен Apps Script)
-    var localTopicsBackup = {};
-    
-    function loadLocalBackup() {
-        const saved = localStorage.getItem('rsrp_sheet_backup');
+    function loadTopics() {
+        var saved = localStorage.getItem("rsrp_forum_final");
         if (saved) {
-            localTopicsBackup = JSON.parse(saved);
-        }
-    }
-    
-    function saveLocalBackup() {
-        localStorage.setItem('rsrp_sheet_backup', JSON.stringify(localTopicsBackup));
-    }
-    
-    function getTopics() {
-        if (Object.keys(localTopicsBackup).length === 0) {
-            // Инициализация пустыми массивами
-            const allCategories = [...forumSections, ...serverKhimkiSubs, ...techSupport, ...complaints];
-            allCategories.forEach(cat => { localTopicsBackup[cat.id] = []; });
-        }
-        return localTopicsBackup;
-    }
-    
-    function saveTopic(categoryId, topicId, title, content, isEdit = false) {
-        let topics = getTopics();
-        if (!topics[categoryId]) topics[categoryId] = [];
-        
-        if (isEdit && topicId) {
-            const index = topics[categoryId].findIndex(t => t.id == topicId);
-            if (index !== -1) {
-                topics[categoryId][index].title = title;
-                topics[categoryId][index].content = content;
-            }
+            forumTopics = JSON.parse(saved);
         } else {
-            const newTopic = {
-                id: 'topic_' + Date.now(),
-                category: categoryId,
-                title: title,
-                author: 'Игрок',
-                date: new Date().toLocaleDateString(),
-                content: content,
-                replies: 0
-            };
-            topics[categoryId].push(newTopic);
+            // Инициализация всех категорий
+            var allCategories = [
+                ...forumSections.map(s => s.id),
+                ...serverKhimkiSubs.map(s => s.id),
+                ...techSupport.map(t => t.id),
+                ...complaints.map(c => c.id)
+            ];
+            allCategories.forEach(cat => { forumTopics[cat] = []; });
         }
-        saveLocalBackup();
-        return true;
     }
     
-    function deleteTopicFromStorage(categoryId, topicId) {
-        let topics = getTopics();
-        if (topics[categoryId]) {
-            const index = topics[categoryId].findIndex(t => t.id == topicId);
+    function saveTopics() {
+        localStorage.setItem("rsrp_forum_final", JSON.stringify(forumTopics));
+    }
+    
+    function getTopicsByCategory(categoryId) {
+        if (!forumTopics[categoryId]) forumTopics[categoryId] = [];
+        return forumTopics[categoryId];
+    }
+    
+    function addTopic(categoryId, title, content) {
+        if (!forumTopics[categoryId]) forumTopics[categoryId] = [];
+        var newTopic = {
+            id: 'topic_' + Date.now(),
+            title: title,
+            author: 'Игрок',
+            date: new Date().toLocaleDateString(),
+            content: content,
+            replies: 0
+        };
+        forumTopics[categoryId].push(newTopic);
+        saveTopics();
+        return newTopic;
+    }
+    
+    function updateTopic(categoryId, topicId, title, content) {
+        var topics = forumTopics[categoryId];
+        if (topics) {
+            var index = topics.findIndex(t => t.id == topicId);
             if (index !== -1) {
-                topics[categoryId].splice(index, 1);
-                saveLocalBackup();
+                topics[index].title = title;
+                topics[index].content = content;
+                saveTopics();
                 return true;
             }
         }
         return false;
     }
     
-    function getTopicsByCategory(categoryId) {
-        const topics = getTopics();
-        return topics[categoryId] || [];
+    function deleteTopic(categoryId, topicId) {
+        var topics = forumTopics[categoryId];
+        if (topics) {
+            var index = topics.findIndex(t => t.id == topicId);
+            if (index !== -1) {
+                topics.splice(index, 1);
+                saveTopics();
+                return true;
+            }
+        }
+        return false;
     }
     
     function loadDisqus(threadId, threadTitle) {
@@ -280,74 +224,83 @@
         }
     }
     
-    function renderTopicsList(categoryId, title, backCallback, categoryName) {
-        const topics = getTopicsByCategory(categoryId);
-        const container = document.getElementById('main-content');
-        let html = '<div class="content-left" style="width:100%">';
-        html += `<button class="back-btn" onclick="(${backCallback.toString()})()"><i class="fas fa-arrow-left"></i> Назад</button>`;
-        html += `<div class="section-card"><div class="section-title"><i class="fas fa-folder-open"></i> ${title}</div><div class="topics-list">`;
+    function renderTopicsList(categoryId, title, backCallback) {
+        var topics = getTopicsByCategory(categoryId);
+        var container = document.getElementById('main-content');
+        var html = '<div class="content-left" style="width:100%">';
+        html += '<button class="back-btn" onclick="(' + backCallback.toString() + ')()"><i class="fas fa-arrow-left"></i> Назад</button>';
+        html += '<div class="section-card"><div class="section-title"><i class="fas fa-folder-open"></i> ' + title + '</div><div class="topics-list">';
         
         if (topics.length === 0) {
             html += '<div class="empty-topics"><i class="fas fa-inbox"></i><p>Нет тем в этом разделе</p></div>';
         } else {
-            topics.forEach(topic => {
-                html += `<div class="topic-item" data-topic="${topic.id}" data-title="${topic.title}">`;
-                html += `<div style="flex:1"><div class="topic-title">${topic.title}</div>`;
-                html += `<div class="topic-meta"><i class="fas fa-user"></i> ${topic.author} · ${topic.date} · ответов: ${topic.replies}</div></div>`;
-                html += `<div class="topic-actions">`;
-                html += `<i class="fas fa-edit" title="Редактировать" data-action="edit"></i>`;
-                html += `<i class="fas fa-trash-alt" title="Удалить" data-action="delete"></i>`;
-                html += `</div></div>`;
-            });
+            for (var i = 0; i < topics.length; i++) {
+                var topic = topics[i];
+                html += '<div class="topic-item" data-topic="' + topic.id + '" data-title="' + topic.title.replace(/"/g, '&quot;') + '">';
+                html += '<div style="flex:1"><div class="topic-title">' + topic.title + '</div>';
+                html += '<div class="topic-meta"><i class="fas fa-user"></i> ' + topic.author + ' · ' + topic.date + ' · ответов: ' + topic.replies + '</div></div>';
+                html += '<div class="topic-actions">';
+                html += '<i class="fas fa-edit" title="Редактировать" data-action="edit"></i>';
+                html += '<i class="fas fa-trash-alt" title="Удалить" data-action="delete"></i>';
+                html += '</div></div>';
+            }
         }
         
-        html += `</div><div style="padding:16px 22px;"><button class="create-topic-btn" data-cat="${categoryId}"><i class="fas fa-plus"></i> Создать тему</button></div></div></div>`;
+        html += '</div><div style="padding:16px 22px;"><button class="create-topic-btn" data-cat="' + categoryId + '"><i class="fas fa-plus"></i> Создать тему</button></div></div></div>';
         container.innerHTML = html;
         
-        document.querySelectorAll('.topic-item').forEach(el => {
-            const topicId = el.dataset.topic;
-            const topicTitle = el.dataset.title;
-            el.querySelector('.topic-title')?.addEventListener('click', (e) => {
+        var self = this;
+        document.querySelectorAll('.topic-item').forEach(function(el) {
+            var topicId = el.dataset.topic;
+            var topicTitle = el.dataset.title;
+            el.querySelector('.topic-title')?.addEventListener('click', function(e) {
                 e.stopPropagation();
                 showThread(categoryId, topicId, topicTitle);
             });
-            el.querySelector('[data-action="edit"]')?.addEventListener('click', (e) => {
+            el.querySelector('[data-action="edit"]')?.addEventListener('click', function(e) {
                 e.stopPropagation();
-                editTopic(categoryId, topicId);
+                openEditModal(categoryId, topicId);
             });
-            el.querySelector('[data-action="delete"]')?.addEventListener('click', (e) => {
+            el.querySelector('[data-action="delete"]')?.addEventListener('click', function(e) {
                 e.stopPropagation();
                 if (confirm('Удалить тему?')) {
-                    deleteTopicFromStorage(categoryId, topicId);
-                    renderTopicsList(categoryId, title, backCallback, categoryName);
+                    deleteTopic(categoryId, topicId);
+                    renderTopicsList(categoryId, title, backCallback);
                 }
             });
         });
-        document.querySelector('.create-topic-btn')?.addEventListener('click', (e) => openCreateModal(e.target.dataset.cat, categoryName, backCallback));
+        document.querySelector('.create-topic-btn')?.addEventListener('click', function(e) {
+            openCreateModal(e.target.dataset.cat, backCallback);
+        });
     }
     
     function showThread(categoryId, threadId, threadTitle) {
-        const topics = getTopicsByCategory(categoryId);
-        const topic = topics.find(t => t.id == threadId);
-        const container = document.getElementById('main-content');
-        let html = '<div class="content-left" style="width:100%">';
+        var topics = getTopicsByCategory(categoryId);
+        var topic = null;
+        for (var i = 0; i < topics.length; i++) {
+            if (topics[i].id == threadId) { topic = topics[i]; break; }
+        }
+        var container = document.getElementById('main-content');
+        var html = '<div class="content-left" style="width:100%">';
         html += '<button class="back-btn" onclick="location.reload()"><i class="fas fa-arrow-left"></i> Назад</button>';
         html += '<div class="thread-view">';
         if (topic) {
-            html += `<div class="thread-title">${topic.title}</div>`;
-            html += `<div class="thread-meta"><span><i class="fas fa-user"></i> ${topic.author} · ${topic.date}</span>`;
-            html += `<div class="topic-actions"><i class="fas fa-edit" title="Редактировать" id="editThreadBtn" style="cursor:pointer;"></i>`;
-            html += `<i class="fas fa-trash-alt" title="Удалить" id="deleteThreadBtn" style="cursor:pointer; margin-left:12px;"></i></div></div>`;
-            html += `<div class="thread-content">${topic.content.replace(/\n/g, '<br>')}</div>`;
+            html += '<div class="thread-title">' + topic.title + '</div>';
+            html += '<div class="thread-meta"><span><i class="fas fa-user"></i> ' + topic.author + ' · ' + topic.date + '</span>';
+            html += '<div class="topic-actions"><i class="fas fa-edit" title="Редактировать" id="editThreadBtn" style="cursor:pointer;"></i>';
+            html += '<i class="fas fa-trash-alt" title="Удалить" id="deleteThreadBtn" style="cursor:pointer; margin-left:12px;"></i></div></div>';
+            html += '<div class="thread-content">' + (topic.content || '').replace(/\n/g, '<br>') + '</div>';
         }
         html += '<div id="disqus_thread"></div></div></div>';
         container.innerHTML = html;
         
         if (topic) {
-            document.getElementById('editThreadBtn')?.addEventListener('click', () => editTopic(categoryId, threadId));
-            document.getElementById('deleteThreadBtn')?.addEventListener('click', () => {
+            document.getElementById('editThreadBtn')?.addEventListener('click', function() {
+                openEditModal(categoryId, threadId);
+            });
+            document.getElementById('deleteThreadBtn')?.addEventListener('click', function() {
                 if (confirm('Удалить тему?')) {
-                    deleteTopicFromStorage(categoryId, threadId);
+                    deleteTopic(categoryId, threadId);
                     showMainPage();
                 }
             });
@@ -355,9 +308,22 @@
         loadDisqus(threadId, threadTitle);
     }
     
-    function editTopic(categoryId, topicId) {
-        const topics = getTopicsByCategory(categoryId);
-        const topic = topics.find(t => t.id == topicId);
+    function openCreateModal(categoryId, backCallback) {
+        currentEditCategory = categoryId;
+        currentEditTopicId = null;
+        currentBackCallback = backCallback;
+        document.getElementById('modalTitle').innerText = 'Создать новую тему';
+        document.getElementById('topicTitle').value = '';
+        document.getElementById('topicContent').value = '';
+        document.getElementById('topicModal').style.display = 'flex';
+    }
+    
+    function openEditModal(categoryId, topicId) {
+        var topics = getTopicsByCategory(categoryId);
+        var topic = null;
+        for (var i = 0; i < topics.length; i++) {
+            if (topics[i].id == topicId) { topic = topics[i]; break; }
+        }
         if (topic) {
             currentEditCategory = categoryId;
             currentEditTopicId = topicId;
@@ -368,26 +334,17 @@
         }
     }
     
-    function openCreateModal(categoryId, categoryName, backCallback) {
-        currentEditCategory = categoryId;
-        currentEditTopicId = null;
-        document.getElementById('modalTitle').innerText = 'Создать новую тему';
-        document.getElementById('topicTitle').value = '';
-        document.getElementById('topicContent').value = '';
-        document.getElementById('topicModal').style.display = 'flex';
-        window.currentBackCallback = backCallback;
-    }
-    
     function closeModal() {
         document.getElementById('topicModal').style.display = 'none';
         currentEditCategory = null;
         currentEditTopicId = null;
     }
     
+    // Главная страница
     function showMainPage() {
-        loadLocalBackup();
-        const container = document.getElementById('main-content');
-        let html = '<div class="content-left">';
+        loadTopics();
+        var container = document.getElementById('main-content');
+        var html = '<div class="content-left">';
         
         html += '<div class="section-card">';
         html += '<div class="section-title"><i class="fas fa-server"></i> Игровые сервера</div>';
@@ -403,12 +360,13 @@
         html += '<div class="section-card">';
         html += '<div class="section-title"><i class="fas fa-layer-group"></i> Разделы форума</div>';
         html += '<div class="category-list">';
-        forumSections.forEach(section => {
-            const topics = getTopicsByCategory(section.id);
-            html += `<div class="category-item" data-category="${section.id}">`;
-            html += `<div class="cat-info"><h3><i class="${section.icon}"></i> ${section.name}</h3><p>${section.desc}</p></div>`;
-            html += `<div class="cat-stats"><i class="fas fa-file-alt"></i> Тем: ${topics.length}</div></div>`;
-        });
+        for (var i = 0; i < forumSections.length; i++) {
+            var section = forumSections[i];
+            var topicCount = getTopicsByCategory(section.id).length;
+            html += '<div class="category-item" data-category="' + section.id + '">';
+            html += '<div class="cat-info"><h3><i class="' + section.icon + '"></i> ' + section.name + '</h3><p>' + section.desc + '</p></div>';
+            html += '<div class="cat-stats"><i class="fas fa-file-alt"></i> Тем: ' + topicCount + '</div></div>';
+        }
         html += '</div></div>';
         
         html += '</div><div class="content-right">';
@@ -417,53 +375,139 @@
         
         container.innerHTML = html;
         
-        document.querySelectorAll('.category-item[data-category]').forEach(el => {
-            el.addEventListener('click', () => showCategory(el.dataset.category));
+        document.querySelectorAll('.category-item[data-category]').forEach(function(el) {
+            el.addEventListener('click', function() { showCategory(el.dataset.category); });
         });
-        document.querySelectorAll('.server-sub').forEach(el => {
-            el.addEventListener('click', (e) => { e.stopPropagation(); showServerSub(el.dataset.sub); });
+        document.querySelectorAll('.server-sub').forEach(function(el) {
+            el.addEventListener('click', function(e) { e.stopPropagation(); showServerSub(el.dataset.sub); });
         });
-        document.getElementById('khimkiServerBtn')?.addEventListener('click', () => showServerPage());
+        document.getElementById('khimkiServerBtn')?.addEventListener('click', function() { showServerPage(); });
     }
     
     function showCategory(categoryId) {
-        const cat = forumSections.find(c => c.id == categoryId);
-        renderTopicsList(categoryId, cat.name, showMainPage, cat.name);
+        var cat = null;
+        for (var i = 0; i < forumSections.length; i++) {
+            if (forumSections[i].id == categoryId) { cat = forumSections[i]; break; }
+        }
+        if (cat) {
+            renderTopicsList(categoryId, cat.name, showMainPage);
+        }
     }
     
     function showServerPage() {
-        const container = document.getElementById('main-content');
-        let html = '<div class="content-left" style="width:100%">';
+        var container = document.getElementById('main-content');
+        var html = '<div class="content-left" style="width:100%">';
         html += '<button class="back-btn" onclick="showMainPage()"><i class="fas fa-arrow-left"></i> Назад</button>';
         html += '<div class="section-card"><div class="section-title"><i class="fas fa-server"></i> Сервер №1 | Химки</div><div class="category-list">';
-        serverKhimkiSubs.forEach(sub => {
-            const topics = getTopicsByCategory(sub.id);
-            html += `<div class="category-item" data-sub="${sub.id}">`;
-            html += `<div class="cat-info"><h3><i class="${sub.icon}"></i> ${sub.name}</h3><p>${sub.desc}</p></div>`;
-            html += `<div class="cat-stats"><i class="fas fa-file-alt"></i> Тем: ${topics.length}</div></div>`;
-        });
+        for (var i = 0; i < serverKhimkiSubs.length; i++) {
+            var sub = serverKhimkiSubs[i];
+            var topicCount = getTopicsByCategory(sub.id).length;
+            html += '<div class="category-item" data-sub="' + sub.id + '">';
+            html += '<div class="cat-info"><h3><i class="' + sub.icon + '"></i> ' + sub.name + '</h3><p>' + sub.desc + '</p></div>';
+            html += '<div class="cat-stats"><i class="fas fa-file-alt"></i> Тем: ' + topicCount + '</div></div>';
+        }
         html += '</div></div></div>';
         container.innerHTML = html;
-        document.querySelectorAll('.category-item[data-sub]').forEach(el => {
-            el.addEventListener('click', () => showServerSub(el.dataset.sub));
+        document.querySelectorAll('.category-item[data-sub]').forEach(function(el) {
+            el.addEventListener('click', function() { showServerSub(el.dataset.sub); });
         });
     }
     
     function showServerSub(subId) {
-        const sub = serverKhimkiSubs.find(s => s.id == subId);
-        renderTopicsList(subId, `${sub.name} - Сервер Химки`, showServerPage, sub.name);
+        var sub = null;
+        for (var i = 0; i < serverKhimkiSubs.length; i++) {
+            if (serverKhimkiSubs[i].id == subId) { sub = serverKhimkiSubs[i]; break; }
+        }
+        if (sub) {
+            renderTopicsList(subId, sub.name + ' - Сервер Химки', showServerPage);
+        }
     }
     
     function showTechSupportPage() {
-        const container = document.getElementById('main-content');
-        let html = '<div class="content-left" style="width:100%">';
+        var container = document.getElementById('main-content');
+        var html = '<div class="content-left" style="width:100%">';
         html += '<button class="back-btn" onclick="showMainPage()"><i class="fas fa-arrow-left"></i> Назад</button>';
         html += '<div class="section-card"><div class="section-title"><i class="fas fa-headset"></i> Техническая поддержка</div><div class="category-list">';
-        techSupport.forEach(tech => {
-            const topics = getTopicsByCategory(tech.id);
-            html += `<div class="category-item" data-tech="${tech.id}">`;
-            html += `<div class="cat-info"><h3><i class="${tech.icon}"></i> ${tech.name}</h3><p>${tech.desc}</p></div>`;
-            html += `<div class="cat-stats"><i class="fas fa-file-alt"></i> Тем: ${topics.length}</div></div>`;
-        });
+        for (var i = 0; i < techSupport.length; i++) {
+            var tech = techSupport[i];
+            var topicCount = getTopicsByCategory(tech.id).length;
+            html += '<div class="category-item" data-tech="' + tech.id + '">';
+            html += '<div class="cat-info"><h3><i class="' + tech.icon + '"></i> ' + tech.name + '</h3><p>' + tech.desc + '</p></div>';
+            html += '<div class="cat-stats"><i class="fas fa-file-alt"></i> Тем: ' + topicCount + '</div></div>';
+        }
         html += '</div></div></div>';
         container.innerHTML = html;
+        document.querySelectorAll('.category-item[data-tech]').forEach(function(el) {
+            el.addEventListener('click', function() { showTechCategory(el.dataset.tech); });
+        });
+    }
+    
+    function showTechCategory(techId) {
+        var tech = null;
+        for (var i = 0; i < techSupport.length; i++) {
+            if (techSupport[i].id == techId) { tech = techSupport[i]; break; }
+        }
+        if (tech) {
+            renderTopicsList(techId, tech.name, showTechSupportPage);
+        }
+    }
+    
+    function showComplaints() {
+        var container = document.getElementById('main-content');
+        var html = '<div class="content-left" style="width:100%">';
+        html += '<button class="back-btn" onclick="showMainPage()"><i class="fas fa-arrow-left"></i> Назад</button>';
+        html += '<div class="section-card"><div class="section-title"><i class="fas fa-file-alt"></i> Жалобы и заявления</div><div class="category-list">';
+        for (var i = 0; i < complaints.length; i++) {
+            var comp = complaints[i];
+            var topicCount = getTopicsByCategory(comp.id).length;
+            html += '<div class="category-item" data-complaint="' + comp.id + '">';
+            html += '<div class="cat-info"><h3><i class="' + comp.icon + '"></i> ' + comp.name + '</h3><p>' + comp.desc + '</p></div>';
+            html += '<div class="cat-stats"><i class="fas fa-file-alt"></i> Тем: ' + topicCount + '</div></div>';
+        }
+        html += '</div></div></div>';
+        container.innerHTML = html;
+        document.querySelectorAll('.category-item[data-complaint]').forEach(function(el) {
+            el.addEventListener('click', function() { showComplaintCategory(el.dataset.complaint); });
+        });
+    }
+    
+    function showComplaintCategory(compId) {
+        var comp = null;
+        for (var i = 0; i < complaints.length; i++) {
+            if (complaints[i].id == compId) { comp = complaints[i]; break; }
+        }
+        if (comp) {
+            renderTopicsList(compId, comp.name, showComplaints);
+        }
+    }
+    
+    // Навигация
+    document.querySelectorAll('.forum-nav a').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            if (btn.dataset.page === 'main') showMainPage();
+            if (btn.dataset.page === 'support_tech') showTechSupportPage();
+            if (btn.dataset.page === 'complaints') showComplaints();
+        });
+    });
+    
+    // Модальное окно
+    document.querySelector('.close-modal')?.addEventListener('click', closeModal);
+    document.getElementById('cancelModalBtn')?.addEventListener('click', closeModal);
+    window.onclick = function(e) { if (e.target == document.getElementById('topicModal')) closeModal(); };
+    
+    document.getElementById('submitTopicBtn')?.addEventListener('click', function() {
+        var title = document.getElementById('topicTitle').value.trim();
+        var content = document.getElementById('topicContent').value.trim();
+        if (!title || !content) { alert('Заполните все поля'); return; }
+        if (!currentEditCategory) return;
+        
+        if (currentEditTopicId) {
+            updateTopic(currentEditCategory, currentEditTopicId, title, content);
+        } else {
+            addTopic(currentEditCategory, title, content);
+        }
+        closeModal();
+        if (currentBackCallback) {
+            currentBackCallback();
+        } else {
+            showMain
