@@ -6,7 +6,6 @@
   <title>RussiaSoulRP | RSRP — Форум</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { background: #0B0C10; font-family: 'Inter', sans-serif; color: #E0E4F0; padding: 24px 20px; }
@@ -15,75 +14,58 @@
     .header-top { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 20px; }
     .logo-area h1 { font-size: 2.2rem; font-weight: 800; background: linear-gradient(135deg, #FFD966, #FFB347); -webkit-background-clip: text; background-clip: text; color: transparent; }
     .logo-area p { font-size: 0.85rem; color: #9AA4BF; margin-top: 6px; }
-
     .header-actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; justify-content: flex-end; }
     .badge-rp { background: #1E1F2C; padding: 6px 16px; border-radius: 60px; font-size: 0.8rem; font-weight: 700; color: #FFD966; border: 1px solid rgba(255,215,0,0.3); display: inline-flex; align-items: center; gap: 8px; }
     .chip-btn { background: rgba(255,217,102,0.12); border: 1px solid rgba(255,217,102,0.55); color: #FFD966; padding: 8px 12px; border-radius: 999px; cursor: pointer; font-weight: 700; font-size: 0.82rem; display: inline-flex; align-items: center; gap: 8px; transition: 0.12s; }
     .chip-btn:hover { background: rgba(255,217,102,0.18); transform: translateY(-1px); }
     .chip-btn:active { transform: translateY(0); }
-
     .mini-profile { display: inline-flex; align-items: center; gap: 10px; padding: 6px 10px; border-radius: 999px; background: rgba(12,15,24,0.35); border: 1px solid rgba(35,39,50,0.9); }
     .mini-avatar { width: 28px; height: 28px; border-radius: 999px; background: #1E232F; border: 1px solid rgba(255,217,102,0.25); object-fit: cover; }
     .mini-name { font-weight: 800; font-size: 0.85rem; color: #E0E4F0; max-width: 240px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .mini-rank { font-size: 0.72rem; font-weight: 800; padding: 3px 10px; border-radius: 999px; background: rgba(255,217,102,0.12); border: 1px solid rgba(255,217,102,0.3); color: #FFD966; }
-
     .forum-nav { padding: 16px 32px; background: #0C0E14; display: flex; flex-wrap: wrap; gap: 28px; border-bottom: 1px solid #20232E; }
     .forum-nav a { color: #C0C9E0; text-decoration: none; font-weight: 700; transition: 0.2s; display: inline-flex; align-items: center; gap: 8px; cursor: pointer; }
     .forum-nav a i { color: #FFD966; }
     .forum-nav a:hover { color: #FFD966; }
-
     .forum-main { display: flex; flex-wrap: wrap; padding: 28px 32px; gap: 32px; }
     .content-left { flex: 2.2; min-width: 260px; }
     .content-right { flex: 1.2; min-width: 260px; }
-
     .section-card { background: #13161F; border-radius: 20px; margin-bottom: 28px; border: 1px solid #232732; overflow: hidden; }
     .section-title { background: #1A1E2A; padding: 14px 22px; font-weight: 800; font-size: 1.2rem; border-left: 4px solid #FFD700; display: flex; align-items: center; gap: 10px; justify-content: space-between; flex-wrap: wrap; }
     .section-title i { color: #FFD966; }
     .add-section-btn { background: #FFD96620; border: 1px solid #FFD966; color: #FFD966; padding: 6px 12px; border-radius: 20px; font-size: 0.72rem; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; font-weight: 800; }
     .add-section-btn:hover { background: #FFD9662F; }
-
     .category-item { display: flex; justify-content: space-between; align-items: center; padding: 14px 22px; border-bottom: 1px solid #20232F; flex-wrap: wrap; gap: 10px; cursor: pointer; transition: 0.1s; }
     .category-item:hover { background: #191E2B; }
     .cat-info h3 { font-size: 1rem; font-weight: 800; margin-bottom: 4px; }
     .cat-info p { font-size: 0.75rem; color: #8A94B0; font-weight: 600; }
     .cat-stats { font-size: 0.75rem; background: #0C0F18; padding: 4px 12px; border-radius: 40px; font-weight: 800; }
     .cat-actions { display: flex; gap: 8px; }
-
     .topics-list { padding: 0 22px; }
     .topic-item { padding: 12px 0; border-bottom: 1px solid #20232F; cursor: pointer; transition: 0.1s; display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
     .topic-item:hover { background: #191E2B; margin: 0 -22px; padding: 12px 22px; }
     .topic-title { font-weight: 900; margin-bottom: 4px; color: #FFD966; }
     .topic-meta { font-size: 0.7rem; color: #8A94B0; font-weight: 700; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
     .meta-avatar { width: 18px; height: 18px; border-radius: 999px; object-fit: cover; border: 1px solid rgba(255,217,102,0.25); background: #1E232F; }
-    .meta-rank {
-      font-size: 0.68rem; font-weight: 900; padding: 2px 8px; border-radius: 999px;
-      border: 1px solid rgba(255,217,102,0.25); background: rgba(255,217,102,0.10); color: #FFD966;
-    }
-
+    .meta-rank { font-size: 0.68rem; font-weight: 900; padding: 2px 8px; border-radius: 999px; border: 1px solid rgba(255,217,102,0.25); background: rgba(255,217,102,0.10); color: #FFD966; }
     .topic-actions { display: flex; align-items: center; gap: 10px; padding: 6px; border-radius: 14px; background: rgba(12,15,24,0.35); border: 1px solid rgba(35,39,50,0.8); }
     .topic-actions:hover { border-color: rgba(255,217,102,0.35); background: rgba(25,30,43,0.55); }
-
     .icon-btn { width: 38px; height: 34px; border-radius: 12px; border: 1px solid rgba(35,39,50,0.9); background: #0C0F18; color: #8A94B0; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; transition: 0.12s; user-select: none; }
     .icon-btn:hover { color: #FFD966; border-color: rgba(255,217,102,0.55); transform: translateY(-1px); }
     .icon-btn:active { transform: translateY(0); }
     .icon-btn.danger:hover { color: #ff8f8f; border-color: rgba(255,143,143,0.7); }
-
     .empty-topics { padding: 28px 22px; text-align: center; color: #8A94B0; font-weight: 700; }
     .forum-footer { background: #090B10; padding: 20px 32px; border-top: 1px solid #20232E; font-size: 0.75rem; text-align: center; color: #6F7A98; font-weight: 700; }
-
     .thread-view { background: #13161F; border-radius: 20px; padding: 24px; margin-bottom: 28px; border: 1px solid #232732; }
     .thread-title { font-size: 1.5rem; font-weight: 900; margin-bottom: 10px; color: #FFD966; }
     .thread-meta { font-size: 0.8rem; color: #8A94B0; margin-bottom: 18px; padding-bottom: 14px; border-bottom: 1px solid #232732; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; font-weight: 800; }
     .thread-author { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
     .thread-author img { width: 28px; height: 28px; border-radius: 999px; object-fit: cover; border: 1px solid rgba(255,217,102,0.25); background: #1E232F; }
     .thread-content { color: #C0C9E0; line-height: 1.6; margin-bottom: 18px; white-space: pre-wrap; font-weight: 600; }
-
     .back-btn { background: #1E232F; border: none; color: #FFD966; padding: 8px 16px; border-radius: 20px; cursor: pointer; margin-bottom: 20px; display: inline-block; font-weight: 900; }
     .back-btn:hover { background: #242a39; }
-
     .create-topic-btn { background: #FFD96620; border: 1px solid #FFD966; color: #FFD966; padding: 10px 16px; border-radius: 30px; cursor: pointer; margin-top: 16px; font-weight: 900; display: inline-flex; align-items: center; gap: 10px; }
     .create-topic-btn:hover { background: #FFD9662B; }
-
     .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); justify-content: center; align-items: center; z-index: 1000; padding: 18px; }
     .modal-content { background: #13161F; padding: 28px; border-radius: 24px; width: 100%; max-width: 560px; border: 1px solid rgba(255,217,102,0.65); }
     .modal-content h3 { font-weight: 900; }
@@ -91,13 +73,11 @@
     .modal-content button { background: #FFD966; color: #0B0C10; border: none; padding: 10px 20px; border-radius: 30px; cursor: pointer; font-weight: 900; margin-top: 10px; margin-right: 10px; }
     .modal-content button.cancel { background: #3A3F55; color: white; }
     .close-modal { float: right; font-size: 28px; cursor: pointer; color: #FFD966; }
-
     .server-card { background: linear-gradient(135deg, #1A1E2A, #13161F); border-radius: 16px; padding: 20px; margin: 16px 20px; border: 1px solid #FFD96640; cursor: pointer; transition: 0.2s; }
     .server-card:hover { border-color: #FFD966; background: #1E2436; }
     .server-name { font-size: 1.3rem; font-weight: 900; color: #FFD966; margin-bottom: 8px; }
     .server-status { font-size: 0.75rem; color: #4CAF50; margin-bottom: 12px; font-weight: 900; }
     .voice-card { background: #13161F; border-radius: 20px; padding: 18px; border: 1px solid #2C3040; margin-bottom: 28px; text-align: center; font-weight: 800; }
-
     .comments-wrap { margin-top: 18px; border-top: 1px solid #232732; padding-top: 16px; }
     .comments-title { font-weight: 900; color: #E0E4F0; display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
     .comment { display: flex; gap: 12px; padding: 12px; border-radius: 16px; border: 1px solid rgba(35,39,50,0.9); background: rgba(12,15,24,0.35); margin-bottom: 10px; }
@@ -108,20 +88,13 @@
     .comment-date { color: #8A94B0; font-size: 0.72rem; font-weight: 900; }
     .comment-text { margin-top: 6px; color: #C0C9E0; font-weight: 650; white-space: pre-wrap; }
     .comment-actions { display:flex; gap:8px; }
-
     .comment-form { margin-top: 12px; border: 1px solid rgba(35,39,50,0.9); border-radius: 16px; background: rgba(12,15,24,0.25); padding: 12px; }
     .comment-form textarea { width: 100%; min-height: 88px; resize: vertical; padding: 10px; background: #1E232F; border: 1px solid #232732; border-radius: 12px; color: white; font-family: 'Inter', sans-serif; font-weight: 700; outline: none; }
     .comment-form .row { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
     .comment-form .hint { color: #8A94B0; font-size: 0.78rem; font-weight: 800; }
-
-    @media (max-width: 800px) {
-      .forum-main { flex-direction: column; }
-      .topic-actions { width: 100%; justify-content: flex-end; }
-      .mini-name { max-width: 160px; }
-    }
+    @media (max-width: 800px) { .forum-main { flex-direction: column; } .topic-actions { width: 100%; justify-content: flex-end; } .mini-name { max-width: 160px; } }
   </style>
 </head>
-
 <body>
 <div class="forum-container">
   <div class="forum-header">
@@ -139,7 +112,7 @@
         </div>
 
         <button class="chip-btn" onclick="openProfile()"><i class="fas fa-user"></i> Профиль</button>
-        <button class="chip-btn" onclick="openRanks()"><i class="fas fa-award"></i> Ранги</button>
+        <button id="ranksBtn" class="chip-btn" onclick="openRanks()" style="display:none;"><i class="fas fa-award"></i> Ранги</button>
         <div class="badge-rp"><i class="fas fa-shield-alt"></i> Официальный форум</div>
       </div>
     </div>
@@ -152,11 +125,9 @@
   </div>
 
   <div id="main-content" class="forum-main"></div>
-
   <div class="forum-footer">RussiaSoul RP · Криминальная Москва 2026 · <span style="color:#FFD966;">Официальный форум RSRP</span></div>
 </div>
 
-<!-- Topic modal -->
 <div id="topicModal" class="modal">
   <div class="modal-content">
     <span class="close-modal" onclick="closeModal()">&times;</span>
@@ -168,7 +139,6 @@
   </div>
 </div>
 
-<!-- Section modal (custom only, still local) -->
 <div id="sectionModal" class="modal">
   <div class="modal-content">
     <span class="close-modal" onclick="closeModal()">&times;</span>
@@ -180,7 +150,6 @@
   </div>
 </div>
 
-<!-- Profile modal -->
 <div id="profileModal" class="modal">
   <div class="modal-content">
     <span class="close-modal" onclick="closeModal()">&times;</span>
@@ -193,27 +162,22 @@
   </div>
 </div>
 
-<!-- Ranks modal -->
 <div id="ranksModal" class="modal">
   <div class="modal-content">
     <span class="close-modal" onclick="closeModal()">&times;</span>
     <h3 style="color:#FFD966;">Ранги (управление)</h3>
-
     <div style="color:#8A94B0; font-weight:800; font-size:0.85rem; margin-top:6px;">
-      Ранги хранятся в Google Sheets. Здесь можно добавлять/редактировать/удалять.
+      Только Руководитель проекта может менять ранги.
     </div>
-
     <input type="text" id="rankName" placeholder="Название ранга (например: Администратор)">
     <input type="text" id="rankColor" placeholder="Цвет (hex, например: #FFD966)">
     <button id="addRankBtn">Добавить ранг</button>
     <button class="cancel" onclick="closeModal()">Закрыть</button>
-
     <div id="ranksList" style="margin-top:14px;"></div>
   </div>
 </div>
 
 <script>
-  // ====== Apps Script (JSONP) ======
   const API_URL = "https://script.google.com/macros/s/AKfycbxvrqybl3Oc7DJB3lw4E9EYfp0pt0Obv_fz7FtBhH3PP83xA8qO-xmezyuHFz_vEbVu3g/exec";
   const API_KEY = "rsrp_12345";
 
@@ -238,7 +202,6 @@
       params.set("action", action);
       params.set("key", API_KEY);
       params.set("callback", cbName);
-
       Object.keys(payload).forEach(k => {
         if (payload[k] !== undefined && payload[k] !== null) params.set(k, String(payload[k]));
       });
@@ -249,31 +212,44 @@
         script.remove();
         reject(new Error("jsonp_load_failed"));
       };
-
       document.head.appendChild(script);
     });
   }
 
-  // ====== local identity ======
   const USER_ID = (localStorage.getItem("rsrp_user_id") || ("u_" + Date.now() + "_" + Math.random().toString(16).slice(2)));
   localStorage.setItem("rsrp_user_id", USER_ID);
 
-  // ====== local cache (profile/ranks/profiles-map) ======
-  const CACHE_KEY = "rsrp_cache_v3";
+  // RULES (from you)
+  const LEADER_ID = "u_1778319751780_7f581c595e1c7";
+  const LEADER_RANK_ID = "r_1778321320732";
+  function isLeader(){ return String(USER_ID) === String(LEADER_ID); }
+
+  const OPEN_TOPIC_CATEGORIES = new Set([
+    "tech_help","tech_bugs","tech_support",
+    "complaint_admin","complaint_players","complaint_leaders",
+    "amnesty","moderator_app","leader_app"
+  ]);
+  function canCreateTopicIn(cat){ return isLeader() || OPEN_TOPIC_CATEGORIES.has(String(cat)); }
+
+  function visibleRankId(rankId){
+    if (!isLeader() && String(rankId) === String(LEADER_RANK_ID)) return "rank_none";
+    return rankId;
+  }
+
+  const CACHE_KEY = "rsrp_cache_rules_v1";
   const DEFAULT_AVATAR = "https://i.imgur.com/1Xq9BiO.png";
 
   function defaultCache(){
     return {
       profile: { id: USER_ID, nick: "Игрок", avatar: DEFAULT_AVATAR, rankId: "rank_none" },
       ranks: [{ id: "rank_none", name: "Без ранга", color: "#FFD966" }],
-      profilesById: {} // userId -> {userId,nick,avatar,rankId}
+      profilesById: {}
     };
   }
   let cache = defaultCache();
   function cacheLoad(){ try{ cache = JSON.parse(localStorage.getItem(CACHE_KEY) || "null") || defaultCache(); }catch(e){ cache = defaultCache(); } }
   function cacheSave(){ localStorage.setItem(CACHE_KEY, JSON.stringify(cache)); }
 
-  // ====== categories ======
   const forumSections = [
     { id: "rules_common", name: "Общие правила проекта", desc: "Основные правила поведения", icon: "fas fa-gavel" },
     { id: "rules_criminal", name: "Общие правила криминальных организаций", desc: "Правила для банд и мафии", icon: "fas fa-skull" },
@@ -297,12 +273,10 @@
     { id: "leader_app", name: "Заявление на пост лидера", desc: "Заявка на лидерство", icon: "fas fa-chart-line" }
   ];
 
-  // custom subs still local (быстро/просто)
   let customSubs = JSON.parse(localStorage.getItem("rsrp_custom_subs") || "[]");
   function saveCustomSubs(){ localStorage.setItem("rsrp_custom_subs", JSON.stringify(customSubs)); }
   function getAllSubs(){ return baseSubs.concat(customSubs); }
 
-  // ====== state ======
   let currentCategory = null;
   let currentTopicId = null;
 
@@ -320,7 +294,6 @@
     return showMain();
   }
 
-  // ====== helpers ======
   function esc(s){ return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
   function safeForAttr(s){ return String(s||"").replace(/'/g,"\\'"); }
 
@@ -330,18 +303,13 @@
 
   function profileFor(userId){
     const p = (cache.profilesById && cache.profilesById[userId]) ? cache.profilesById[userId] : null;
-    if (!p) return { userId, nick: "Неизвестно", avatar: DEFAULT_AVATAR, rankId: "rank_none" };
-    return {
-      userId: p.userId || userId,
-      nick: p.nick || "Игрок",
-      avatar: p.avatar || DEFAULT_AVATAR,
-      rankId: p.rankId || "rank_none"
-    };
+    if (!p) return { userId, nick: "Игрок", avatar: DEFAULT_AVATAR, rankId: "rank_none" };
+    return { userId: p.userId || userId, nick: p.nick || "Игрок", avatar: p.avatar || DEFAULT_AVATAR, rankId: p.rankId || "rank_none" };
   }
 
   function refreshMiniProfile(){
     const p = cache.profile || {};
-    const r = getRank(p.rankId);
+    const r = getRank(visibleRankId(p.rankId));
     document.getElementById("miniAvatar").src = p.avatar || DEFAULT_AVATAR;
     document.getElementById("miniName").innerText = p.nick || "Игрок";
     const el = document.getElementById("miniRank");
@@ -361,7 +329,6 @@
     });
   }
 
-  // ====== API wrappers ======
   async function loadRanks(){
     const r = await api("listRanks");
     cache.ranks = (r.ranks||[]).map(x => ({ id:x.rankId, name:x.name, color:x.color }));
@@ -384,14 +351,9 @@
         rankId: String(p.rankId || "rank_none")
       };
     });
-
-    // если профиля нет в таблице — создадим “заглушку” (потом пользователь сам сохранит)
     missing.forEach(id => {
-      if (!cache.profilesById[id]) {
-        cache.profilesById[id] = { userId: id, nick: "Игрок", avatar: DEFAULT_AVATAR, rankId: "rank_none" };
-      }
+      if (!cache.profilesById[id]) cache.profilesById[id] = { userId: id, nick: "Игрок", avatar: DEFAULT_AVATAR, rankId: "rank_none" };
     });
-
     cacheSave();
   }
 
@@ -411,70 +373,46 @@
   async function getTopic(topicId){
     const r = await api("getTopic", { topicId });
     const t = r.topic;
-    return {
-      id: t.topicId,
-      categoryId: t.categoryId,
-      title: t.title,
-      content: t.content,
-      authorId: t.authorId || "",
-      createdAt: t.createdAt,
-      updatedAt: t.updatedAt
-    };
+    return { id: t.topicId, categoryId: t.categoryId, title: t.title, content: t.content, authorId: t.authorId || "", createdAt: t.createdAt, updatedAt: t.updatedAt };
   }
 
   async function createTopic(categoryId, title, content){
-    const r = await api("createTopic", { categoryId, title, content, authorId: USER_ID });
-    return r.topic;
+    return (await api("createTopic", { categoryId, title, content, authorId: USER_ID })).topic;
   }
-
   async function updateTopic(topicId, title, content){
     await api("updateTopic", { topicId, title, content, actorId: USER_ID });
   }
-
   async function deleteTopic(topicId){
     await api("deleteTopic", { topicId, actorId: USER_ID });
   }
 
   async function listComments(topicId){
     const r = await api("listComments", { topicId });
-    return (r.comments || []).map(c => ({
-      id: c.commentId,
-      topicId: c.topicId,
-      authorId: c.authorId || "",
-      text: c.text || "",
-      createdAt: c.createdAt
-    }));
+    return (r.comments || []).map(c => ({ id: c.commentId, topicId: c.topicId, authorId: c.authorId || "", text: c.text || "", createdAt: c.createdAt }));
   }
-
   async function createComment(topicId, text){
-    const r = await api("createComment", { topicId, authorId: USER_ID, text });
-    return r.comment;
+    await api("createComment", { topicId, authorId: USER_ID, text });
   }
-
   async function updateComment(commentId, text){
     await api("updateComment", { commentId, text, actorId: USER_ID });
   }
-
   async function deleteComment(commentId){
     await api("deleteComment", { commentId, actorId: USER_ID });
   }
 
   async function createRank(name, color){
-    await api("createRank", { name, color });
+    await api("createRank", { name, color, actorId: USER_ID });
     await loadRanks();
   }
-
   async function updateRank(rankId, name, color){
-    await api("updateRank", { rankId, name, color });
+    await api("updateRank", { rankId, name, color, actorId: USER_ID });
     await loadRanks();
   }
-
   async function deleteRank(rankId){
-    await api("deleteRank", { rankId });
+    await api("deleteRank", { rankId, actorId: USER_ID });
     await loadRanks();
   }
 
-  // ====== modals ======
   function closeModal(){
     document.getElementById("topicModal").style.display = "none";
     document.getElementById("sectionModal").style.display = "none";
@@ -503,7 +441,6 @@
       box.innerHTML = "<div style='color:#8A94B0;font-weight:800;margin-top:10px;'>Рангов пока нет.</div>";
       return;
     }
-
     box.innerHTML = ranks.map(r => `
       <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px;border:1px solid rgba(35,39,50,0.9);border-radius:16px;background:rgba(12,15,24,0.25);margin-top:10px;">
         <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
@@ -526,7 +463,6 @@
     if (name === null) return;
     const color = prompt("Цвет (hex), например #FFD966:", r.color || "#FFD966");
     if (color === null) return;
-
     try {
       await updateRank(rankId, String(name).trim(), String(color).trim());
       renderRanksList();
@@ -534,7 +470,7 @@
       refreshMiniProfile();
     } catch (e) {
       console.error(e);
-      alert("Ошибка редактирования ранга");
+      alert("Нет прав (только Руководитель проекта)");
     }
   }
 
@@ -542,7 +478,6 @@
     if(!confirm("Удалить ранг?")) return;
     try {
       await deleteRank(rankId);
-      // если текущий профиль стоял на этом ранге — сбросим
       if (cache.profile.rankId === rankId) cache.profile.rankId = "rank_none";
       cacheSave();
       renderRanksList();
@@ -550,11 +485,10 @@
       refreshMiniProfile();
     } catch (e) {
       console.error(e);
-      alert("Ошибка удаления ранга");
+      alert("Нет прав (только Руководитель проекта)");
     }
   }
 
-  // ====== pages ======
   function showMain(){
     setBack(showMain);
     currentView = { type:"main" };
@@ -568,7 +502,6 @@
             '<div class="server-status"><i class="fas fa-circle" style="color:#4CAF50; font-size:0.6rem;"></i> Онлайн</div>' +
           '</div>' +
         '</div>' +
-
         '<div class="section-card">' +
           '<div class="section-title"><i class="fas fa-layer-group"></i> Разделы форума</div>' +
           '<div class="category-list">';
@@ -582,13 +515,8 @@
         '</div>';
     }
 
-    html +=
-          '</div>' +
-        '</div>' +
-      '</div>' +
-      '<div class="content-right">' +
-        '<div class="voice-card"><i class="fas fa-microphone-alt"></i> <strong>Голосовое объединение</strong><div style="margin-top:10px">Подключитесь к Discord</div></div>' +
-      '</div>';
+    html += '</div></div></div>' +
+      '<div class="content-right"><div class="voice-card"><i class="fas fa-microphone-alt"></i> <strong>Голосовое объединение</strong><div style="margin-top:10px">Подключитесь к Discord</div></div></div>';
 
     document.getElementById("main-content").innerHTML = html;
   }
@@ -671,9 +599,9 @@
       for (let i=0;i<arr.length;i++){
         const t = arr[i];
         const ap = profileFor(t.authorId);
-        const ar = getRank(ap.rankId);
+        const ar = getRank(visibleRankId(ap.rankId));
 
-        const canEdit = String(t.authorId) === String(USER_ID);
+        const canEdit = isLeader() || String(t.authorId) === String(USER_ID);
 
         html +=
           '<div class="topic-item">' +
@@ -691,7 +619,7 @@
               (canEdit
                 ? '<button class="icon-btn" title="Редактировать" onclick="openEdit(\''+cat+'\',\''+t.id+'\',\''+safeForAttr(t.title)+'\',\''+safeForAttr(t.content)+'\')"><i class="fas fa-edit"></i></button>' +
                   '<button class="icon-btn danger" title="Удалить" onclick="delTopicUI(\''+cat+'\',\''+t.id+'\',\''+safeForAttr(title)+'\')"><i class="fas fa-trash-alt"></i></button>'
-                : '<button class="icon-btn" title="Недоступно" onclick="alert(\'Редактировать/удалять может только автор или модератор\')"><i class="fas fa-lock"></i></button>'
+                : '<button class="icon-btn" title="Недоступно" onclick="alert(\'Редактировать/удалять может только автор или Руководитель проекта\')"><i class="fas fa-lock"></i></button>'
               ) +
             '</div>' +
           '</div>';
@@ -699,25 +627,27 @@
     }
 
     document.querySelector(".topics-list").innerHTML = html;
-    document.querySelector(".section-card").insertAdjacentHTML("beforeend",
-      '<div style="padding:16px 22px;"><button class="create-topic-btn" onclick="openCreate(\''+cat+'\')"><i class="fas fa-plus"></i> Создать тему</button></div>'
-    );
+
+    if (canCreateTopicIn(cat)) {
+      document.querySelector(".section-card").insertAdjacentHTML("beforeend",
+        '<div style="padding:16px 22px;"><button class="create-topic-btn" onclick="openCreate(\''+cat+'\')"><i class="fas fa-plus"></i> Создать тему</button></div>'
+      );
+    }
   }
 
   async function delTopicUI(cat, topicId, listTitle){
     if (!confirm("Удалить тему?")) return;
-    try {
-      await deleteTopic(topicId);
-    } catch (e) {
+    try { await deleteTopic(topicId); }
+    catch (e) {
       console.error(e);
-      if (String(e.message||"").includes("forbidden")) alert("Нет прав (только автор/модератор)");
-      else alert("Ошибка удаления");
+      alert(String(e.message||"").includes("forbidden") ? "Нет прав" : "Ошибка удаления");
       return;
     }
     renderTopics(cat, listTitle, currentView.back || showMain);
   }
 
   function openCreate(cat){
+    if (!canCreateTopicIn(cat)) return alert("Создавать темы здесь может только Руководитель проекта");
     currentCategory = cat;
     currentTopicId = null;
     document.getElementById("modalTitle").innerText = "Создать тему";
@@ -741,10 +671,7 @@
     document.getElementById("main-content").innerHTML =
       '<div class="content-left" style="width:100%">' +
         '<button class="back-btn" onclick="goBack()"><i class="fas fa-arrow-left"></i> Назад</button>' +
-        '<div class="thread-view">' +
-          '<div class="thread-title">'+esc(topicTitle)+'</div>' +
-          '<div class="thread-content">Загрузка...</div>' +
-        '</div>' +
+        '<div class="thread-view"><div class="thread-title">'+esc(topicTitle)+'</div><div class="thread-content">Загрузка...</div></div>' +
       '</div>';
 
     let topic = null;
@@ -752,9 +679,8 @@
     try {
       topic = await getTopic(id);
       cmts = await listComments(id);
-
       const ids = [];
-      if (topic && topic.authorId) ids.push(topic.authorId);
+      if (topic.authorId) ids.push(topic.authorId);
       cmts.forEach(c => c.authorId && ids.push(c.authorId));
       await ensureProfiles(ids);
     } catch (e) {
@@ -764,10 +690,9 @@
     }
 
     const view = document.querySelector(".thread-view");
-
     const author = profileFor(topic.authorId);
-    const authorRank = getRank(author.rankId);
-    const canTopicEdit = String(topic.authorId) === String(USER_ID);
+    const authorRank = getRank(visibleRankId(author.rankId));
+    const canTopicEdit = isLeader() || String(topic.authorId) === String(USER_ID);
 
     view.innerHTML =
       '<div class="thread-title">'+esc(topic.title)+'</div>' +
@@ -776,21 +701,19 @@
           '<img alt="ava" src="'+esc(author.avatar)+'" />' +
           '<span>'+esc(author.nick)+'</span>' +
           '<span class="meta-rank" style="color:'+esc(authorRank.color)+';border-color:'+esc(authorRank.color)+'55;background:'+esc(authorRank.color)+'12;">'+esc(authorRank.name)+'</span>' +
-          '<span>·</span>' +
-          '<span>'+esc(new Date(topic.createdAt||Date.now()).toLocaleString())+'</span>' +
+          '<span>·</span><span>'+esc(new Date(topic.createdAt||Date.now()).toLocaleString())+'</span>' +
         '</div>' +
         '<div class="topic-actions" onclick="event.stopPropagation();">' +
           (canTopicEdit
             ? '<button class="icon-btn" title="Редактировать" onclick="openEdit(\''+cat+'\',\''+topic.id+'\',\''+safeForAttr(topic.title)+'\',\''+safeForAttr(topic.content)+'\')"><i class="fas fa-edit"></i></button>' +
               '<button class="icon-btn danger" title="Удалить" onclick="delTopicUI(\''+cat+'\',\''+topic.id+'\',\''+safeForAttr(listTitle)+'\')"><i class="fas fa-trash-alt"></i></button>'
-            : '<button class="icon-btn" title="Недоступно" onclick="alert(\'Редактировать/удалять может только автор или модератор\')"><i class="fas fa-lock"></i></button>'
+            : '<button class="icon-btn" title="Недоступно" onclick="alert(\'Редактировать/удалять может только автор или Руководитель проекта\')"><i class="fas fa-lock"></i></button>'
           ) +
         '</div>' +
       '</div>' +
-      '<div class="thread-content">'+esc(topic.content).replace(/\n/g,"<br>")+'</div>';
+      '<div class="thread-content">'+esc(topic.content).replace(/\n/g,"<br>")+'</div>' +
+      '<div class="comments-wrap" id="commentsWrap"></div>';
 
-    // comments
-    view.insertAdjacentHTML("beforeend", '<div class="comments-wrap" id="commentsWrap"></div>');
     renderComments(cat, topic.id, topic.title, listTitle, cmts);
   }
 
@@ -798,17 +721,15 @@
     const wrap = document.getElementById("commentsWrap");
     if (!wrap) return;
 
-    let html =
-      '<div class="comments-title"><i class="fas fa-comments" style="color:#FFD966;"></i> Комментарии ('+cmts.length+')</div>';
+    let html = '<div class="comments-title"><i class="fas fa-comments" style="color:#FFD966;"></i> Комментарии ('+cmts.length+')</div>';
 
     if (cmts.length === 0) {
       html += '<div style="color:#8A94B0;font-weight:800;margin:6px 0 12px;">Пока нет комментариев. Будь первым.</div>';
     } else {
       html += cmts.map(c => {
         const ap = profileFor(c.authorId);
-        const ar = getRank(ap.rankId);
-        const canEdit = String(c.authorId) === String(USER_ID);
-
+        const ar = getRank(visibleRankId(ap.rankId));
+        const canEdit = isLeader() || String(c.authorId) === String(USER_ID);
         return (
           '<div class="comment">' +
             '<img class="comment-avatar" alt="ava" src="'+esc(ap.avatar)+'"/>' +
@@ -850,61 +771,36 @@
     const ta = document.getElementById("commentText");
     const text = (ta && ta.value ? ta.value.trim() : "");
     if (!text) return alert("Напиши комментарий");
-    try {
-      await createComment(topicId, text);
-      await showThread(cat, topicId, topicTitle, listTitle);
-    } catch(e){
-      console.error(e);
-      alert("Ошибка отправки");
-    }
+    try { await createComment(topicId, text); await showThread(cat, topicId, topicTitle, listTitle); }
+    catch (e) { console.error(e); alert("Ошибка отправки"); }
   }
 
   async function uiEditComment(commentId, currentText, cat, topicId, topicTitle, listTitle){
     const text = prompt("Редактировать комментарий:", currentText || "");
     if (text === null) return;
     if (!String(text).trim()) return alert("Текст пустой");
-    try {
-      await updateComment(commentId, String(text));
-      await showThread(cat, topicId, topicTitle, listTitle);
-    } catch (e) {
-      console.error(e);
-      if (String(e.message||"").includes("forbidden")) alert("Нет прав (только автор/модератор)");
-      else alert("Ошибка редактирования");
-    }
+    try { await updateComment(commentId, String(text)); await showThread(cat, topicId, topicTitle, listTitle); }
+    catch (e) { console.error(e); alert(String(e.message||"").includes("forbidden") ? "Нет прав" : "Ошибка редактирования"); }
   }
 
   async function uiDeleteComment(commentId, cat, topicId, topicTitle, listTitle){
     if (!confirm("Удалить комментарий?")) return;
-    try {
-      await deleteComment(commentId);
-      await showThread(cat, topicId, topicTitle, listTitle);
-    } catch (e) {
-      console.error(e);
-      if (String(e.message||"").includes("forbidden")) alert("Нет прав (только автор/модератор)");
-      else alert("Ошибка удаления");
-    }
+    try { await deleteComment(commentId); await showThread(cat, topicId, topicTitle, listTitle); }
+    catch (e) { console.error(e); alert(String(e.message||"").includes("forbidden") ? "Нет прав" : "Ошибка удаления"); }
   }
 
   function showTech(){
     setBack(showMain);
     currentView = { type:"tech" };
-
     let html =
-      '<div class="content-left" style="width:100%">' +
-        '<button class="back-btn" onclick="goBack()"><i class="fas fa-arrow-left"></i> Назад</button>' +
-        '<div class="section-card">' +
-          '<div class="section-title"><i class="fas fa-headset"></i> Техническая поддержка</div>' +
-          '<div class="category-list">';
-
+      '<div class="content-left" style="width:100%"><button class="back-btn" onclick="goBack()"><i class="fas fa-arrow-left"></i> Назад</button>' +
+      '<div class="section-card"><div class="section-title"><i class="fas fa-headset"></i> Техническая поддержка</div><div class="category-list">';
     for (let i=0;i<tech.length;i++){
       const t = tech[i];
-      html +=
-        '<div class="category-item" onclick="renderTopics(\''+t.id+'\',\''+safeForAttr(t.name)+'\', showTech)">' +
-          '<div class="cat-info"><h3><i class="'+t.icon+'"></i> '+esc(t.name)+'</h3><p>'+esc(t.desc)+'</p></div>' +
-          '<div class="cat-stats"><i class="fas fa-folder"></i></div>' +
-        '</div>';
+      html += '<div class="category-item" onclick="renderTopics(\''+t.id+'\',\''+safeForAttr(t.name)+'\', showTech)">' +
+        '<div class="cat-info"><h3><i class="'+t.icon+'"></i> '+esc(t.name)+'</h3><p>'+esc(t.desc)+'</p></div>' +
+        '<div class="cat-stats"><i class="fas fa-folder"></i></div></div>';
     }
-
     html += '</div></div></div>';
     document.getElementById("main-content").innerHTML = html;
   }
@@ -912,28 +808,19 @@
   function showComplaints(){
     setBack(showMain);
     currentView = { type:"complaints" };
-
     let html =
-      '<div class="content-left" style="width:100%">' +
-        '<button class="back-btn" onclick="goBack()"><i class="fas fa-arrow-left"></i> Назад</button>' +
-        '<div class="section-card">' +
-          '<div class="section-title"><i class="fas fa-file-alt"></i> Жалобы и заявления</div>' +
-          '<div class="category-list">';
-
+      '<div class="content-left" style="width:100%"><button class="back-btn" onclick="goBack()"><i class="fas fa-arrow-left"></i> Назад</button>' +
+      '<div class="section-card"><div class="section-title"><i class="fas fa-file-alt"></i> Жалобы и заявления</div><div class="category-list">';
     for (let i=0;i<complaintsList.length;i++){
       const c = complaintsList[i];
-      html +=
-        '<div class="category-item" onclick="renderTopics(\''+c.id+'\',\''+safeForAttr(c.name)+'\', showComplaints)">' +
-          '<div class="cat-info"><h3><i class="'+c.icon+'"></i> '+esc(c.name)+'</h3><p>'+esc(c.desc)+'</p></div>' +
-          '<div class="cat-stats"><i class="fas fa-folder"></i></div>' +
-        '</div>';
+      html += '<div class="category-item" onclick="renderTopics(\''+c.id+'\',\''+safeForAttr(c.name)+'\', showComplaints)">' +
+        '<div class="cat-info"><h3><i class="'+c.icon+'"></i> '+esc(c.name)+'</h3><p>'+esc(c.desc)+'</p></div>' +
+        '<div class="cat-stats"><i class="fas fa-folder"></i></div></div>';
     }
-
     html += '</div></div></div>';
     document.getElementById("main-content").innerHTML = html;
   }
 
-  // ====== buttons ======
   document.getElementById("submitSectionBtn").onclick = function(){
     const name = document.getElementById("sectionName").value.trim();
     const desc = document.getElementById("sectionDesc").value.trim();
@@ -948,17 +835,14 @@
     const title = document.getElementById("topicTitle").value.trim();
     const content = document.getElementById("topicContent").value.trim();
     if(!title || !content) return alert("Заполните поля");
-
     try {
       if(currentTopicId) await updateTopic(currentTopicId, title, content);
       else await createTopic(currentCategory, title, content);
     } catch(e){
       console.error(e);
-      if (String(e.message||"").includes("forbidden")) alert("Нет прав (только автор/модератор)");
-      else alert("Ошибка сохранения темы");
+      alert(String(e.message||"").includes("forbidden") ? "Нет прав создавать темы в этом разделе" : "Ошибка сохранения");
       return;
     }
-
     closeModal();
     refreshView();
   };
@@ -969,20 +853,13 @@
     const rankId = document.getElementById("profileRank").value;
     if(!nick) return alert("Введи ник");
 
-    cache.profile.id = USER_ID;
-    cache.profile.nick = nick;
-    cache.profile.avatar = ava || DEFAULT_AVATAR;
-    cache.profile.rankId = rankId || "rank_none";
+    cache.profile = { id: USER_ID, nick, avatar: ava || DEFAULT_AVATAR, rankId: rankId || "rank_none" };
     cache.profilesById = cache.profilesById || {};
     cache.profilesById[USER_ID] = { userId: USER_ID, nick: cache.profile.nick, avatar: cache.profile.avatar, rankId: cache.profile.rankId };
     cacheSave();
 
-    try {
-      await api("upsertProfile", { userId: USER_ID, nick: cache.profile.nick, avatar: cache.profile.avatar, rankId: cache.profile.rankId });
-    } catch(e){
-      console.error(e);
-      alert("Ошибка сохранения профиля");
-    }
+    try { await api("upsertProfile", { userId: USER_ID, nick: cache.profile.nick, avatar: cache.profile.avatar, rankId: cache.profile.rankId }); }
+    catch(e){ console.error(e); alert("Ошибка сохранения профиля"); }
 
     refreshMiniProfile();
     closeModal();
@@ -993,38 +870,29 @@
     const name = document.getElementById("rankName").value.trim();
     const color = (document.getElementById("rankColor").value.trim() || "#FFD966");
     if(!name) return alert("Введите название ранга");
-
-    try {
-      await createRank(name, color);
-      renderRanksList();
-      fillRankSelect(document.getElementById("profileRank"), cache.profile.rankId || "rank_none");
-      refreshMiniProfile();
-    } catch(e){
-      console.error(e);
-      alert("Ошибка добавления ранга");
-    }
+    try { await createRank(name, color); renderRanksList(); }
+    catch(e){ console.error(e); alert("Нет прав (только Руководитель проекта)"); }
   };
 
-  // ====== init ======
   (async () => {
     cacheLoad();
     await loadRanks();
     await ensureProfiles([USER_ID]);
-    cache.profile = {
-      id: USER_ID,
-      nick: profileFor(USER_ID).nick,
-      avatar: profileFor(USER_ID).avatar,
-      rankId: profileFor(USER_ID).rankId
-    };
+
+    // ensure local profile from cache/profiles map
+    const p = profileFor(USER_ID);
+    cache.profile = { id: USER_ID, nick: p.nick, avatar: p.avatar, rankId: p.rankId };
     cacheSave();
 
     fillRankSelect(document.getElementById("profileRank"), cache.profile.rankId || "rank_none");
     refreshMiniProfile();
+    document.getElementById("ranksBtn").style.display = isLeader() ? "inline-flex" : "none";
     showMain();
   })().catch(e => {
     console.error(e);
     cacheLoad();
     refreshMiniProfile();
+    document.getElementById("ranksBtn").style.display = isLeader() ? "inline-flex" : "none";
     showMain();
   });
 </script>
