@@ -420,12 +420,20 @@
     document.getElementById("ranksModal").style.display = "none";
   }
 
-  function openProfile(){
+function openProfile(){
     document.getElementById("profileNick").value = cache.profile.nick || "";
     document.getElementById("profileAvatar").value = cache.profile.avatar || "";
     fillRankSelect(document.getElementById("profileRank"), cache.profile.rankId || "rank_none");
+    
+    // 🔒 Скрываем выбор ранга для не-лидера
+    const rankSelect = document.getElementById("profileRank");
+    if (rankSelect) {
+        rankSelect.disabled = !isLeader();
+        rankSelect.style.opacity = isLeader() ? "1" : "0.6";
+    }
+    
     document.getElementById("profileModal").style.display = "flex";
-  }
+}
 
   function openRanks(){
     document.getElementById("rankName").value = "";
@@ -847,24 +855,48 @@
     refreshView();
   };
 
-  document.getElementById("saveProfileBtn").onclick = async function(){
+document.getElementById("saveProfileBtn").onclick = async function(){
     const nick = document.getElementById("profileNick").value.trim();
     const ava = document.getElementById("profileAvatar").value.trim();
     const rankId = document.getElementById("profileRank").value;
     if(!nick) return alert("Введи ник");
 
+    // Сохраняем локально
     cache.profile = { id: USER_ID, nick, avatar: ava || DEFAULT_AVATAR, rankId: rankId || "rank_none" };
     cache.profilesById = cache.profilesById || {};
     cache.profilesById[USER_ID] = { userId: USER_ID, nick: cache.profile.nick, avatar: cache.profile.avatar, rankId: cache.profile.rankId };
     cacheSave();
 
-    try { await api("upsertProfile", { userId: USER_ID, nick: cache.profile.nick, avatar: cache.profile.avatar, rankId: cache.profile.rankId }); }
+    // 🔑 Отправляем на сервер с actorId
+    const payload = { 
+        userId: USER_ID, 
+        actorId: USER_ID,  // ← добавляем actorId
+        nick: cache.profile.nick, 
+        avatar: cache.profile.avatar 
+    };
+    if (isLeader()) {
+        payload.rankId = cache.profile.rankId;  // только лидер отправляет rankId
+    }
+    
+    try { await api("upsertProfile", payload); }
     catch(e){ console.error(e); alert("Ошибка сохранения профиля"); }
+
+    // ⚠️ Если не лидер — перезагружаем rankId с сервера (чтобы нельзя было обойти)
+    if (!isLeader()) {
+        try {
+            const freshProfile = await api("getProfile", { userId: USER_ID });
+            if (freshProfile && freshProfile.profile) {
+                cache.profile.rankId = freshProfile.profile.rankId || "rank_none";
+                cacheSave();
+                refreshMiniProfile();
+            }
+        } catch(e) { console.error(e); }
+    }
 
     refreshMiniProfile();
     closeModal();
     refreshView();
-  };
+};
 
   document.getElementById("addRankBtn").onclick = async function(){
     const name = document.getElementById("rankName").value.trim();
