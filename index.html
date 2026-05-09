@@ -488,6 +488,22 @@ async function assignRankToUser(userId, rankId){
     }
     cacheSave();
     
+    renderUsersList(cachedUsersForFilter);  // ✅ ДОБАВЬ ЭТО
+  } catch (e) {
+    console.error(e);
+    alert("Ошибка назначения ранга");
+  }
+}
+    
+    if (cache.profilesById && cache.profilesById[userId]) {
+      cache.profilesById[userId].rankId = rankId;
+    }
+    if (cache.allUsers) {
+      const u = cache.allUsers.find(u => u.userId === userId);
+      if (u) u.rankId = rankId;
+    }
+    cacheSave();
+    
     renderUsersList(cachedUsersForFilter);  // ✅ ДОБАВЬ ЭТО ПОСЛЕ cacheSave()
     
   } catch (e) {
