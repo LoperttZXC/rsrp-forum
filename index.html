@@ -465,15 +465,35 @@
     renderUsersList(filtered);
   }
 
-  async function assignRankToUser(userId, rankId){
-    try {
-      await api("upsertProfile", {
-        userId,
-        actorId: USER_ID,
-        nick: null,
-        avatar: null,
-        rankId
-      });
+async function assignRankToUser(userId, rankId){
+  try {
+    // Находим пользователя в кэше чтобы получить его ник и аватар
+    const user = cache.allUsers.find(u => u.userId === userId);
+    if (!user) return alert("Пользователь не найден");
+
+    await api("upsertProfile", {
+      userId,
+      actorId: USER_ID,
+      nick: user.nick,           // ✅ Передаём текущий ник вместо null
+      avatar: user.avatar,       // ✅ Передаём текущий аватар вместо null
+      rankId
+    });
+    
+    if (cache.profilesById && cache.profilesById[userId]) {
+      cache.profilesById[userId].rankId = rankId;
+    }
+    if (cache.allUsers) {
+      const u = cache.allUsers.find(u => u.userId === userId);
+      if (u) u.rankId = rankId;
+    }
+    cacheSave();
+    
+    renderUsersList(cachedUsersForFilter);
+  } catch (e) {
+    console.error(e);
+    alert("Ошибка назначения ранга");
+  }
+}
       
       if (cache.profilesById && cache.profilesById[userId]) {
         cache.profilesById[userId].rankId = rankId;
