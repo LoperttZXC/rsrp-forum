@@ -311,7 +311,7 @@
     { id: "complaint_players", name: "Жалобы на игроков", desc: "Нарушения правилами игроками", icon: "fas fa-users" },
     { id: "complaint_leaders", name: "Жалобы на лидеров", desc: "Нарушения лидеров", icon: "fas fa-crown" },
     { id: "amnesty", name: "Заявление на амнистию", desc: "Смягчение наказания", icon: "fas fa-hand-peace" },
-    { id: "moderator_app", name: "За��вление на пост модератора", desc: "Заявка в модерацию", icon: "fas fa-user-tie" },
+    { id: "moderator_app", name: "Заявление на пост модератора", desc: "Заявка в модерацию", icon: "fas fa-user-tie" },
     { id: "leader_app", name: "Заявление на пост лидера", desc: "Заявка на лидерство", icon: "fas fa-chart-line" }
   ];
 
@@ -356,7 +356,7 @@
     document.getElementById("miniAvatar").src = p.avatar || DEFAULT_AVATAR;
     document.getElementById("miniName").innerText = p.nick || "Игрок";
     const el = document.getElementById("miniRank");
-    el.innerText = r.name || "Без ра��га";
+    el.innerText = r.name || "Без ранга";
     el.style.borderColor = (r.color || "#FFD966") + "55";
     el.style.color = r.color || "#FFD966";
   }
@@ -405,7 +405,7 @@
     listEl.innerHTML = '<div style="color:#8A94B0;font-weight:800;text-align:center;padding:20px;">Загрузка...</div>';
     
     try {
-      const r = await api("listAllUsers");
+      const r = await api("listAllUsers", { actorId: USER_ID });
       cache.allUsers = (r.users || []).map(u => ({
         userId: String(u.userId),
         nick: String(u.nick || "Игрок"),
@@ -475,7 +475,6 @@
         rankId
       });
       
-      // Обновляем локальный кэш
       if (cache.profilesById && cache.profilesById[userId]) {
         cache.profilesById[userId].rankId = rankId;
       }
@@ -485,7 +484,6 @@
       }
       cacheSave();
       
-      // Перерендеиваем список
       renderUsersList(cachedUsersForFilter);
     } catch (e) {
       console.error(e);
@@ -562,7 +560,6 @@
     document.getElementById("profileAvatar").value = cache.profile.avatar || "";
     fillRankSelect(document.getElementById("profileRank"), cache.profile.rankId || "rank_none");
     
-    // 🔒 Скрываем выбор ранга для не-лидера
     const rankSelect = document.getElementById("profileRank");
     if (rankSelect) {
         rankSelect.disabled = !isLeader();
@@ -1005,13 +1002,11 @@
     const rankId = document.getElementById("profileRank").value;
     if(!nick) return alert("Введи ник");
 
-    // Сохраняем локально
     cache.profile = { id: USER_ID, nick, avatar: ava || DEFAULT_AVATAR, rankId: rankId || "rank_none" };
     cache.profilesById = cache.profilesById || {};
     cache.profilesById[USER_ID] = { userId: USER_ID, nick: cache.profile.nick, avatar: cache.profile.avatar, rankId: cache.profile.rankId };
     cacheSave();
 
-    // 🔑 Отправляем на сервер с actorId
     const payload = { 
         userId: USER_ID, 
         actorId: USER_ID,
