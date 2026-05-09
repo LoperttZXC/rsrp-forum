@@ -528,7 +528,7 @@
 
   async function assignRankToUser(userId, rankId) {
     try {
-      await api("upsertProfile", { userId, actorId: USER_ID, nick: null, avatar: null, rankId });
+      await api("upsertProfile", { userId, actorId: USER_ID, rankId }); // nick/avatar не передаём — бэк сохранит существующие
       if (cache.profilesById && cache.profilesById[userId]) cache.profilesById[userId].rankId = rankId;
       if (cache.allUsers) { const u = cache.allUsers.find(x => x.userId === userId); if (u) u.rankId = rankId; }
       invalidateProfile(userId); // следующий показ возьмёт свежее
