@@ -131,6 +131,25 @@
     .skeleton-line.medium { width: 65%; }
 
 
+
+    /* ── Виджет "Команда онлайн" ───────────────────────────────────────────── */
+    .team-card { background: #13161F; border-radius: 20px; padding: 0; border: 1px solid #2C3040; margin-bottom: 28px; overflow: hidden; }
+    .team-card-header { padding: 14px 18px; background: #1A1E2A; border-bottom: 1px solid #232732; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .team-card-title { font-weight: 800; font-size: 0.95rem; color: #E0E4F0; display: flex; align-items: center; gap: 8px; }
+    .team-card-title i { color: #FFD966; }
+    .team-online-count { font-size: 0.7rem; font-weight: 900; padding: 3px 10px; border-radius: 999px; background: rgba(76,175,80,0.12); border: 1px solid rgba(76,175,80,0.3); color: #4CAF50; }
+    .team-list { padding: 10px 12px; display: flex; flex-direction: column; gap: 6px; min-height: 60px; }
+    .team-member { display: flex; align-items: center; gap: 10px; padding: 7px 8px; border-radius: 12px; transition: background 0.12s; cursor: default; }
+    .team-member:hover { background: rgba(255,217,102,0.05); }
+    .team-member-avatar-wrap { position: relative; flex: 0 0 auto; }
+    .team-member-avatar { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(255,217,102,0.15); background: #1E232F; }
+    .team-member-online-dot { position: absolute; bottom: 0; right: 0; width: 9px; height: 9px; border-radius: 50%; background: #4CAF50; border: 2px solid #13161F; }
+    .team-member-info { flex: 1; min-width: 0; }
+    .team-member-nick { font-size: 0.82rem; font-weight: 800; color: #E0E4F0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .team-member-rank { font-size: 0.68rem; font-weight: 700; color: #FFD966; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .team-empty { text-align: center; padding: 18px 12px; color: #5A6380; font-size: 0.8rem; font-weight: 700; }
+    .team-loading { display: flex; gap: 6px; flex-direction: column; padding: 10px 12px; }
+
     /* ── Страница профиля ───────────────────────────────────────────────────── */
     .profile-page { display: none; position: fixed; inset: 0; z-index: 500; overflow-y: auto; padding: 32px 20px; }
     .profile-page.open { display: block; }
@@ -566,6 +585,98 @@
     cacheSave();
   }
 
+  // ─── КОМАНДА ОНЛАЙН ───────────────────────────────────────────────────────
+  const TEAM_RANK_IDS = new Set(["r_1778324473913","r_1778321320732","r_1778320331945"]);
+  // "Онлайн" = заходил на форум за последние 15 минут
+  // Реализуем через localStorage — при загрузке страницы пишем heartbeat для себя
+  const HEARTBEAT_KEY = "rsrp_hb";
+  const HEARTBEAT_TTL = 15 * 60 * 1000; // 15 минут
+
+  function writeHeartbeat() {
+    try {
+      const hb = JSON.parse(localStorage.getItem(HEARTBEAT_KEY) || "{}");
+      hb[USER_ID] = Date.now();
+      // Чистим старые записи
+      const now = Date.now();
+      Object.keys(hb).forEach(id => { if (now - hb[id] > HEARTBEAT_TTL) delete hb[id]; });
+      localStorage.setItem(HEARTBEAT_KEY, JSON.stringify(hb));
+    } catch(e) {}
+  }
+
+  function getOnlineUserIds() {
+    try {
+      const hb = JSON.parse(localStorage.getItem(HEARTBEAT_KEY) || "{}");
+      const now = Date.now();
+      return new Set(Object.keys(hb).filter(id => now - hb[id] < HEARTBEAT_TTL));
+    } catch(e) { return new Set(); }
+  }
+
+  async function loadTeamOnline() {
+    const el = document.getElementById("teamList");
+    if (!el) return;
+
+    el.innerHTML = '<div class="team-loading">' +
+      '<div class="skeleton skeleton-line medium"></div>' +
+      '<div class="skeleton skeleton-line short"></div>' +
+      '</div>';
+
+    try {
+      const r = await api("listTeamMembers");
+      const members = r.members || [];
+      const onlineIds = getOnlineUserIds();
+
+      const result = members.map(u => ({
+        ...u,
+        online: onlineIds.has(String(u.userId))
+      }));
+
+      // Сортируем: онлайн сначала, потом по нику
+      result.sort((a, b) => (b.online - a.online) || (a.nick || "").localeCompare(b.nick || ""));
+      renderTeamOnline(result);
+    } catch(e) {
+      console.error(e);
+      if (el) el.innerHTML = '<div class="team-empty"><i class="fas fa-exclamation-circle"></i> Ошибка загрузки</div>';
+    }
+  }
+
+  function renderTeamOnline(members) {
+    const el = document.getElementById("teamList");
+    const cnt = document.getElementById("teamOnlineCount");
+    if (!el) return;
+
+    const onlineCount = members.filter(m => m.online).length;
+    if (cnt) cnt.innerText = onlineCount + " онлайн";
+
+    if (!members.length) {
+      el.innerHTML = '<div class="team-empty"><i class="fas fa-moon"></i><br>Команда не в сети</div>';
+      return;
+    }
+
+    el.innerHTML = members.map(function(m) {
+      const rank = getRank(String(m.rankId));
+      const avatar = esc(m.avatar || DEFAULT_AVATAR);
+      const nick = esc(m.nick || "Игрок");
+      const rankName = esc(rank.name);
+      const rankColor = esc(rank.color);
+      const nickColor = m.online ? "#E0E4F0" : "#5A6380";
+      const dot = m.online ? '<div class="team-member-online-dot"></div>' : "";
+      return '<div class="team-member">' +
+        '<div class="team-member-avatar-wrap">' +
+          '<img class="team-member-avatar" src="' + avatar + '" alt="avatar" />' +
+          dot +
+        '</div>' +
+        '<div class="team-member-info">' +
+          '<div class="team-member-nick" style="color:' + nickColor + '">' + nick + '</div>' +
+          '<div class="team-member-rank" style="color:' + rankColor + '">' + rankName + '</div>' +
+        '</div>' +
+      '</div>';
+    }).join("");
+  }
+
+
+
+
+
   // ─── ПРОФИЛИ ──────────────────────────────────────────────────────────────
   // Загружает только те ID, которых нет в кэше или кэш устарел
   async function ensureProfiles(userIds) {
@@ -875,6 +986,18 @@
       </div>
       <div class="content-right">
         <div class="voice-card"><i class="fas fa-microphone-alt"></i> <strong>Голосовое объединение</strong><div style="margin-top:10px">Подключитесь к Discord</div></div>
+        <div class="team-card">
+          <div class="team-card-header">
+            <div class="team-card-title"><i class="fas fa-shield-alt"></i> Команда онлайн</div>
+            <div class="team-online-count" id="teamOnlineCount">...</div>
+          </div>
+          <div class="team-list" id="teamList">
+            <div class="team-loading">
+              <div class="skeleton skeleton-line medium"></div>
+              <div class="skeleton skeleton-line short"></div>
+            </div>
+          </div>
+        </div>
       </div>`;
   }
 
@@ -1297,6 +1420,8 @@
     refreshMiniProfile();
     updateAdminButtons();
     showMain();
+    writeHeartbeat();
+    setInterval(writeHeartbeat, 5 * 60 * 1000);
 
     // Фоновая загрузка свежих данных
     try {
@@ -1305,13 +1430,18 @@
         ensureProfiles([USER_ID])
       ]);
 
+      // Обновляем профиль ДО loadTeamOnline — чтобы myLevel() был актуальным
       const p = profileFor(USER_ID);
       cache.profile = { id: USER_ID, nick: p.nick, avatar: p.avatar, rankId: p.rankId };
       cacheSave();
 
       fillRankSelect(document.getElementById("profileRank"), cache.profile.rankId || "rank_none");
       refreshMiniProfile();
-      updateAdminButtons(); // пересчитываем после получения актуального ранга
+      updateAdminButtons();
+
+      // Перерендериваем главную с актуальными правами, потом грузим команду
+      if (currentView.type === "main") showMain();
+      loadTeamOnline();
     } catch (e) {
       console.error("Init error:", e);
     }
