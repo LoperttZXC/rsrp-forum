@@ -610,10 +610,16 @@
   function openProfile() {
     document.getElementById("profileNick").value = cache.profile.nick || "";
     document.getElementById("profileAvatar").value = cache.profile.avatar || "";
-    fillRankSelect(document.getElementById("profileRank"), cache.profile.rankId || "rank_none");
     const rs = document.getElementById("profileRank");
-    rs.disabled = !isLeader();
-    rs.style.opacity = isLeader() ? "1" : "0.6";
+    if (isLeader()) {
+      fillRankSelect(rs, cache.profile.rankId || "rank_none");
+      rs.disabled = false;
+      rs.style.display = "block";
+      rs.style.opacity = "1";
+    } else {
+      // обычные игроки и Гл. администратор — select скрыт полностью
+      rs.style.display = "none";
+    }
     document.getElementById("profileModal").style.display = "flex";
   }
 
