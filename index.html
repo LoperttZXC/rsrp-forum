@@ -150,6 +150,12 @@
     .team-empty { text-align: center; padding: 18px 12px; color: #5A6380; font-size: 0.8rem; font-weight: 700; }
     .team-loading { display: flex; gap: 6px; flex-direction: column; padding: 10px 12px; }
 
+
+    /* ── Просмотр профиля другого игрока ───────────────────────────────────── */
+    .view-profile-page { display: none; position: fixed; inset: 0; z-index: 500; overflow-y: auto; padding: 32px 20px; }
+    .view-profile-page.open { display: block; }
+    .team-member { cursor: pointer; }
+
     /* ── Страница профиля ───────────────────────────────────────────────────── */
     .profile-page { display: none; position: fixed; inset: 0; z-index: 500; overflow-y: auto; padding: 32px 20px; }
     .profile-page.open { display: block; }
@@ -304,6 +310,42 @@
             <span class="profile-save-status" id="profileSaveStatus"><i class="fas fa-check-circle"></i> Сохранено!</span>
           </div>
 
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Просмотр профиля другого игрока -->
+<div id="viewProfilePage" class="view-profile-page">
+  <div class="profile-backdrop" onclick="closeViewProfile()"></div>
+  <div class="profile-wrap">
+    <div class="profile-card">
+      <div class="profile-banner">
+        <div class="profile-banner-pattern"></div>
+        <button class="profile-close-btn" onclick="closeViewProfile()"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="profile-body">
+        <div class="profile-avatar-row">
+          <div class="profile-avatar-wrap">
+            <img id="viewProfileAvatar" class="profile-avatar-img" src="" alt="avatar" />
+            <div id="viewProfileOnlineDot" style="display:none; position:absolute; bottom:6px; right:6px; width:14px; height:14px; border-radius:50%; background:#4CAF50; border:3px solid rgba(15,17,23,0.97);"></div>
+          </div>
+          <div class="profile-name-block">
+            <div class="profile-nick" id="viewProfileNick">Игрок</div>
+            <div class="profile-rank-badge" id="viewProfileRank"><i class="fas fa-circle" style="font-size:6px;"></i> Без ранга</div>
+            <div id="viewProfileOnlineStatus" style="font-size:0.72rem; font-weight:800; margin-top:6px;"></div>
+            <div class="profile-uid" id="viewProfileUid"></div>
+          </div>
+        </div>
+        <hr class="profile-divider">
+        <div id="viewProfileAboutSection" style="display:none;">
+          <div class="profile-section-title"><i class="fas fa-info-circle"></i> О себе</div>
+          <div id="viewProfileAbout" style="color:#C0C9E0; font-size:0.88rem; font-weight:600; line-height:1.6; padding:12px 14px; background:#0C0F18; border-radius:12px; border:1px solid #232732; white-space:pre-wrap;"></div>
+          <br>
+        </div>
+        <div style="color:#5A6380; font-size:0.75rem; font-weight:700; text-align:center; padding:8px 0;">
+          <i class="fas fa-lock" style="margin-right:6px;"></i>Информация только для чтения
         </div>
       </div>
     </div>
@@ -626,16 +668,18 @@
       const onlineIds = getOnlineUserIds();
 
       const result = members.map(u => ({
-        ...u,
+        userId: u.userId, nick: u.nick, avatar: u.avatar, rankId: u.rankId,
+        about: u.about || '',
         online: onlineIds.has(String(u.userId))
       }));
 
-      // Сортируем: онлайн сначала, потом по нику
       result.sort((a, b) => (b.online - a.online) || (a.nick || "").localeCompare(b.nick || ""));
       renderTeamOnline(result);
     } catch(e) {
-      console.error(e);
-      if (el) el.innerHTML = '<div class="team-empty"><i class="fas fa-exclamation-circle"></i> Ошибка загрузки</div>';
+      console.error("loadTeamOnline:", e);
+      const cnt = document.getElementById("teamOnlineCount");
+      if (cnt) cnt.innerText = "—";
+      if (el) el.innerHTML = '<div class="team-empty" style="color:#5A6380;">Задеплой Code.gs<br>для отображения команды</div>';
     }
   }
 
@@ -659,8 +703,9 @@
       const rankName = esc(rank.name);
       const rankColor = esc(rank.color);
       const nickColor = m.online ? "#E0E4F0" : "#5A6380";
+      const about = esc((m.about||'').replace(/'/g,"&#39;"));
       const dot = m.online ? '<div class="team-member-online-dot"></div>' : "";
-      return '<div class="team-member">' +
+      return '<div class="team-member" onclick="viewUserProfile(\''+m.userId+'\',\''+nick+'\',\''+avatar+'\',\''+rankName+'\',\''+rankColor+'\',\''+about+'\',\''+String(m.online)+'\')" title="Открыть профиль">' +
         '<div class="team-member-avatar-wrap">' +
           '<img class="team-member-avatar" src="' + avatar + '" alt="avatar" />' +
           dot +
@@ -877,6 +922,51 @@
     document.body.style.overflow = "hidden";
   }
 
+
+  // ─── ПРОСМОТР ПРОФИЛЯ ДРУГОГО ИГРОКА ─────────────────────────────────────
+  function viewUserProfile(userId, nick, avatar, rankName, rankColor, about, onlineStr) {
+    // Если это свой профиль — открываем редактирование
+    if (String(userId) === String(USER_ID)) {
+      showProfilePage();
+      return;
+    }
+
+    document.getElementById("viewProfileAvatar").src = avatar || DEFAULT_AVATAR;
+    document.getElementById("viewProfileNick").innerText = nick || "Игрок";
+    document.getElementById("viewProfileUid").innerText = "ID: " + userId;
+
+    const rb = document.getElementById("viewProfileRank");
+    rb.innerHTML = '<i class="fas fa-circle" style="font-size:6px;"></i> ' + esc(rankName || "Без ранга");
+    rb.style.color = rankColor || "#FFD966";
+    rb.style.borderColor = (rankColor || "#FFD966") + "55";
+    rb.style.background = (rankColor || "#FFD966") + "15";
+
+    const isOnline = onlineStr === "true";
+    const dot = document.getElementById("viewProfileOnlineDot");
+    dot.style.display = isOnline ? "block" : "none";
+    const status = document.getElementById("viewProfileOnlineStatus");
+    status.innerHTML = isOnline
+      ? '<span style="color:#4CAF50;"><i class="fas fa-circle" style="font-size:7px;"></i> Онлайн сейчас</span>'
+      : '<span style="color:#5A6380;"><i class="fas fa-circle" style="font-size:7px;"></i> Не в сети</span>';
+
+    const aboutEl = document.getElementById("viewProfileAbout");
+    const aboutSection = document.getElementById("viewProfileAboutSection");
+    if (about && about.trim()) {
+      aboutEl.innerText = about;
+      aboutSection.style.display = "block";
+    } else {
+      aboutSection.style.display = "none";
+    }
+
+    document.getElementById("viewProfilePage").classList.add("open");
+    document.body.style.overflow = "hidden";
+  }
+
+  function closeViewProfile() {
+    document.getElementById("viewProfilePage").classList.remove("open");
+    document.body.style.overflow = "";
+  }
+
   function closeProfilePage() {
     document.getElementById("profilePage").classList.remove("open");
     document.body.style.overflow = "";
@@ -985,7 +1075,6 @@
         </div>
       </div>
       <div class="content-right">
-        <div class="voice-card"><i class="fas fa-microphone-alt"></i> <strong>Голосовое объединение</strong><div style="margin-top:10px">Подключитесь к Discord</div></div>
         <div class="team-card">
           <div class="team-card-header">
             <div class="team-card-title"><i class="fas fa-shield-alt"></i> Команда онлайн</div>
