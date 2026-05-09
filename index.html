@@ -381,7 +381,9 @@
 
   async function ensureProfiles(userIds){
     const unique = Array.from(new Set((userIds||[]).map(String).filter(Boolean)));
-    const missing = unique.filter(id => !(cache.profilesById && cache.profilesById[id]));
+    // Всегда обновляем профиль текущего пользователя (его ранг мог изменить руководитель)
+    // и подтягиваем все профили, которых ещё нет в кэше.
+    const missing = unique.filter(id => id === String(USER_ID) || !(cache.profilesById && cache.profilesById[id]));
     if (missing.length === 0) return;
 
     const r = await api("listProfiles", { userIds: missing.join(",") });
@@ -734,7 +736,12 @@
     let arr = [];
     try {
       arr = await listTopics(cat);
-      await ensureProfiles(arr.map(t => t.authorId).filter(Boolean));
+      // Сбрасываем кэш профилей авторов, чтобы их ранги подтянулись с сервера актуальными
+      const authorIds = arr.map(t => t.authorId).filter(Boolean);
+      if (cache.profilesById) {
+        authorIds.forEach(id => { delete cache.profilesById[id]; });
+      }
+      await ensureProfiles(authorIds);
     } catch (e) {
       console.error(e);
       document.querySelector(".topics-list").innerHTML = '<div class="empty-topics">Ошибка загрузки тем</div>';
@@ -831,6 +838,10 @@
       const ids = [];
       if (topic.authorId) ids.push(topic.authorId);
       cmts.forEach(c => c.authorId && ids.push(c.authorId));
+      // Сбрасываем кэш этих профилей, чтобы их ранги подтянулись с сервера актуальными
+      if (cache.profilesById) {
+        ids.forEach(uid => { delete cache.profilesById[uid]; });
+      }
       await ensureProfiles(ids);
     } catch (e) {
       console.error(e);
