@@ -130,6 +130,55 @@
     .skeleton-line.short { width: 40%; }
     .skeleton-line.medium { width: 65%; }
 
+
+    /* ── Страница профиля ───────────────────────────────────────────────────── */
+    .profile-page { display: none; position: fixed; inset: 0; z-index: 500; overflow-y: auto; padding: 32px 20px; }
+    .profile-page.open { display: block; }
+    .profile-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(6px); z-index: -1; }
+    .profile-wrap { max-width: 760px; margin: 0 auto; }
+    .profile-card { background: rgba(15,17,23,0.97); border: 1px solid rgba(255,215,0,0.2); border-radius: 28px; overflow: hidden; box-shadow: 0 24px 80px rgba(0,0,0,0.7); }
+    .profile-banner { height: 160px; background: linear-gradient(135deg, #0d0f18 0%, #1a1628 40%, #12150f 100%); position: relative; overflow: hidden; }
+    .profile-banner::after { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 60% 80% at 30% 50%, rgba(255,215,0,0.08) 0%, transparent 70%); }
+    .profile-banner-pattern { position: absolute; inset: 0; background-image: repeating-linear-gradient(45deg, rgba(255,215,0,0.03) 0px, rgba(255,215,0,0.03) 1px, transparent 1px, transparent 24px); }
+    .profile-close-btn { position: absolute; top: 16px; right: 16px; width: 36px; height: 36px; background: rgba(0,0,0,0.45); border: 1px solid rgba(255,255,255,0.12); border-radius: 50%; color: #aaa; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 18px; z-index: 10; transition: 0.15s; }
+    .profile-close-btn:hover { background: rgba(255,80,80,0.3); border-color: rgba(255,80,80,0.5); color: #fff; }
+    .profile-body { padding: 0 32px 32px; }
+    .profile-avatar-row { display: flex; align-items: flex-end; gap: 20px; margin-top: -52px; margin-bottom: 20px; flex-wrap: wrap; }
+    .profile-avatar-wrap { position: relative; flex: 0 0 auto; }
+    .profile-avatar-img { width: 104px; height: 104px; border-radius: 50%; object-fit: cover; border: 4px solid rgba(15,17,23,0.97); background: #1E232F; box-shadow: 0 4px 24px rgba(0,0,0,0.6); display: block; }
+    .profile-avatar-edit { position: absolute; bottom: 4px; right: 4px; width: 28px; height: 28px; background: #FFD966; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 12px; color: #0B0C10; border: 2px solid rgba(15,17,23,0.97); transition: 0.15s; }
+    .profile-avatar-edit:hover { background: #ffe080; transform: scale(1.1); }
+    .profile-name-block { flex: 1; min-width: 0; padding-bottom: 6px; }
+    .profile-nick { font-size: 1.6rem; font-weight: 900; color: #F0E8C8; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .profile-rank-badge { display: inline-flex; align-items: center; gap: 6px; margin-top: 6px; font-size: 0.78rem; font-weight: 800; padding: 4px 12px; border-radius: 999px; border: 1px solid rgba(255,217,102,0.3); background: rgba(255,217,102,0.1); color: #FFD966; }
+    .profile-uid { font-size: 0.68rem; color: #5A6380; font-weight: 700; margin-top: 4px; font-family: monospace; }
+    .profile-divider { border: none; border-top: 1px solid #1E2330; margin: 4px 0 22px; }
+    .profile-sections { display: flex; flex-direction: column; gap: 20px; }
+    .profile-section-title { font-size: 0.72rem; font-weight: 900; color: #6A74A0; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+    .profile-section-title i { color: #FFD966; }
+    .profile-field { margin-bottom: 14px; }
+    .profile-field label { display: block; font-size: 0.75rem; font-weight: 800; color: #8A94B0; margin-bottom: 6px; }
+    .profile-field input, .profile-field textarea, .profile-field select { width: 100%; padding: 10px 14px; background: #0C0F18; border: 1px solid #232732; border-radius: 12px; color: #E0E4F0; font-family: 'Inter', sans-serif; font-weight: 700; font-size: 0.9rem; outline: none; transition: border-color 0.15s; resize: vertical; }
+    .profile-field input:focus, .profile-field textarea:focus { border-color: rgba(255,217,102,0.5); background: #0F1220; }
+    .profile-field textarea { min-height: 90px; }
+    .profile-avatar-preview { display: flex; align-items: center; gap: 14px; margin-top: 10px; }
+    .profile-avatar-preview img { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(255,217,102,0.2); background: #1E232F; }
+    .profile-avatar-preview span { font-size: 0.75rem; color: #6A74A0; font-weight: 700; }
+    .profile-save-row { display: flex; gap: 12px; margin-top: 24px; flex-wrap: wrap; align-items: center; }
+    .profile-save-btn { background: linear-gradient(135deg, #FFD966, #FFB347); color: #0B0C10; border: none; padding: 11px 28px; border-radius: 30px; cursor: pointer; font-weight: 900; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 8px; transition: 0.15s; }
+    .profile-save-btn:hover { filter: brightness(1.1); transform: translateY(-1px); }
+    .profile-save-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+    .profile-cancel-btn { background: transparent; border: 1px solid #2A2F3E; color: #8A94B0; padding: 11px 22px; border-radius: 30px; cursor: pointer; font-weight: 800; font-size: 0.9rem; transition: 0.15s; }
+    .profile-cancel-btn:hover { border-color: #4A5060; color: #C0C9E0; }
+    .profile-save-status { font-size: 0.8rem; font-weight: 800; color: #4CAF50; display: none; }
+    .profile-save-status.show { display: inline-flex; align-items: center; gap: 6px; }
+    @media (max-width: 600px) {
+      .profile-body { padding: 0 18px 24px; }
+      .profile-avatar-row { gap: 14px; margin-top: -42px; }
+      .profile-avatar-img { width: 84px; height: 84px; }
+      .profile-nick { font-size: 1.3rem; }
+    }
+
     @media (max-width: 800px) {
       .forum-main { flex-direction: column; }
       .topic-actions { width: 100%; justify-content: flex-end; }
@@ -174,6 +223,74 @@
   <div class="forum-footer">RussiaSoul RP · Криминальная Москва 2026 · <span style="color:#FFD966;">Официальный форум RSRP</span></div>
 </div>
 
+<!-- Страница профиля -->
+<div id="profilePage" class="profile-page">
+  <div class="profile-backdrop" onclick="closeProfilePage()"></div>
+  <div class="profile-wrap">
+    <div class="profile-card">
+      <div class="profile-banner">
+        <div class="profile-banner-pattern"></div>
+        <button class="profile-close-btn" onclick="closeProfilePage()"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="profile-body">
+        <div class="profile-avatar-row">
+          <div class="profile-avatar-wrap">
+            <img id="profilePageAvatar" class="profile-avatar-img" src="" alt="avatar" />
+            <div class="profile-avatar-edit" onclick="document.getElementById('profileAvatarInput').focus()" title="Сменить аватар"><i class="fas fa-camera"></i></div>
+          </div>
+          <div class="profile-name-block">
+            <div class="profile-nick" id="profilePageNick">Игрок</div>
+            <div class="profile-rank-badge" id="profilePageRank"><i class="fas fa-circle" style="font-size:6px;"></i> Без ранга</div>
+            <div class="profile-uid" id="profilePageUid"></div>
+          </div>
+        </div>
+        <hr class="profile-divider">
+        <div class="profile-sections">
+
+          <div>
+            <div class="profile-section-title"><i class="fas fa-user-edit"></i> Основная информация</div>
+            <div class="profile-field">
+              <label>Игровой ник</label>
+              <input type="text" id="profileNick" placeholder="Введи свой ник" maxlength="32">
+            </div>
+            <div class="profile-field">
+              <label>О себе</label>
+              <textarea id="profileAbout" placeholder="Расскажи немного о себе..." maxlength="300"></textarea>
+            </div>
+          </div>
+
+          <div>
+            <div class="profile-section-title"><i class="fas fa-image"></i> Аватар</div>
+            <div class="profile-field">
+              <label>Ссылка на аватар (URL)</label>
+              <input type="text" id="profileAvatarInput" placeholder="https://i.imgur.com/..." oninput="previewAvatar(this.value)">
+            </div>
+            <div class="profile-avatar-preview">
+              <img id="profileAvatarPreview" src="" alt="preview" />
+              <span>Предпросмотр</span>
+            </div>
+          </div>
+
+          <div id="profileRankSection" style="display:none;">
+            <div class="profile-section-title"><i class="fas fa-award"></i> Ранг</div>
+            <div class="profile-field">
+              <label>Выбрать ранг</label>
+              <select id="profileRank"></select>
+            </div>
+          </div>
+
+          <div class="profile-save-row">
+            <button class="profile-save-btn" id="saveProfileBtn"><i class="fas fa-save"></i> Сохранить</button>
+            <button class="profile-cancel-btn" onclick="closeProfilePage()">Отмена</button>
+            <span class="profile-save-status" id="profileSaveStatus"><i class="fas fa-check-circle"></i> Сохранено!</span>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Modals -->
 <div id="topicModal" class="modal">
   <div class="modal-content">
@@ -197,17 +314,7 @@
   </div>
 </div>
 
-<div id="profileModal" class="modal">
-  <div class="modal-content">
-    <span class="close-modal" onclick="closeModal()">&times;</span>
-    <h3 style="color:#FFD966;">Профиль</h3>
-    <input type="text" id="profileNick" placeholder="Ник (например: Sastd)">
-    <input type="text" id="profileAvatar" placeholder="Ссылка на аватар (URL)">
-    <select id="profileRank"></select>
-    <button id="saveProfileBtn">Сохранить</button>
-    <button class="cancel" onclick="closeModal()">Отмена</button>
-  </div>
-</div>
+<!-- profileModal removed - replaced by profile page -->
 
 <div id="ranksModal" class="modal">
   <div class="modal-content">
@@ -614,26 +721,71 @@
 
   // ─── МОДАЛКИ ──────────────────────────────────────────────────────────────
   function closeModal() {
-    ["topicModal","sectionModal","profileModal","ranksModal","usersModal"].forEach(id => {
+    ["topicModal","sectionModal","ranksModal","usersModal"].forEach(id => {
       document.getElementById(id).style.display = "none";
     });
   }
 
-  function openProfile() {
-    document.getElementById("profileNick").value = cache.profile.nick || "";
-    document.getElementById("profileAvatar").value = cache.profile.avatar || "";
+  function openProfile() { showProfilePage(); }
+
+  function showProfilePage() {
+    const p = cache.profile || {};
+    const r = getRank(visibleRankId(p.rankId));
+
+    // Заполняем превью-шапку
+    document.getElementById("profilePageAvatar").src = p.avatar || DEFAULT_AVATAR;
+    document.getElementById("profilePageNick").innerText = p.nick || "Игрок";
+    const rb = document.getElementById("profilePageRank");
+    rb.innerHTML = '<i class="fas fa-circle" style="font-size:6px;"></i> ' + esc(r.name);
+    rb.style.color = r.color || "#FFD966";
+    rb.style.borderColor = (r.color || "#FFD966") + "55";
+    rb.style.background = (r.color || "#FFD966") + "15";
+    document.getElementById("profilePageUid").innerText = "ID: " + USER_ID;
+
+    // Поля
+    document.getElementById("profileNick").value = p.nick || "";
+    document.getElementById("profileAbout").value = p.about || "";
+    document.getElementById("profileAvatarInput").value = p.avatar && p.avatar !== DEFAULT_AVATAR ? p.avatar : "";
+    previewAvatar(p.avatar || DEFAULT_AVATAR);
+
+    // Ранг — только лидеры
     const rs = document.getElementById("profileRank");
+    const rsSection = document.getElementById("profileRankSection");
     if (isLeader()) {
-      fillRankSelect(rs, cache.profile.rankId || "rank_none");
-      rs.disabled = false;
-      rs.style.display = "block";
-      rs.style.opacity = "1";
+      fillRankSelect(rs, p.rankId || "rank_none");
+      rsSection.style.display = "block";
     } else {
-      // обычные игроки и Гл. администратор — select скрыт полностью
-      rs.style.display = "none";
+      rsSection.style.display = "none";
     }
-    document.getElementById("profileModal").style.display = "flex";
+
+    // Статус сохранения
+    const st = document.getElementById("profileSaveStatus");
+    st.classList.remove("show");
+
+    document.getElementById("profilePage").classList.add("open");
+    document.body.style.overflow = "hidden";
   }
+
+  function closeProfilePage() {
+    document.getElementById("profilePage").classList.remove("open");
+    document.body.style.overflow = "";
+  }
+
+  function previewAvatar(url) {
+    const img = document.getElementById("profileAvatarPreview");
+    const bigImg = document.getElementById("profilePageAvatar");
+    const src = url && url.trim() ? url.trim() : DEFAULT_AVATAR;
+    img.src = src;
+    bigImg.src = src;
+  }
+
+  // Живое обновление ника в шапке профиля
+  document.addEventListener("DOMContentLoaded", () => {
+    const nickInput = document.getElementById("profileNick");
+    if (nickInput) nickInput.addEventListener("input", e => {
+      document.getElementById("profilePageNick").innerText = e.target.value || "Игрок";
+    });
+  });
 
   function openRanks() {
     document.getElementById("rankName").value = "";
@@ -1064,20 +1216,35 @@
 
   document.getElementById("saveProfileBtn").onclick = async function () {
     const nick = document.getElementById("profileNick").value.trim();
-    const ava = document.getElementById("profileAvatar").value.trim();
+    const ava  = document.getElementById("profileAvatarInput").value.trim();
+    const about = document.getElementById("profileAbout").value.trim();
     const rankId = document.getElementById("profileRank").value;
-    if (!nick) return alert("Введи ник");
+    if (!nick) { document.getElementById("profileNick").focus(); return; }
 
-    cache.profile = { id: USER_ID, nick, avatar: ava || DEFAULT_AVATAR, rankId: rankId || "rank_none" };
+    const btn = document.getElementById("saveProfileBtn");
+    const st  = document.getElementById("profileSaveStatus");
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Сохранение...';
+    st.classList.remove("show");
+
+    cache.profile = { id: USER_ID, nick, avatar: ava || DEFAULT_AVATAR, about, rankId: rankId || cache.profile.rankId || "rank_none" };
     cache.profilesById = cache.profilesById || {};
-    cache.profilesById[USER_ID] = { userId: USER_ID, nick: cache.profile.nick, avatar: cache.profile.avatar, rankId: cache.profile.rankId };
+    cache.profilesById[USER_ID] = { userId: USER_ID, nick, avatar: ava || DEFAULT_AVATAR, about, rankId: cache.profile.rankId };
     invalidateProfile(USER_ID);
     cacheSave();
 
-    const payload = { userId: USER_ID, actorId: USER_ID, nick: cache.profile.nick, avatar: cache.profile.avatar };
+    const payload = { userId: USER_ID, actorId: USER_ID, nick, avatar: ava || DEFAULT_AVATAR, about };
     if (isLeader()) payload.rankId = cache.profile.rankId;
 
-    try { await api("upsertProfile", payload); } catch (e) { console.error(e); alert("Ошибка сохранения профиля"); }
+    try {
+      await api("upsertProfile", payload);
+    } catch (e) {
+      console.error(e);
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fas fa-save"></i> Сохранить';
+      alert("Ошибка сохранения профиля");
+      return;
+    }
 
     if (!isLeader()) {
       try {
@@ -1091,7 +1258,21 @@
     }
 
     refreshMiniProfile();
-    closeModal();
+
+    // Обновляем шапку профиля
+    const r = getRank(visibleRankId(cache.profile.rankId));
+    document.getElementById("profilePageNick").innerText = nick;
+    const rb = document.getElementById("profilePageRank");
+    rb.innerHTML = '<i class="fas fa-circle" style="font-size:6px;"></i> ' + esc(r.name);
+    rb.style.color = r.color || "#FFD966";
+    rb.style.borderColor = (r.color || "#FFD966") + "55";
+    rb.style.background = (r.color || "#FFD966") + "15";
+
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-save"></i> Сохранить';
+    st.classList.add("show");
+    setTimeout(() => st.classList.remove("show"), 3000);
+
     refreshView();
   };
 
