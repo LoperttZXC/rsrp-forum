@@ -6,6 +6,7 @@
   <title>RussiaSoulRP | RSRP — Форум</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { background: #0B0C10; font-family: 'Inter', sans-serif; color: #E0E4F0; padding: 24px 20px; }
@@ -14,27 +15,33 @@
     .header-top { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 20px; }
     .logo-area h1 { font-size: 2.2rem; font-weight: 800; background: linear-gradient(135deg, #FFD966, #FFB347); -webkit-background-clip: text; background-clip: text; color: transparent; }
     .logo-area p { font-size: 0.85rem; color: #9AA4BF; margin-top: 6px; }
+
     .header-actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; justify-content: flex-end; }
     .badge-rp { background: #1E1F2C; padding: 6px 16px; border-radius: 60px; font-size: 0.8rem; font-weight: 700; color: #FFD966; border: 1px solid rgba(255,215,0,0.3); display: inline-flex; align-items: center; gap: 8px; }
     .chip-btn { background: rgba(255,217,102,0.12); border: 1px solid rgba(255,217,102,0.55); color: #FFD966; padding: 8px 12px; border-radius: 999px; cursor: pointer; font-weight: 700; font-size: 0.82rem; display: inline-flex; align-items: center; gap: 8px; transition: 0.12s; }
     .chip-btn:hover { background: rgba(255,217,102,0.18); transform: translateY(-1px); }
     .chip-btn:active { transform: translateY(0); }
+
     .mini-profile { display: inline-flex; align-items: center; gap: 10px; padding: 6px 10px; border-radius: 999px; background: rgba(12,15,24,0.35); border: 1px solid rgba(35,39,50,0.9); }
     .mini-avatar { width: 28px; height: 28px; border-radius: 999px; background: #1E232F; border: 1px solid rgba(255,217,102,0.25); object-fit: cover; }
     .mini-name { font-weight: 800; font-size: 0.85rem; color: #E0E4F0; max-width: 240px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .mini-rank { font-size: 0.72rem; font-weight: 800; padding: 3px 10px; border-radius: 999px; background: rgba(255,217,102,0.12); border: 1px solid rgba(255,217,102,0.3); color: #FFD966; }
+
     .forum-nav { padding: 16px 32px; background: #0C0E14; display: flex; flex-wrap: wrap; gap: 28px; border-bottom: 1px solid #20232E; }
     .forum-nav a { color: #C0C9E0; text-decoration: none; font-weight: 700; transition: 0.2s; display: inline-flex; align-items: center; gap: 8px; cursor: pointer; }
     .forum-nav a i { color: #FFD966; }
     .forum-nav a:hover { color: #FFD966; }
+
     .forum-main { display: flex; flex-wrap: wrap; padding: 28px 32px; gap: 32px; }
     .content-left { flex: 2.2; min-width: 260px; }
     .content-right { flex: 1.2; min-width: 260px; }
+
     .section-card { background: #13161F; border-radius: 20px; margin-bottom: 28px; border: 1px solid #232732; overflow: hidden; }
     .section-title { background: #1A1E2A; padding: 14px 22px; font-weight: 800; font-size: 1.2rem; border-left: 4px solid #FFD700; display: flex; align-items: center; gap: 10px; justify-content: space-between; flex-wrap: wrap; }
     .section-title i { color: #FFD966; }
     .add-section-btn { background: #FFD96620; border: 1px solid #FFD966; color: #FFD966; padding: 6px 12px; border-radius: 20px; font-size: 0.72rem; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; font-weight: 800; }
     .add-section-btn:hover { background: #FFD9662F; }
+
     .category-item { display: flex; justify-content: space-between; align-items: center; padding: 14px 22px; border-bottom: 1px solid #20232F; flex-wrap: wrap; gap: 10px; cursor: pointer; transition: 0.1s; }
     .category-item:hover { background: #191E2B; }
     .cat-info h3 { font-size: 1rem; font-weight: 800; margin-bottom: 4px; }
@@ -46,23 +53,37 @@
     .topic-item { padding: 12px 0; border-bottom: 1px solid #20232F; cursor: pointer; transition: 0.1s; display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
     .topic-item:hover { background: #191E2B; margin: 0 -22px; padding: 12px 22px; }
     .topic-title { font-weight: 900; margin-bottom: 4px; color: #FFD966; }
-    .topic-meta { font-size: 0.7rem; color: #8A94B0; font-weight: 700; }
+    .topic-meta { font-size: 0.7rem; color: #8A94B0; font-weight: 700; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+    .meta-avatar { width: 18px; height: 18px; border-radius: 999px; object-fit: cover; border: 1px solid rgba(255,217,102,0.25); background: #1E232F; }
+    .meta-rank {
+      font-size: 0.68rem; font-weight: 900; padding: 2px 8px; border-radius: 999px;
+      border: 1px solid rgba(255,217,102,0.25); background: rgba(255,217,102,0.10); color: #FFD966;
+    }
+
     .topic-actions { display: flex; align-items: center; gap: 10px; padding: 6px; border-radius: 14px; background: rgba(12,15,24,0.35); border: 1px solid rgba(35,39,50,0.8); }
     .topic-actions:hover { border-color: rgba(255,217,102,0.35); background: rgba(25,30,43,0.55); }
+
     .icon-btn { width: 38px; height: 34px; border-radius: 12px; border: 1px solid rgba(35,39,50,0.9); background: #0C0F18; color: #8A94B0; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; transition: 0.12s; user-select: none; }
     .icon-btn:hover { color: #FFD966; border-color: rgba(255,217,102,0.55); transform: translateY(-1px); }
     .icon-btn:active { transform: translateY(0); }
     .icon-btn.danger:hover { color: #ff8f8f; border-color: rgba(255,143,143,0.7); }
+
     .empty-topics { padding: 28px 22px; text-align: center; color: #8A94B0; font-weight: 700; }
     .forum-footer { background: #090B10; padding: 20px 32px; border-top: 1px solid #20232E; font-size: 0.75rem; text-align: center; color: #6F7A98; font-weight: 700; }
+
     .thread-view { background: #13161F; border-radius: 20px; padding: 24px; margin-bottom: 28px; border: 1px solid #232732; }
-    .thread-title { font-size: 1.5rem; font-weight: 900; margin-bottom: 16px; color: #FFD966; }
+    .thread-title { font-size: 1.5rem; font-weight: 900; margin-bottom: 10px; color: #FFD966; }
     .thread-meta { font-size: 0.8rem; color: #8A94B0; margin-bottom: 18px; padding-bottom: 14px; border-bottom: 1px solid #232732; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; font-weight: 800; }
+    .thread-author { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+    .thread-author img { width: 28px; height: 28px; border-radius: 999px; object-fit: cover; border: 1px solid rgba(255,217,102,0.25); background: #1E232F; }
     .thread-content { color: #C0C9E0; line-height: 1.6; margin-bottom: 18px; white-space: pre-wrap; font-weight: 600; }
+
     .back-btn { background: #1E232F; border: none; color: #FFD966; padding: 8px 16px; border-radius: 20px; cursor: pointer; margin-bottom: 20px; display: inline-block; font-weight: 900; }
     .back-btn:hover { background: #242a39; }
+
     .create-topic-btn { background: #FFD96620; border: 1px solid #FFD966; color: #FFD966; padding: 10px 16px; border-radius: 30px; cursor: pointer; margin-top: 16px; font-weight: 900; display: inline-flex; align-items: center; gap: 10px; }
     .create-topic-btn:hover { background: #FFD9662B; }
+
     .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); justify-content: center; align-items: center; z-index: 1000; padding: 18px; }
     .modal-content { background: #13161F; padding: 28px; border-radius: 24px; width: 100%; max-width: 560px; border: 1px solid rgba(255,217,102,0.65); }
     .modal-content h3 { font-weight: 900; }
@@ -70,6 +91,7 @@
     .modal-content button { background: #FFD966; color: #0B0C10; border: none; padding: 10px 20px; border-radius: 30px; cursor: pointer; font-weight: 900; margin-top: 10px; margin-right: 10px; }
     .modal-content button.cancel { background: #3A3F55; color: white; }
     .close-modal { float: right; font-size: 28px; cursor: pointer; color: #FFD966; }
+
     .server-card { background: linear-gradient(135deg, #1A1E2A, #13161F); border-radius: 16px; padding: 20px; margin: 16px 20px; border: 1px solid #FFD96640; cursor: pointer; transition: 0.2s; }
     .server-card:hover { border-color: #FFD966; background: #1E2436; }
     .server-name { font-size: 1.3rem; font-weight: 900; color: #FFD966; margin-bottom: 8px; }
@@ -82,17 +104,24 @@
     .comment-avatar { width: 40px; height: 40px; border-radius: 999px; object-fit: cover; border: 1px solid rgba(255,217,102,0.25); background: #1E232F; flex: 0 0 auto; }
     .comment-main { flex: 1; min-width: 0; }
     .comment-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: space-between; }
-    .comment-author { font-weight: 900; color: #FFD966; }
+    .comment-author { font-weight: 900; color: #FFD966; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
     .comment-date { color: #8A94B0; font-size: 0.72rem; font-weight: 900; }
     .comment-text { margin-top: 6px; color: #C0C9E0; font-weight: 650; white-space: pre-wrap; }
+    .comment-actions { display:flex; gap:8px; }
+
     .comment-form { margin-top: 12px; border: 1px solid rgba(35,39,50,0.9); border-radius: 16px; background: rgba(12,15,24,0.25); padding: 12px; }
     .comment-form textarea { width: 100%; min-height: 88px; resize: vertical; padding: 10px; background: #1E232F; border: 1px solid #232732; border-radius: 12px; color: white; font-family: 'Inter', sans-serif; font-weight: 700; outline: none; }
     .comment-form .row { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
     .comment-form .hint { color: #8A94B0; font-size: 0.78rem; font-weight: 800; }
 
-    @media (max-width: 800px) { .forum-main { flex-direction: column; } .topic-actions { width: 100%; justify-content: flex-end; } .mini-name { max-width: 160px; } }
+    @media (max-width: 800px) {
+      .forum-main { flex-direction: column; }
+      .topic-actions { width: 100%; justify-content: flex-end; }
+      .mini-name { max-width: 160px; }
+    }
   </style>
 </head>
+
 <body>
 <div class="forum-container">
   <div class="forum-header">
@@ -127,6 +156,7 @@
   <div class="forum-footer">RussiaSoul RP · Криминальная Москва 2026 · <span style="color:#FFD966;">Официальный форум RSRP</span></div>
 </div>
 
+<!-- Topic modal -->
 <div id="topicModal" class="modal">
   <div class="modal-content">
     <span class="close-modal" onclick="closeModal()">&times;</span>
@@ -138,6 +168,7 @@
   </div>
 </div>
 
+<!-- Section modal (custom only, still local) -->
 <div id="sectionModal" class="modal">
   <div class="modal-content">
     <span class="close-modal" onclick="closeModal()">&times;</span>
@@ -149,6 +180,7 @@
   </div>
 </div>
 
+<!-- Profile modal -->
 <div id="profileModal" class="modal">
   <div class="modal-content">
     <span class="close-modal" onclick="closeModal()">&times;</span>
@@ -161,29 +193,33 @@
   </div>
 </div>
 
+<!-- Ranks modal -->
 <div id="ranksModal" class="modal">
   <div class="modal-content">
     <span class="close-modal" onclick="closeModal()">&times;</span>
     <h3 style="color:#FFD966;">Ранги (управление)</h3>
+
     <div style="color:#8A94B0; font-weight:800; font-size:0.85rem; margin-top:6px;">
-      Ранги берутся из Google Sheets. Добавление — тоже в Sheets.
+      Ранги хранятся в Google Sheets. Здесь можно добавлять/редактировать/удалять.
     </div>
+
     <input type="text" id="rankName" placeholder="Название ранга (например: Администратор)">
     <input type="text" id="rankColor" placeholder="Цвет (hex, например: #FFD966)">
     <button id="addRankBtn">Добавить ранг</button>
     <button class="cancel" onclick="closeModal()">Закрыть</button>
+
     <div id="ranksList" style="margin-top:14px;"></div>
   </div>
 </div>
 
 <script>
+  // ====== Apps Script (JSONP) ======
   const API_URL = "https://script.google.com/macros/s/AKfycbxvrqybl3Oc7DJB3lw4E9EYfp0pt0Obv_fz7FtBhH3PP83xA8qO-xmezyuHFz_vEbVu3g/exec";
   const API_KEY = "rsrp_12345";
 
   function api(action, payload = {}) {
     return new Promise((resolve, reject) => {
       const cbName = "__rsrp_cb_" + Date.now() + "_" + Math.random().toString(16).slice(2);
-
       const script = document.createElement("script");
 
       window[cbName] = (data) => {
@@ -218,15 +254,19 @@
     });
   }
 
+  // ====== local identity ======
   const USER_ID = (localStorage.getItem("rsrp_user_id") || ("u_" + Date.now() + "_" + Math.random().toString(16).slice(2)));
   localStorage.setItem("rsrp_user_id", USER_ID);
 
-  // ====== local cache for UI ======
-  const CACHE_KEY = "rsrp_cache_v2";
+  // ====== local cache (profile/ranks/profiles-map) ======
+  const CACHE_KEY = "rsrp_cache_v3";
+  const DEFAULT_AVATAR = "https://i.imgur.com/1Xq9BiO.png";
+
   function defaultCache(){
     return {
-      profile: { id: USER_ID, nick: "Игрок", avatar: "https://i.imgur.com/1Xq9BiO.png", rankId: "rank_none" },
-      ranks: [{ id: "rank_none", name: "Без ранга", color: "#FFD966" }]
+      profile: { id: USER_ID, nick: "Игрок", avatar: DEFAULT_AVATAR, rankId: "rank_none" },
+      ranks: [{ id: "rank_none", name: "Без ранга", color: "#FFD966" }],
+      profilesById: {} // userId -> {userId,nick,avatar,rankId}
     };
   }
   let cache = defaultCache();
@@ -257,6 +297,7 @@
     { id: "leader_app", name: "Заявление на пост лидера", desc: "Заявка на лидерство", icon: "fas fa-chart-line" }
   ];
 
+  // custom subs still local (быстро/просто)
   let customSubs = JSON.parse(localStorage.getItem("rsrp_custom_subs") || "[]");
   function saveCustomSubs(){ localStorage.setItem("rsrp_custom_subs", JSON.stringify(customSubs)); }
   function getAllSubs(){ return baseSubs.concat(customSubs); }
@@ -281,15 +322,27 @@
 
   // ====== helpers ======
   function esc(s){ return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+  function safeForAttr(s){ return String(s||"").replace(/'/g,"\\'"); }
 
   function getRank(rankId){
     return (cache.ranks||[]).find(r => r.id === rankId) || (cache.ranks||[])[0] || { id:"rank_none", name:"Без ранга", color:"#FFD966" };
   }
 
+  function profileFor(userId){
+    const p = (cache.profilesById && cache.profilesById[userId]) ? cache.profilesById[userId] : null;
+    if (!p) return { userId, nick: "Неизвестно", avatar: DEFAULT_AVATAR, rankId: "rank_none" };
+    return {
+      userId: p.userId || userId,
+      nick: p.nick || "Игрок",
+      avatar: p.avatar || DEFAULT_AVATAR,
+      rankId: p.rankId || "rank_none"
+    };
+  }
+
   function refreshMiniProfile(){
     const p = cache.profile || {};
     const r = getRank(p.rankId);
-    document.getElementById("miniAvatar").src = p.avatar || "https://i.imgur.com/1Xq9BiO.png";
+    document.getElementById("miniAvatar").src = p.avatar || DEFAULT_AVATAR;
     document.getElementById("miniName").innerText = p.nick || "Игрок";
     const el = document.getElementById("miniRank");
     el.innerText = r.name || "Без ранга";
@@ -308,6 +361,7 @@
     });
   }
 
+  // ====== API wrappers ======
   async function loadRanks(){
     const r = await api("listRanks");
     cache.ranks = (r.ranks||[]).map(x => ({ id:x.rankId, name:x.name, color:x.color }));
@@ -315,7 +369,112 @@
     cacheSave();
   }
 
-  // ====== UI modals ======
+  async function ensureProfiles(userIds){
+    const unique = Array.from(new Set((userIds||[]).map(String).filter(Boolean)));
+    const missing = unique.filter(id => !(cache.profilesById && cache.profilesById[id]));
+    if (missing.length === 0) return;
+
+    const r = await api("listProfiles", { userIds: missing.join(",") });
+    cache.profilesById = cache.profilesById || {};
+    (r.profiles || []).forEach(p => {
+      cache.profilesById[String(p.userId)] = {
+        userId: String(p.userId),
+        nick: String(p.nick || "Игрок"),
+        avatar: String(p.avatar || DEFAULT_AVATAR),
+        rankId: String(p.rankId || "rank_none")
+      };
+    });
+
+    // если профиля нет в таблице — создадим “заглушку” (потом пользователь сам сохранит)
+    missing.forEach(id => {
+      if (!cache.profilesById[id]) {
+        cache.profilesById[id] = { userId: id, nick: "Игрок", avatar: DEFAULT_AVATAR, rankId: "rank_none" };
+      }
+    });
+
+    cacheSave();
+  }
+
+  async function listTopics(categoryId){
+    const r = await api("listTopics", { categoryId });
+    return (r.topics||[]).map(t => ({
+      id: t.topicId,
+      categoryId: t.categoryId,
+      title: t.title,
+      content: t.content,
+      authorId: t.authorId || "",
+      createdAt: t.createdAt,
+      updatedAt: t.updatedAt
+    }));
+  }
+
+  async function getTopic(topicId){
+    const r = await api("getTopic", { topicId });
+    const t = r.topic;
+    return {
+      id: t.topicId,
+      categoryId: t.categoryId,
+      title: t.title,
+      content: t.content,
+      authorId: t.authorId || "",
+      createdAt: t.createdAt,
+      updatedAt: t.updatedAt
+    };
+  }
+
+  async function createTopic(categoryId, title, content){
+    const r = await api("createTopic", { categoryId, title, content, authorId: USER_ID });
+    return r.topic;
+  }
+
+  async function updateTopic(topicId, title, content){
+    await api("updateTopic", { topicId, title, content, actorId: USER_ID });
+  }
+
+  async function deleteTopic(topicId){
+    await api("deleteTopic", { topicId, actorId: USER_ID });
+  }
+
+  async function listComments(topicId){
+    const r = await api("listComments", { topicId });
+    return (r.comments || []).map(c => ({
+      id: c.commentId,
+      topicId: c.topicId,
+      authorId: c.authorId || "",
+      text: c.text || "",
+      createdAt: c.createdAt
+    }));
+  }
+
+  async function createComment(topicId, text){
+    const r = await api("createComment", { topicId, authorId: USER_ID, text });
+    return r.comment;
+  }
+
+  async function updateComment(commentId, text){
+    await api("updateComment", { commentId, text, actorId: USER_ID });
+  }
+
+  async function deleteComment(commentId){
+    await api("deleteComment", { commentId, actorId: USER_ID });
+  }
+
+  async function createRank(name, color){
+    await api("createRank", { name, color });
+    await loadRanks();
+  }
+
+  async function updateRank(rankId, name, color){
+    await api("updateRank", { rankId, name, color });
+    await loadRanks();
+  }
+
+  async function deleteRank(rankId){
+    await api("deleteRank", { rankId });
+    await loadRanks();
+  }
+
+  // ====== modals ======
   function closeModal(){
     document.getElementById("topicModal").style.display = "none";
     document.getElementById("sectionModal").style.display = "none";
@@ -339,57 +498,60 @@
 
   function renderRanksList(){
     const box = document.getElementById("ranksList");
-    const ranks = (cache.ranks||[]).filter(r=>r.id!=="rank_none");
-    if(ranks.length===0){
+    const ranks = (cache.ranks || []).filter(r => r.id !== "rank_none");
+    if (ranks.length === 0) {
       box.innerHTML = "<div style='color:#8A94B0;font-weight:800;margin-top:10px;'>Рангов пока нет.</div>";
       return;
     }
-    box.innerHTML = ranks.map(r =>
-      '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px;border:1px solid rgba(35,39,50,0.9);border-radius:16px;background:rgba(12,15,24,0.25);margin-top:10px;">' +
-        '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">' +
-          '<div style="width:12px;height:12px;border-radius:99px;background:'+esc(r.color)+';border:1px solid rgba(255,255,255,0.15);"></div>' +
-          '<div style="font-weight:900;color:#E0E4F0;">'+esc(r.name)+'</div>' +
-          '<div style="font-weight:800;color:#8A94B0;font-size:0.78rem;">'+esc(r.color)+'</div>' +
-        '</div>' +
-      '</div>'
-    ).join("");
+
+    box.innerHTML = ranks.map(r => `
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px;border:1px solid rgba(35,39,50,0.9);border-radius:16px;background:rgba(12,15,24,0.25);margin-top:10px;">
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+          <div style="width:12px;height:12px;border-radius:99px;background:${esc(r.color)};border:1px solid rgba(255,255,255,0.15);"></div>
+          <div style="font-weight:900;color:#E0E4F0;">${esc(r.name)}</div>
+          <div style="font-weight:800;color:#8A94B0;font-size:0.78rem;">${esc(r.color)}</div>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button class="icon-btn" title="Редактировать" onclick="uiEditRank('${esc(r.id)}')"><i class="fas fa-edit"></i></button>
+          <button class="icon-btn danger" title="Удалить" onclick="uiDeleteRank('${esc(r.id)}')"><i class="fas fa-trash-alt"></i></button>
+        </div>
+      </div>
+    `).join("");
   }
 
-  // ====== sheets api wrappers ======
-  async function listTopics(categoryId){
-    const r = await api("listTopics", { categoryId });
-    return (r.topics||[]).map(t => ({
-      id: t.topicId,
-      categoryId: t.categoryId,
-      title: t.title,
-      content: t.content,
-      authorId: t.authorId,
-      createdAt: t.createdAt,
-      updatedAt: t.updatedAt
-    }));
+  async function uiEditRank(rankId){
+    const r = (cache.ranks||[]).find(x=>x.id===rankId);
+    if(!r) return;
+    const name = prompt("Название ранга:", r.name || "");
+    if (name === null) return;
+    const color = prompt("Цвет (hex), например #FFD966:", r.color || "#FFD966");
+    if (color === null) return;
+
+    try {
+      await updateRank(rankId, String(name).trim(), String(color).trim());
+      renderRanksList();
+      fillRankSelect(document.getElementById("profileRank"), cache.profile.rankId || "rank_none");
+      refreshMiniProfile();
+    } catch (e) {
+      console.error(e);
+      alert("Ошибка редактирования ранга");
+    }
   }
 
-  async function createTopic(categoryId, title, content){
-    const r = await api("createTopic", { categoryId, title, content, authorId: USER_ID });
-    return r.topic;
-  }
-
-  async function updateTopic(topicId, title, content){
-    await api("updateTopic", { topicId, title, content });
-  }
-
-  async function deleteTopic(topicId){
-    await api("deleteTopic", { topicId });
-  }
-
-  async function listComments(topicId){
-    const r = await api("listComments", { topicId });
-    return r.comments || [];
-  }
-
-  async function createComment(topicId, text){
-    const r = await api("createComment", { topicId, authorId: USER_ID, text });
-    return r.comment;
+  async function uiDeleteRank(rankId){
+    if(!confirm("Удалить ранг?")) return;
+    try {
+      await deleteRank(rankId);
+      // если текущий профиль стоял на этом ранге — сбросим
+      if (cache.profile.rankId === rankId) cache.profile.rankId = "rank_none";
+      cacheSave();
+      renderRanksList();
+      fillRankSelect(document.getElementById("profileRank"), cache.profile.rankId || "rank_none");
+      refreshMiniProfile();
+    } catch (e) {
+      console.error(e);
+      alert("Ошибка удаления ранга");
+    }
   }
 
   // ====== pages ======
@@ -495,6 +657,7 @@
     let arr = [];
     try {
       arr = await listTopics(cat);
+      await ensureProfiles(arr.map(t => t.authorId).filter(Boolean));
     } catch (e) {
       console.error(e);
       document.querySelector(".topics-list").innerHTML = '<div class="empty-topics">Ошибка загрузки тем</div>';
@@ -507,15 +670,29 @@
     } else {
       for (let i=0;i<arr.length;i++){
         const t = arr[i];
+        const ap = profileFor(t.authorId);
+        const ar = getRank(ap.rankId);
+
+        const canEdit = String(t.authorId) === String(USER_ID);
+
         html +=
           '<div class="topic-item">' +
-            '<div style="flex:1; min-width: 220px;" onclick="showThread(\''+cat+'\',\''+t.id+'\',\''+(t.title||"").replace(/'/g,"\\'")+'\',\''+(title||"").replace(/'/g,"\\'")+'\')">' +
+            '<div style="flex:1; min-width: 220px;" onclick="showThread(\''+cat+'\',\''+t.id+'\',\''+safeForAttr(t.title)+'\',\''+safeForAttr(title)+'\')">' +
               '<div class="topic-title">'+esc(t.title)+'</div>' +
-              '<div class="topic-meta"><i class="fas fa-user"></i> '+esc(cache.profile.nick)+' · '+esc(new Date(t.createdAt||Date.now()).toLocaleDateString())+'</div>' +
+              '<div class="topic-meta">' +
+                '<img class="meta-avatar" alt="ava" src="'+esc(ap.avatar)+'" />' +
+                '<span>'+esc(ap.nick)+'</span>' +
+                '<span class="meta-rank" style="color:'+esc(ar.color)+';border-color:'+esc(ar.color)+'55;background:'+esc(ar.color)+'12;">'+esc(ar.name)+'</span>' +
+                '<span>·</span>' +
+                '<span>'+esc(new Date(t.createdAt||Date.now()).toLocaleDateString())+'</span>' +
+              '</div>' +
             '</div>' +
             '<div class="topic-actions" onclick="event.stopPropagation();">' +
-              '<button class="icon-btn" title="Редактировать" onclick="openEdit(\''+cat+'\',\''+t.id+'\',\''+(t.title||"").replace(/'/g,"\\'")+'\',\''+(t.content||"").replace(/'/g,"\\'")+'\')"><i class="fas fa-edit"></i></button>' +
-              '<button class="icon-btn danger" title="Удалить" onclick="delTopicUI(\''+cat+'\',\''+t.id+'\',\''+(title||"").replace(/'/g,"\\'")+'\')"><i class="fas fa-trash-alt"></i></button>' +
+              (canEdit
+                ? '<button class="icon-btn" title="Редактировать" onclick="openEdit(\''+cat+'\',\''+t.id+'\',\''+safeForAttr(t.title)+'\',\''+safeForAttr(t.content)+'\')"><i class="fas fa-edit"></i></button>' +
+                  '<button class="icon-btn danger" title="Удалить" onclick="delTopicUI(\''+cat+'\',\''+t.id+'\',\''+safeForAttr(title)+'\')"><i class="fas fa-trash-alt"></i></button>'
+                : '<button class="icon-btn" title="Недоступно" onclick="alert(\'Редактировать/удалять может только автор или модератор\')"><i class="fas fa-lock"></i></button>'
+              ) +
             '</div>' +
           '</div>';
       }
@@ -533,7 +710,8 @@
       await deleteTopic(topicId);
     } catch (e) {
       console.error(e);
-      alert("Ошибка удаления");
+      if (String(e.message||"").includes("forbidden")) alert("Нет прав (только автор/модератор)");
+      else alert("Ошибка удаления");
       return;
     }
     renderTopics(cat, listTitle, currentView.back || showMain);
@@ -569,40 +747,103 @@
         '</div>' +
       '</div>';
 
-    let topics = [];
-    try { topics = await listTopics(cat); } catch(e){ console.error(e); }
-    const topic = topics.find(t => t.id === id);
+    let topic = null;
+    let cmts = [];
+    try {
+      topic = await getTopic(id);
+      cmts = await listComments(id);
+
+      const ids = [];
+      if (topic && topic.authorId) ids.push(topic.authorId);
+      cmts.forEach(c => c.authorId && ids.push(c.authorId));
+      await ensureProfiles(ids);
+    } catch (e) {
+      console.error(e);
+      document.querySelector(".thread-content").innerHTML = "Ошибка загрузки";
+      return;
+    }
 
     const view = document.querySelector(".thread-view");
-    view.querySelector(".thread-content").innerHTML = esc(topic ? topic.content : "").replace(/\n/g,"<br>");
 
-    let cmts = [];
-    try { cmts = await listComments(id); } catch(e){ console.error(e); }
+    const author = profileFor(topic.authorId);
+    const authorRank = getRank(author.rankId);
+    const canTopicEdit = String(topic.authorId) === String(USER_ID);
 
-    view.insertAdjacentHTML("beforeend",
-      '<div class="comments-wrap">' +
-        '<div class="comments-title"><i class="fas fa-comments" style="color:#FFD966;"></i> Комментарии ('+cmts.length+')</div>' +
-        (cmts.length
-          ? cmts.map(c =>
-              '<div class="comment">' +
-                '<img class="comment-avatar" alt="ava" src="'+esc(cache.profile.avatar)+'"/>' +
-                '<div class="comment-main">' +
-                  '<div class="comment-head"><div><span class="comment-author">'+esc(cache.profile.nick)+'</span> <span class="comment-date">'+esc(new Date(c.createdAt||Date.now()).toLocaleString())+'</span></div></div>' +
-                  '<div class="comment-text">'+esc(c.text).replace(/\n/g,"<br>")+'</div>' +
-                '</div>' +
-              '</div>'
-            ).join("")
-          : '<div style="color:#8A94B0;font-weight:800;margin:6px 0 12px;">Пока нет комментариев. Будь первым.</div>'
-        ) +
-        '<div class="comment-form">' +
-          '<textarea id="commentText" placeholder="Написать комментарий..."></textarea>' +
-          '<div class="row">' +
-            '<div class="hint">Пишешь как: <span style="color:#FFD966;">'+esc(cache.profile.nick)+'</span></div>' +
-            '<button class="chip-btn" onclick="submitComment(\''+cat+'\',\''+id+'\',\''+topicTitle.replace(/'/g,"\\'")+'\',\''+listTitle.replace(/'/g,"\\'")+'\')"><i class="fas fa-paper-plane"></i> Отправить</button>' +
-          '</div>' +
+    view.innerHTML =
+      '<div class="thread-title">'+esc(topic.title)+'</div>' +
+      '<div class="thread-meta">' +
+        '<div class="thread-author">' +
+          '<img alt="ava" src="'+esc(author.avatar)+'" />' +
+          '<span>'+esc(author.nick)+'</span>' +
+          '<span class="meta-rank" style="color:'+esc(authorRank.color)+';border-color:'+esc(authorRank.color)+'55;background:'+esc(authorRank.color)+'12;">'+esc(authorRank.name)+'</span>' +
+          '<span>·</span>' +
+          '<span>'+esc(new Date(topic.createdAt||Date.now()).toLocaleString())+'</span>' +
         '</div>' +
-      '</div>'
-    );
+        '<div class="topic-actions" onclick="event.stopPropagation();">' +
+          (canTopicEdit
+            ? '<button class="icon-btn" title="Редактировать" onclick="openEdit(\''+cat+'\',\''+topic.id+'\',\''+safeForAttr(topic.title)+'\',\''+safeForAttr(topic.content)+'\')"><i class="fas fa-edit"></i></button>' +
+              '<button class="icon-btn danger" title="Удалить" onclick="delTopicUI(\''+cat+'\',\''+topic.id+'\',\''+safeForAttr(listTitle)+'\')"><i class="fas fa-trash-alt"></i></button>'
+            : '<button class="icon-btn" title="Недоступно" onclick="alert(\'Редактировать/удалять может только автор или модератор\')"><i class="fas fa-lock"></i></button>'
+          ) +
+        '</div>' +
+      '</div>' +
+      '<div class="thread-content">'+esc(topic.content).replace(/\n/g,"<br>")+'</div>';
+
+    // comments
+    view.insertAdjacentHTML("beforeend", '<div class="comments-wrap" id="commentsWrap"></div>');
+    renderComments(cat, topic.id, topic.title, listTitle, cmts);
+  }
+
+  function renderComments(cat, topicId, topicTitle, listTitle, cmts){
+    const wrap = document.getElementById("commentsWrap");
+    if (!wrap) return;
+
+    let html =
+      '<div class="comments-title"><i class="fas fa-comments" style="color:#FFD966;"></i> Комментарии ('+cmts.length+')</div>';
+
+    if (cmts.length === 0) {
+      html += '<div style="color:#8A94B0;font-weight:800;margin:6px 0 12px;">Пока нет комментариев. Будь первым.</div>';
+    } else {
+      html += cmts.map(c => {
+        const ap = profileFor(c.authorId);
+        const ar = getRank(ap.rankId);
+        const canEdit = String(c.authorId) === String(USER_ID);
+
+        return (
+          '<div class="comment">' +
+            '<img class="comment-avatar" alt="ava" src="'+esc(ap.avatar)+'"/>' +
+            '<div class="comment-main">' +
+              '<div class="comment-head">' +
+                '<div class="comment-author">' +
+                  '<span>'+esc(ap.nick)+'</span>' +
+                  '<span class="meta-rank" style="color:'+esc(ar.color)+';border-color:'+esc(ar.color)+'55;background:'+esc(ar.color)+'12;">'+esc(ar.name)+'</span>' +
+                  '<span class="comment-date">'+esc(new Date(c.createdAt||Date.now()).toLocaleString())+'</span>' +
+                '</div>' +
+                '<div class="comment-actions">' +
+                  (canEdit
+                    ? '<button class="icon-btn" title="Редактировать" onclick="uiEditComment(\''+esc(c.id)+'\',\''+safeForAttr(c.text)+'\',\''+esc(cat)+'\',\''+esc(topicId)+'\',\''+safeForAttr(topicTitle)+'\',\''+safeForAttr(listTitle)+'\')"><i class="fas fa-edit"></i></button>' +
+                      '<button class="icon-btn danger" title="Удалить" onclick="uiDeleteComment(\''+esc(c.id)+'\',\''+esc(cat)+'\',\''+esc(topicId)+'\',\''+safeForAttr(topicTitle)+'\',\''+safeForAttr(listTitle)+'\')"><i class="fas fa-trash-alt"></i></button>'
+                    : ''
+                  ) +
+                '</div>' +
+              '</div>' +
+              '<div class="comment-text">'+esc(c.text).replace(/\n/g,"<br>")+'</div>' +
+            '</div>' +
+          '</div>'
+        );
+      }).join("");
+    }
+
+    html +=
+      '<div class="comment-form">' +
+        '<textarea id="commentText" placeholder="Написать комментарий..."></textarea>' +
+        '<div class="row">' +
+          '<div class="hint">Пишешь как: <span style="color:#FFD966;">'+esc(cache.profile.nick)+'</span></div>' +
+          '<button class="chip-btn" onclick="submitComment(\''+esc(cat)+'\',\''+esc(topicId)+'\',\''+safeForAttr(topicTitle)+'\',\''+safeForAttr(listTitle)+'\')"><i class="fas fa-paper-plane"></i> Отправить</button>' +
+        '</div>' +
+      '</div>';
+
+    wrap.innerHTML = html;
   }
 
   async function submitComment(cat, topicId, topicTitle, listTitle){
@@ -611,12 +852,37 @@
     if (!text) return alert("Напиши комментарий");
     try {
       await createComment(topicId, text);
+      await showThread(cat, topicId, topicTitle, listTitle);
     } catch(e){
       console.error(e);
       alert("Ошибка отправки");
-      return;
     }
-    showThread(cat, topicId, topicTitle, listTitle);
+  }
+
+  async function uiEditComment(commentId, currentText, cat, topicId, topicTitle, listTitle){
+    const text = prompt("Редактировать комментарий:", currentText || "");
+    if (text === null) return;
+    if (!String(text).trim()) return alert("Текст пустой");
+    try {
+      await updateComment(commentId, String(text));
+      await showThread(cat, topicId, topicTitle, listTitle);
+    } catch (e) {
+      console.error(e);
+      if (String(e.message||"").includes("forbidden")) alert("Нет прав (только автор/модератор)");
+      else alert("Ошибка редактирования");
+    }
+  }
+
+  async function uiDeleteComment(commentId, cat, topicId, topicTitle, listTitle){
+    if (!confirm("Удалить комментарий?")) return;
+    try {
+      await deleteComment(commentId);
+      await showThread(cat, topicId, topicTitle, listTitle);
+    } catch (e) {
+      console.error(e);
+      if (String(e.message||"").includes("forbidden")) alert("Нет прав (только автор/модератор)");
+      else alert("Ошибка удаления");
+    }
   }
 
   function showTech(){
@@ -633,7 +899,7 @@
     for (let i=0;i<tech.length;i++){
       const t = tech[i];
       html +=
-        '<div class="category-item" onclick="renderTopics(\''+t.id+'\',\''+(t.name||"").replace(/'/g,"\\'")+'\', showTech)">' +
+        '<div class="category-item" onclick="renderTopics(\''+t.id+'\',\''+safeForAttr(t.name)+'\', showTech)">' +
           '<div class="cat-info"><h3><i class="'+t.icon+'"></i> '+esc(t.name)+'</h3><p>'+esc(t.desc)+'</p></div>' +
           '<div class="cat-stats"><i class="fas fa-folder"></i></div>' +
         '</div>';
@@ -657,7 +923,7 @@
     for (let i=0;i<complaintsList.length;i++){
       const c = complaintsList[i];
       html +=
-        '<div class="category-item" onclick="renderTopics(\''+c.id+'\',\''+(c.name||"").replace(/'/g,"\\'")+'\', showComplaints)">' +
+        '<div class="category-item" onclick="renderTopics(\''+c.id+'\',\''+safeForAttr(c.name)+'\', showComplaints)">' +
           '<div class="cat-info"><h3><i class="'+c.icon+'"></i> '+esc(c.name)+'</h3><p>'+esc(c.desc)+'</p></div>' +
           '<div class="cat-stats"><i class="fas fa-folder"></i></div>' +
         '</div>';
@@ -688,7 +954,8 @@
       else await createTopic(currentCategory, title, content);
     } catch(e){
       console.error(e);
-      alert("Ошибка сохранения темы");
+      if (String(e.message||"").includes("forbidden")) alert("Нет прав (только автор/модератор)");
+      else alert("Ошибка сохранения темы");
       return;
     }
 
@@ -704,8 +971,10 @@
 
     cache.profile.id = USER_ID;
     cache.profile.nick = nick;
-    cache.profile.avatar = ava || "https://i.imgur.com/1Xq9BiO.png";
+    cache.profile.avatar = ava || DEFAULT_AVATAR;
     cache.profile.rankId = rankId || "rank_none";
+    cache.profilesById = cache.profilesById || {};
+    cache.profilesById[USER_ID] = { userId: USER_ID, nick: cache.profile.nick, avatar: cache.profile.avatar, rankId: cache.profile.rankId };
     cacheSave();
 
     try {
@@ -717,6 +986,7 @@
 
     refreshMiniProfile();
     closeModal();
+    refreshView();
   };
 
   document.getElementById("addRankBtn").onclick = async function(){
@@ -725,8 +995,7 @@
     if(!name) return alert("Введите название ранга");
 
     try {
-      await api("createRank", { name, color });
-      await loadRanks();
+      await createRank(name, color);
       renderRanksList();
       fillRankSelect(document.getElementById("profileRank"), cache.profile.rankId || "rank_none");
       refreshMiniProfile();
@@ -740,6 +1009,15 @@
   (async () => {
     cacheLoad();
     await loadRanks();
+    await ensureProfiles([USER_ID]);
+    cache.profile = {
+      id: USER_ID,
+      nick: profileFor(USER_ID).nick,
+      avatar: profileFor(USER_ID).avatar,
+      rankId: profileFor(USER_ID).rankId
+    };
+    cacheSave();
+
     fillRankSelect(document.getElementById("profileRank"), cache.profile.rankId || "rank_none");
     refreshMiniProfile();
     showMain();
