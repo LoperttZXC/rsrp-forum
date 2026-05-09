@@ -201,7 +201,7 @@
   <div class="modal-content">
     <span class="close-modal" onclick="closeModal()">&times;</span>
     <h3 style="color:#FFD966;">Ранги (управление)</h3>
-    <div style="color:#8A94B0; font-weight:800; font-size:0.85rem; margin-top:6px;">Только Руководитель проекта может менять ранги.</div>
+    <div style="color:#8A94B0; font-weight:800; font-size:0.85rem; margin-top:6px;">Только Основатель и Руководитель проекта могут управлять рангами.</div>
     <input type="text" id="rankName" placeholder="Название ранга (например: Администратор)">
     <input type="text" id="rankColor" placeholder="Цвет (hex, например: #FFD966)">
     <button id="addRankBtn">Добавить ранг</button>
@@ -214,7 +214,7 @@
   <div class="modal-content">
     <span class="close-modal" onclick="closeModal()">&times;</span>
     <h3 style="color:#FFD966;"><i class="fas fa-users"></i> Управление пользователями</h3>
-    <div style="color:#8A94B0; font-weight:800; font-size:0.85rem; margin-top:6px; margin-bottom:12px;">Только Руководитель проекта может менять ранги пользователям.</div>
+    <div style="color:#8A94B0; font-weight:800; font-size:0.85rem; margin-top:6px; margin-bottom:12px;">Только Основатель и Руководитель проекта могут менять ранги пользователям.</div>
     <div class="users-search">
       <input type="text" id="usersSearchInput" placeholder="Поиск по нику или ID..." onkeyup="filterUsersList()">
       <button class="chip-btn" onclick="loadUsersList()" style="margin:0;"><i class="fas fa-sync-alt"></i> Обновить</button>
@@ -278,18 +278,38 @@
   const USER_ID = localStorage.getItem("rsrp_user_id") || ("u_" + Date.now() + "_" + Math.random().toString(16).slice(2));
   localStorage.setItem("rsrp_user_id", USER_ID);
 
-  const LEADER_ID = "u_1778319751780_7f581c595e1c7";
-  const LEADER_RANK_ID = "r_1778321320732";
-  function isLeader() { return String(USER_ID) === String(LEADER_ID); }
+  // ─── СИСТЕМА ПРАВ ПО РАНГАМ ───────────────────────────────────────────────
+  // Уровень 2: Основатель (r_1778324473913) + Руководитель (r_1778321320732)
+  //            → всё: ранги, темы везде, редактирование/удаление чужого
+  // Уровень 1: Гл. администратор (r_1778320331945)
+  //            → темы везде, редактирование/удаление чужого, НО без управления рангами
+  // Уровень 0: все остальные — только свои темы/комменты в открытых разделах
+
+  const RANK_LEVEL = {
+    "r_1778324473913": 2,  // Основатель
+    "r_1778321320732": 2,  // Руководитель проекта
+    "r_1778320331945": 1,  // Главный администратор
+  };
+
+  function myLevel() {
+    const rankId = (cache.profile && cache.profile.rankId) || "rank_none";
+    return RANK_LEVEL[rankId] || 0;
+  }
+
+  function isAdmin()  { return myLevel() >= 1; }
+  function isLeader() { return myLevel() >= 2; }
 
   const OPEN_TOPIC_CATEGORIES = new Set([
     "tech_help","tech_bugs","tech_support",
     "complaint_admin","complaint_players","complaint_leaders",
     "amnesty","moderator_app","leader_app"
   ]);
-  function canCreateTopicIn(cat) { return isLeader() || OPEN_TOPIC_CATEGORIES.has(String(cat)); }
+  function canCreateTopicIn(cat) { return isAdmin() || OPEN_TOPIC_CATEGORIES.has(String(cat)); }
+  function canEditContent(authorId) { return isAdmin() || String(authorId) === String(USER_ID); }
+
+  const HIDDEN_RANKS = new Set(["r_1778324473913", "r_1778321320732"]);
   function visibleRankId(rankId) {
-    return (!isLeader() && String(rankId) === String(LEADER_RANK_ID)) ? "rank_none" : rankId;
+    return (!isLeader() && HIDDEN_RANKS.has(String(rankId))) ? "rank_none" : rankId;
   }
 
   // ─── CACHE ────────────────────────────────────────────────────────────────
@@ -605,7 +625,7 @@
   }
 
   function openUserManager() {
-    if (!isLeader()) return alert("Только Руководитель проекта может управлять пользователями");
+    if (!isLeader()) return alert("Только Основатель и Руководитель проекта могут управлять пользователями");
     document.getElementById("usersSearchInput").value = "";
     document.getElementById("usersModal").style.display = "flex";
     loadUsersList();
@@ -763,7 +783,7 @@
       html = arr.map(t => {
         const ap = profileFor(t.authorId);
         const ar = getRank(visibleRankId(ap.rankId));
-        const canEdit = isLeader() || String(t.authorId) === String(USER_ID);
+        const canEdit = canEditContent(t.authorId);
         return `
           <div class="topic-item">
             <div style="flex:1;min-width:220px;" onclick="showThread('${cat}','${t.id}','${safeForAttr(t.title)}','${safeForAttr(title)}')">
@@ -860,7 +880,7 @@
 
     const author = profileFor(topic.authorId);
     const authorRank = getRank(visibleRankId(author.rankId));
-    const canTopicEdit = isLeader() || String(topic.authorId) === String(USER_ID);
+    const canTopicEdit = canEditContent(topic.authorId);
 
     const tv = document.querySelector(".thread-view");
     if (!tv) return;
@@ -899,7 +919,7 @@
       html += cmts.map(c => {
         const ap = profileFor(c.authorId);
         const ar = getRank(visibleRankId(ap.rankId));
-        const canEdit = isLeader() || String(c.authorId) === String(USER_ID);
+        const canEdit = canEditContent(c.authorId);
         return `
           <div class="comment">
             <img class="comment-avatar" alt="ava" src="${esc(ap.avatar)}" />
@@ -1065,15 +1085,19 @@
     catch (e) { console.error(e); alert("Нет прав (только Руководитель проекта)"); }
   };
 
+  function updateAdminButtons() {
+    document.getElementById("ranksBtn").style.display = isLeader() ? "inline-flex" : "none";
+    document.getElementById("usersBtn").style.display = isLeader() ? "inline-flex" : "none";
+  }
+
   // ─── ИНИЦИАЛИЗАЦИЯ ────────────────────────────────────────────────────────
   (async () => {
     cacheLoad();
 
     // Показываем главную сразу из кэша — пользователь видит контент моментально
     refreshMiniProfile();
-    document.getElementById("ranksBtn").style.display = isLeader() ? "inline-flex" : "none";
-    document.getElementById("usersBtn").style.display = isLeader() ? "inline-flex" : "none";
-    showMain(); // рендерим из кэша немедленно
+    updateAdminButtons();
+    showMain();
 
     // Фоновая загрузка свежих данных
     try {
@@ -1088,6 +1112,7 @@
 
       fillRankSelect(document.getElementById("profileRank"), cache.profile.rankId || "rank_none");
       refreshMiniProfile();
+      updateAdminButtons(); // пересчитываем после получения актуального ранга
     } catch (e) {
       console.error("Init error:", e);
     }
