@@ -92,8 +92,6 @@
     .comment-form textarea { width: 100%; min-height: 88px; resize: vertical; padding: 10px; background: #1E232F; border: 1px solid #232732; border-radius: 12px; color: white; font-family: 'Inter', sans-serif; font-weight: 700; outline: none; }
     .comment-form .row { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
     .comment-form .hint { color: #8A94B0; font-size: 0.78rem; font-weight: 800; }
-    
-    /* Стили для управления пользователями */
     .users-search { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
     .users-search input { flex: 1; min-width: 200px; }
     .users-list { max-height: 500px; overflow-y: auto; }
@@ -107,9 +105,25 @@
     .user-actions select { padding: 6px; background: #1E232F; border: 1px solid rgba(255,217,102,0.55); border-radius: 8px; color: #FFD966; font-weight: 700; font-size: 0.8rem; cursor: pointer; }
     .user-actions select:hover { border-color: #FFD966; }
 
-    @media (max-width: 800px) { 
-      .forum-main { flex-direction: column; } 
-      .topic-actions { width: 100%; justify-content: flex-end; } 
+    /* Skeleton loader */
+    @keyframes shimmer {
+      0% { background-position: -600px 0; }
+      100% { background-position: 600px 0; }
+    }
+    .skeleton {
+      background: linear-gradient(90deg, #1A1E2A 25%, #232838 50%, #1A1E2A 75%);
+      background-size: 600px 100%;
+      animation: shimmer 1.4s infinite linear;
+      border-radius: 8px;
+    }
+    .skeleton-topic { height: 58px; margin: 10px 0; border-radius: 12px; }
+    .skeleton-line { height: 14px; margin: 8px 0; }
+    .skeleton-line.short { width: 40%; }
+    .skeleton-line.medium { width: 65%; }
+
+    @media (max-width: 800px) {
+      .forum-main { flex-direction: column; }
+      .topic-actions { width: 100%; justify-content: flex-end; }
       .mini-name { max-width: 160px; }
       .user-item { flex-direction: column; align-items: flex-start; }
       .user-actions { width: 100%; }
@@ -124,14 +138,12 @@
         <h1><i class="fas fa-city"></i> RUSSIA SOUL RP | RSRP</h1>
         <p>Криминальная Москва · GTA 5 RolePlay · Реализм 24/7</p>
       </div>
-
       <div class="header-actions">
         <div class="mini-profile" title="Профиль">
           <img id="miniAvatar" class="mini-avatar" alt="avatar" />
           <div class="mini-name" id="miniName">Игрок</div>
           <div class="mini-rank" id="miniRank">Без ранга</div>
         </div>
-
         <button class="chip-btn" onclick="openProfile()"><i class="fas fa-user"></i> Профиль</button>
         <button id="ranksBtn" class="chip-btn" onclick="openRanks()" style="display:none;"><i class="fas fa-award"></i> Ранги</button>
         <button id="usersBtn" class="chip-btn" onclick="openUserManager()" style="display:none;"><i class="fas fa-users"></i> Пользователи</button>
@@ -150,6 +162,7 @@
   <div class="forum-footer">RussiaSoul RP · Криминальная Москва 2026 · <span style="color:#FFD966;">Официальный форум RSRP</span></div>
 </div>
 
+<!-- Modals -->
 <div id="topicModal" class="modal">
   <div class="modal-content">
     <span class="close-modal" onclick="closeModal()">&times;</span>
@@ -188,9 +201,7 @@
   <div class="modal-content">
     <span class="close-modal" onclick="closeModal()">&times;</span>
     <h3 style="color:#FFD966;">Ранги (управление)</h3>
-    <div style="color:#8A94B0; font-weight:800; font-size:0.85rem; margin-top:6px;">
-      Только Руководитель проекта может менять ранги.
-    </div>
+    <div style="color:#8A94B0; font-weight:800; font-size:0.85rem; margin-top:6px;">Только Руководитель проекта может менять ранги.</div>
     <input type="text" id="rankName" placeholder="Название ранга (например: Администратор)">
     <input type="text" id="rankColor" placeholder="Цвет (hex, например: #FFD966)">
     <button id="addRankBtn">Добавить ранг</button>
@@ -203,15 +214,11 @@
   <div class="modal-content">
     <span class="close-modal" onclick="closeModal()">&times;</span>
     <h3 style="color:#FFD966;"><i class="fas fa-users"></i> Управление пользователями</h3>
-    <div style="color:#8A94B0; font-weight:800; font-size:0.85rem; margin-top:6px; margin-bottom:12px;">
-      Только Руководитель проекта может менять ранги пользователям.
-    </div>
-    
+    <div style="color:#8A94B0; font-weight:800; font-size:0.85rem; margin-top:6px; margin-bottom:12px;">Только Руководитель проекта может менять ранги пользователям.</div>
     <div class="users-search">
       <input type="text" id="usersSearchInput" placeholder="Поиск по нику или ID..." onkeyup="filterUsersList()">
       <button class="chip-btn" onclick="loadUsersList()" style="margin:0;"><i class="fas fa-sync-alt"></i> Обновить</button>
     </div>
-    
     <div class="users-list" id="usersList">
       <div style="color:#8A94B0;font-weight:800;text-align:center;padding:20px;">Загрузка пользователей...</div>
     </div>
@@ -222,33 +229,43 @@
   const API_URL = "https://script.google.com/macros/s/AKfycbxvrqybl3Oc7DJB3lw4E9EYfp0pt0Obv_fz7FtBhH3PP83xA8qO-xmezyuHFz_vEbVu3g/exec";
   const API_KEY = "rsrp_12345";
 
-  function api(action, payload = {}) {
+  // ─── JSONP с таймаутом и очередью ─────────────────────────────────────────
+  const _queue = new Map(); // pending callbacks
+
+  function api(action, payload = {}, timeoutMs = 12000) {
     return new Promise((resolve, reject) => {
-      const cbName = "__rsrp_cb_" + Date.now() + "_" + Math.random().toString(16).slice(2);
+      const cbName = "__rsrp_" + Date.now() + "_" + Math.random().toString(36).slice(2);
       const script = document.createElement("script");
+      let done = false;
+
+      const timer = setTimeout(() => {
+        if (done) return;
+        done = true;
+        delete window[cbName];
+        script.remove();
+        reject(new Error("timeout"));
+      }, timeoutMs);
 
       window[cbName] = (data) => {
-        try {
-          if (!data || !data.ok) throw new Error((data && data.error) || "api_error");
-          resolve(data);
-        } catch (e) {
-          reject(e);
-        } finally {
-          delete window[cbName];
-          script.remove();
-        }
+        if (done) return;
+        done = true;
+        clearTimeout(timer);
+        delete window[cbName];
+        script.remove();
+        if (!data || !data.ok) return reject(new Error((data && data.error) || "api_error"));
+        resolve(data);
       };
 
-      const params = new URLSearchParams();
-      params.set("action", action);
-      params.set("key", API_KEY);
-      params.set("callback", cbName);
-      Object.keys(payload).forEach(k => {
+      const params = new URLSearchParams({ action, key: API_KEY, callback: cbName });
+      for (const k in payload) {
         if (payload[k] !== undefined && payload[k] !== null) params.set(k, String(payload[k]));
-      });
+      }
 
       script.src = API_URL + "?" + params.toString();
       script.onerror = () => {
+        if (done) return;
+        done = true;
+        clearTimeout(timer);
         delete window[cbName];
         script.remove();
         reject(new Error("jsonp_load_failed"));
@@ -257,100 +274,117 @@
     });
   }
 
-  const USER_ID = (localStorage.getItem("rsrp_user_id") || ("u_" + Date.now() + "_" + Math.random().toString(16).slice(2)));
+  // ─── USER ID ───────────────────────────────────────────────────────────────
+  const USER_ID = localStorage.getItem("rsrp_user_id") || ("u_" + Date.now() + "_" + Math.random().toString(16).slice(2));
   localStorage.setItem("rsrp_user_id", USER_ID);
 
-  // RULES (from you)
   const LEADER_ID = "u_1778319751780_7f581c595e1c7";
   const LEADER_RANK_ID = "r_1778321320732";
-  function isLeader(){ return String(USER_ID) === String(LEADER_ID); }
+  function isLeader() { return String(USER_ID) === String(LEADER_ID); }
 
   const OPEN_TOPIC_CATEGORIES = new Set([
     "tech_help","tech_bugs","tech_support",
     "complaint_admin","complaint_players","complaint_leaders",
     "amnesty","moderator_app","leader_app"
   ]);
-  function canCreateTopicIn(cat){ return isLeader() || OPEN_TOPIC_CATEGORIES.has(String(cat)); }
-
-  function visibleRankId(rankId){
-    if (!isLeader() && String(rankId) === String(LEADER_RANK_ID)) return "rank_none";
-    return rankId;
+  function canCreateTopicIn(cat) { return isLeader() || OPEN_TOPIC_CATEGORIES.has(String(cat)); }
+  function visibleRankId(rankId) {
+    return (!isLeader() && String(rankId) === String(LEADER_RANK_ID)) ? "rank_none" : rankId;
   }
 
-  const CACHE_KEY = "rsrp_cache_rules_v1";
+  // ─── CACHE ────────────────────────────────────────────────────────────────
+  const CACHE_KEY = "rsrp_cache_v2";
+  const PROFILE_TTL = 5 * 60 * 1000;    // 5 минут для профилей
+  const RANKS_TTL   = 10 * 60 * 1000;   // 10 минут для рангов
   const DEFAULT_AVATAR = "https://i.imgur.com/1Xq9BiO.png";
 
-  function defaultCache(){
+  function defaultCache() {
     return {
       profile: { id: USER_ID, nick: "Игрок", avatar: DEFAULT_AVATAR, rankId: "rank_none" },
       ranks: [{ id: "rank_none", name: "Без ранга", color: "#FFD966" }],
+      ranksAt: 0,
       profilesById: {},
+      profilesAt: {},   // userId -> timestamp последней загрузки
       allUsers: []
     };
   }
   let cache = defaultCache();
-  function cacheLoad(){ try{ cache = JSON.parse(localStorage.getItem(CACHE_KEY) || "null") || defaultCache(); }catch(e){ cache = defaultCache(); } }
-  function cacheSave(){ localStorage.setItem(CACHE_KEY, JSON.stringify(cache)); }
 
+  function cacheLoad() {
+    try { cache = JSON.parse(localStorage.getItem(CACHE_KEY) || "null") || defaultCache(); }
+    catch (e) { cache = defaultCache(); }
+    // миграция из старого ключа
+    if (!cache.profilesAt) cache.profilesAt = {};
+    if (!cache.ranksAt) cache.ranksAt = 0;
+  }
+  function cacheSave() { localStorage.setItem(CACHE_KEY, JSON.stringify(cache)); }
+
+  // ─── СТАТИЧЕСКИЕ ДАННЫЕ ───────────────────────────────────────────────────
   const forumSections = [
-    { id: "rules_common", name: "Общие правила проекта", desc: "Основные правила поведения", icon: "fas fa-gavel" },
-    { id: "rules_criminal", name: "Общие правила криминальных организаций", desc: "Правила для банд и мафии", icon: "fas fa-skull" },
-    { id: "rules_gov", name: "Общие правила государственных организаций", desc: "Правила для полиции и госструктур", icon: "fas fa-building" }
+    { id: "rules_common",   name: "Общие правила проекта",                    desc: "Основные правила поведения",        icon: "fas fa-gavel"      },
+    { id: "rules_criminal", name: "Общие правила криминальных организаций",    desc: "Правила для банд и мафии",          icon: "fas fa-skull"      },
+    { id: "rules_gov",      name: "Общие правила государственных организаций", desc: "Правила для полиции и госструктур", icon: "fas fa-building"   }
   ];
   const baseSubs = [
-    { id: "khimki_criminal", name: "Криминальные организации", desc: "Банды, мафия, криминальные семьи", icon: "fas fa-mask", removable: false },
-    { id: "khimki_gov", name: "Государственные организации", desc: "Полиция, мэрия, скорая, пожарные", icon: "fas fa-landmark", removable: false }
+    { id: "khimki_criminal", name: "Криминальные организации",   desc: "Банды, мафия, криминальные семьи",    icon: "fas fa-mask",     removable: false },
+    { id: "khimki_gov",      name: "Государственные организации", desc: "Полиция, мэрия, скорая, пожарные",   icon: "fas fa-landmark", removable: false }
   ];
   const tech = [
-    { id: "tech_help", name: "Помощь", desc: "Вопросы по игре", icon: "fas fa-question-circle" },
-    { id: "tech_bugs", name: "Сообщить о баге", desc: "Ошибки и проблемы", icon: "fas fa-bug" },
-    { id: "tech_support", name: "Техподдержка", desc: "Связь с администрацией", icon: "fas fa-headset" }
+    { id: "tech_help",    name: "Помощь",              desc: "Вопросы по игре",           icon: "fas fa-question-circle" },
+    { id: "tech_bugs",    name: "Сообщить о баге",     desc: "Ошибки и проблемы",         icon: "fas fa-bug"             },
+    { id: "tech_support", name: "Техподдержка",        desc: "Связь с администрацией",    icon: "fas fa-headset"         }
   ];
   const complaintsList = [
-    { id: "complaint_admin", name: "Жалобы на администрацию", desc: "Нарушения админов", icon: "fas fa-user-shield" },
-    { id: "complaint_players", name: "Жалобы на игроков", desc: "Нарушения правилами игроками", icon: "fas fa-users" },
-    { id: "complaint_leaders", name: "Жалобы на лидеров", desc: "Нарушения лидеров", icon: "fas fa-crown" },
-    { id: "amnesty", name: "Заявление на амнистию", desc: "Смягчение наказания", icon: "fas fa-hand-peace" },
-    { id: "moderator_app", name: "Заявление на пост модератора", desc: "Заявка в модерацию", icon: "fas fa-user-tie" },
-    { id: "leader_app", name: "Заявление на пост лидера", desc: "Заявка на лидерство", icon: "fas fa-chart-line" }
+    { id: "complaint_admin",   name: "Жалобы на администрацию", desc: "Нарушения админов",              icon: "fas fa-user-shield"  },
+    { id: "complaint_players", name: "Жалобы на игроков",       desc: "Нарушения правилами игроками",   icon: "fas fa-users"        },
+    { id: "complaint_leaders", name: "Жалобы на лидеров",       desc: "Нарушения лидеров",              icon: "fas fa-crown"        },
+    { id: "amnesty",           name: "Заявление на амнистию",   desc: "Смягчение наказания",            icon: "fas fa-hand-peace"   },
+    { id: "moderator_app",     name: "Заявление на пост модератора", desc: "Заявка в модерацию",        icon: "fas fa-user-tie"     },
+    { id: "leader_app",        name: "Заявление на пост лидера", desc: "Заявка на лидерство",           icon: "fas fa-chart-line"   }
   ];
 
   let customSubs = JSON.parse(localStorage.getItem("rsrp_custom_subs") || "[]");
-  function saveCustomSubs(){ localStorage.setItem("rsrp_custom_subs", JSON.stringify(customSubs)); }
-  function getAllSubs(){ return baseSubs.concat(customSubs); }
+  function saveCustomSubs() { localStorage.setItem("rsrp_custom_subs", JSON.stringify(customSubs)); }
+  function getAllSubs() { return baseSubs.concat(customSubs); }
 
+  // ─── НАВИГАЦИЯ ────────────────────────────────────────────────────────────
   let currentCategory = null;
   let currentTopicId = null;
   let cachedUsersForFilter = [];
+  let currentBackFn = null;
+  let currentView = { type: "main" };
 
-  let currentBackFn = showMain;
-  function setBack(fn){ currentBackFn = (typeof fn === "function") ? fn : showMain; }
-  function goBack(){ currentBackFn(); }
+  function setBack(fn) { currentBackFn = typeof fn === "function" ? fn : showMain; }
+  function goBack() { if (currentBackFn) currentBackFn(); else showMain(); }
 
-  let currentView = { type:"main", cat:null, title:null, back: showMain };
-  function setViewTopics(cat, title, back){ currentView = { type:"topics", cat, title, back }; }
-  function refreshView(){
-    if(currentView.type === "topics") return renderTopics(currentView.cat, currentView.title, currentView.back);
-    if(currentView.type === "server") return showServer();
-    if(currentView.type === "tech") return showTech();
-    if(currentView.type === "complaints") return showComplaints();
+  function setViewTopics(cat, title, back) { currentView = { type: "topics", cat, title, back }; }
+  function refreshView() {
+    if (currentView.type === "topics") return renderTopics(currentView.cat, currentView.title, currentView.back);
+    if (currentView.type === "server") return showServer();
+    if (currentView.type === "tech") return showTech();
+    if (currentView.type === "complaints") return showComplaints();
     return showMain();
   }
 
-  function esc(s){ return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
-  function safeForAttr(s){ return String(s||"").replace(/'/g,"\\'"); }
+  // ─── УТИЛИТЫ ──────────────────────────────────────────────────────────────
+  function esc(s) {
+    return String(s || "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  }
+  function safeForAttr(s) { return String(s || "").replace(/'/g,"\\'"); }
 
-  function getRank(rankId){
-    return (cache.ranks||[]).find(r => r.id === rankId) || (cache.ranks||[])[0] || { id:"rank_none", name:"Без ранга", color:"#FFD966" };
+  function getRank(rankId) {
+    return (cache.ranks || []).find(r => r.id === rankId)
+      || (cache.ranks || [])[0]
+      || { id: "rank_none", name: "Без ранга", color: "#FFD966" };
   }
 
-  function profileFor(userId){
-    const p = (cache.profilesById && cache.profilesById[userId]) ? cache.profilesById[userId] : null;
+  function profileFor(userId) {
+    const p = cache.profilesById && cache.profilesById[userId];
     if (!p) return { userId, nick: "Игрок", avatar: DEFAULT_AVATAR, rankId: "rank_none" };
     return { userId: p.userId || userId, nick: p.nick || "Игрок", avatar: p.avatar || DEFAULT_AVATAR, rankId: p.rankId || "rank_none" };
   }
 
-  function refreshMiniProfile(){
+  function refreshMiniProfile() {
     const p = cache.profile || {};
     const r = getRank(visibleRankId(p.rankId));
     document.getElementById("miniAvatar").src = p.avatar || DEFAULT_AVATAR;
@@ -361,9 +395,9 @@
     el.style.color = r.color || "#FFD966";
   }
 
-  function fillRankSelect(selectEl, selectedId){
+  function fillRankSelect(selectEl, selectedId) {
     selectEl.innerHTML = "";
-    (cache.ranks||[]).forEach(r => {
+    (cache.ranks || []).forEach(r => {
       const opt = document.createElement("option");
       opt.value = r.id;
       opt.innerText = r.name;
@@ -372,40 +406,76 @@
     });
   }
 
-  async function loadRanks(){
+  // Скелетон-плейсхолдер для списка тем
+  function skeletonTopics(n = 4) {
+    return Array.from({ length: n }, () =>
+      `<div class="skeleton skeleton-topic"></div>`
+    ).join("");
+  }
+
+  // ─── РАНГИ ────────────────────────────────────────────────────────────────
+  async function loadRanks(force = false) {
+    const age = Date.now() - (cache.ranksAt || 0);
+    if (!force && age < RANKS_TTL && cache.ranks && cache.ranks.length > 1) return; // используем кэш
+
     const r = await api("listRanks");
-    cache.ranks = (r.ranks||[]).map(x => ({ id:x.rankId, name:x.name, color:x.color }));
-    if(!cache.ranks.find(x=>x.id==="rank_none")) cache.ranks.unshift({ id:"rank_none", name:"Без ранга", color:"#FFD966" });
+    cache.ranks = (r.ranks || []).map(x => ({ id: x.rankId, name: x.name, color: x.color }));
+    if (!cache.ranks.find(x => x.id === "rank_none")) {
+      cache.ranks.unshift({ id: "rank_none", name: "Без ранга", color: "#FFD966" });
+    }
+    cache.ranksAt = Date.now();
     cacheSave();
   }
 
-  async function ensureProfiles(userIds){
-    const unique = Array.from(new Set((userIds||[]).map(String).filter(Boolean)));
-    // Всегда обновляем профиль текущего пользователя (его ранг мог изменить руководитель)
-    // и подтягиваем все профили, которых ещё нет в кэше.
-    const missing = unique.filter(id => id === String(USER_ID) || !(cache.profilesById && cache.profilesById[id]));
+  // ─── ПРОФИЛИ ──────────────────────────────────────────────────────────────
+  // Загружает только те ID, которых нет в кэше или кэш устарел
+  async function ensureProfiles(userIds) {
+    const now = Date.now();
+    const unique = Array.from(new Set((userIds || []).map(String).filter(Boolean)));
+
+    const missing = unique.filter(id => {
+      const age = now - ((cache.profilesAt && cache.profilesAt[id]) || 0);
+      return age > PROFILE_TTL; // загружаем если кэш старше TTL
+    });
+
     if (missing.length === 0) return;
 
+    // Грузим батчем за один запрос
     const r = await api("listProfiles", { userIds: missing.join(",") });
     cache.profilesById = cache.profilesById || {};
+    cache.profilesAt = cache.profilesAt || {};
+
     (r.profiles || []).forEach(p => {
-      cache.profilesById[String(p.userId)] = {
-        userId: String(p.userId),
+      const uid = String(p.userId);
+      cache.profilesById[uid] = {
+        userId: uid,
         nick: String(p.nick || "Игрок"),
         avatar: String(p.avatar || DEFAULT_AVATAR),
         rankId: String(p.rankId || "rank_none")
       };
+      cache.profilesAt[uid] = now;
     });
+
+    // Если профиль не вернулся — записываем заглушку с timestamp чтобы не запрашивать снова
     missing.forEach(id => {
-      if (!cache.profilesById[id]) cache.profilesById[id] = { userId: id, nick: "Игрок", avatar: DEFAULT_AVATAR, rankId: "rank_none" };
+      if (!cache.profilesById[id]) {
+        cache.profilesById[id] = { userId: id, nick: "Игрок", avatar: DEFAULT_AVATAR, rankId: "rank_none" };
+      }
+      if (!cache.profilesAt[id]) cache.profilesAt[id] = now;
     });
+
     cacheSave();
   }
 
-  async function loadUsersList(){
+  // Принудительно инвалидировать профиль из кэша (например после смены ранга)
+  function invalidateProfile(userId) {
+    if (cache.profilesAt) cache.profilesAt[String(userId)] = 0;
+  }
+
+  // ─── УПРАВЛЕНИЕ ПОЛЬЗОВАТЕЛЯМИ ────────────────────────────────────────────
+  async function loadUsersList() {
     const listEl = document.getElementById("usersList");
     listEl.innerHTML = '<div style="color:#8A94B0;font-weight:800;text-align:center;padding:20px;">Загрузка...</div>';
-    
     try {
       const r = await api("listAllUsers", { actorId: USER_ID });
       cache.allUsers = (r.users || []).map(u => ({
@@ -423,14 +493,13 @@
     }
   }
 
-  function renderUsersList(users){
+  function renderUsersList(users) {
     const listEl = document.getElementById("usersList");
-    if (users.length === 0) {
+    if (!users.length) {
       listEl.innerHTML = '<div style="color:#8A94B0;font-weight:800;text-align:center;padding:20px;">Пользователей не найдено</div>';
       return;
     }
-
-    let html = users.map(u => {
+    listEl.innerHTML = users.map(u => {
       const rank = getRank(visibleRankId(u.rankId));
       return `
         <div class="user-item">
@@ -443,49 +512,27 @@
           </div>
           <div class="user-actions">
             <select onchange="assignRankToUser('${safeForAttr(u.userId)}', this.value)" data-user-id="${safeForAttr(u.userId)}">
-              ${(cache.ranks || []).map(r => `<option value="${esc(r.id)}" ${r.id === u.rankId ? 'selected' : ''}>${esc(r.name)}</option>`).join('')}
+              ${(cache.ranks || []).map(r => `<option value="${esc(r.id)}" ${r.id === u.rankId ? "selected" : ""}>${esc(r.name)}</option>`).join("")}
             </select>
           </div>
-        </div>
-      `;
+        </div>`;
     }).join("");
-    
-    listEl.innerHTML = html;
   }
 
-  function filterUsersList(){
-    const searchInput = document.getElementById("usersSearchInput").value.toLowerCase().trim();
-    if (!searchInput) {
-      renderUsersList(cachedUsersForFilter);
-      return;
-    }
-
-    const filtered = cachedUsersForFilter.filter(u => 
-      u.nick.toLowerCase().includes(searchInput) || 
-      u.userId.toLowerCase().includes(searchInput)
-    );
-    renderUsersList(filtered);
+  function filterUsersList() {
+    const q = document.getElementById("usersSearchInput").value.toLowerCase().trim();
+    renderUsersList(!q ? cachedUsersForFilter : cachedUsersForFilter.filter(u =>
+      u.nick.toLowerCase().includes(q) || u.userId.toLowerCase().includes(q)
+    ));
   }
 
-  async function assignRankToUser(userId, rankId){
+  async function assignRankToUser(userId, rankId) {
     try {
-      await api("upsertProfile", {
-        userId,
-        actorId: USER_ID,
-        nick: null,
-        avatar: null,
-        rankId
-      });
-      
-      if (cache.profilesById && cache.profilesById[userId]) {
-        cache.profilesById[userId].rankId = rankId;
-      }
-      if (cache.allUsers) {
-        const user = cache.allUsers.find(u => u.userId === userId);
-        if (user) user.rankId = rankId;
-      }
+      await api("upsertProfile", { userId, actorId: USER_ID, nick: null, avatar: null, rankId });
+      if (cache.profilesById && cache.profilesById[userId]) cache.profilesById[userId].rankId = rankId;
+      if (cache.allUsers) { const u = cache.allUsers.find(x => x.userId === userId); if (u) u.rankId = rankId; }
+      invalidateProfile(userId); // следующий показ возьмёт свежее
       cacheSave();
-      
       renderUsersList(cachedUsersForFilter);
     } catch (e) {
       console.error(e);
@@ -493,102 +540,81 @@
     }
   }
 
-  async function listTopics(categoryId){
+  // ─── ТЕМЫ ─────────────────────────────────────────────────────────────────
+  async function listTopics(categoryId) {
     const r = await api("listTopics", { categoryId });
-    return (r.topics||[]).map(t => ({
-      id: t.topicId,
-      categoryId: t.categoryId,
-      title: t.title,
-      content: t.content,
-      authorId: t.authorId || "",
-      createdAt: t.createdAt,
-      updatedAt: t.updatedAt
+    return (r.topics || []).map(t => ({
+      id: t.topicId, categoryId: t.categoryId, title: t.title,
+      content: t.content, authorId: t.authorId || "",
+      createdAt: t.createdAt, updatedAt: t.updatedAt
     }));
   }
 
-  async function getTopic(topicId){
+  async function getTopic(topicId) {
     const r = await api("getTopic", { topicId });
     const t = r.topic;
     return { id: t.topicId, categoryId: t.categoryId, title: t.title, content: t.content, authorId: t.authorId || "", createdAt: t.createdAt, updatedAt: t.updatedAt };
   }
 
-  async function createTopic(categoryId, title, content){
+  async function createTopic(categoryId, title, content) {
     return (await api("createTopic", { categoryId, title, content, authorId: USER_ID })).topic;
   }
-  async function updateTopic(topicId, title, content){
+  async function updateTopic(topicId, title, content) {
     await api("updateTopic", { topicId, title, content, actorId: USER_ID });
   }
-  async function deleteTopic(topicId){
+  async function deleteTopic(topicId) {
     await api("deleteTopic", { topicId, actorId: USER_ID });
   }
 
-  async function listComments(topicId){
+  // ─── КОММЕНТАРИИ ──────────────────────────────────────────────────────────
+  async function listComments(topicId) {
     const r = await api("listComments", { topicId });
     return (r.comments || []).map(c => ({ id: c.commentId, topicId: c.topicId, authorId: c.authorId || "", text: c.text || "", createdAt: c.createdAt }));
   }
-  async function createComment(topicId, text){
-    await api("createComment", { topicId, authorId: USER_ID, text });
-  }
-  async function updateComment(commentId, text){
-    await api("updateComment", { commentId, text, actorId: USER_ID });
-  }
-  async function deleteComment(commentId){
-    await api("deleteComment", { commentId, actorId: USER_ID });
+  async function createComment(topicId, text) { await api("createComment", { topicId, authorId: USER_ID, text }); }
+  async function updateComment(commentId, text) { await api("updateComment", { commentId, text, actorId: USER_ID }); }
+  async function deleteComment(commentId) { await api("deleteComment", { commentId, actorId: USER_ID }); }
+
+  // ─── РАНГИ UI ─────────────────────────────────────────────────────────────
+  async function createRank(name, color) { await api("createRank", { name, color, actorId: USER_ID }); await loadRanks(true); }
+  async function updateRank(rankId, name, color) { await api("updateRank", { rankId, name, color, actorId: USER_ID }); await loadRanks(true); }
+  async function deleteRank(rankId) { await api("deleteRank", { rankId, actorId: USER_ID }); await loadRanks(true); }
+
+  // ─── МОДАЛКИ ──────────────────────────────────────────────────────────────
+  function closeModal() {
+    ["topicModal","sectionModal","profileModal","ranksModal","usersModal"].forEach(id => {
+      document.getElementById(id).style.display = "none";
+    });
   }
 
-  async function createRank(name, color){
-    await api("createRank", { name, color, actorId: USER_ID });
-    await loadRanks();
-  }
-  async function updateRank(rankId, name, color){
-    await api("updateRank", { rankId, name, color, actorId: USER_ID });
-    await loadRanks();
-  }
-  async function deleteRank(rankId){
-    await api("deleteRank", { rankId, actorId: USER_ID });
-    await loadRanks();
-  }
-
-  function closeModal(){
-    document.getElementById("topicModal").style.display = "none";
-    document.getElementById("sectionModal").style.display = "none";
-    document.getElementById("profileModal").style.display = "none";
-    document.getElementById("ranksModal").style.display = "none";
-    document.getElementById("usersModal").style.display = "none";
-  }
-
-  function openProfile(){
+  function openProfile() {
     document.getElementById("profileNick").value = cache.profile.nick || "";
     document.getElementById("profileAvatar").value = cache.profile.avatar || "";
     fillRankSelect(document.getElementById("profileRank"), cache.profile.rankId || "rank_none");
-    
-    const rankSelect = document.getElementById("profileRank");
-    if (rankSelect) {
-        rankSelect.disabled = !isLeader();
-        rankSelect.style.opacity = isLeader() ? "1" : "0.6";
-    }
-    
+    const rs = document.getElementById("profileRank");
+    rs.disabled = !isLeader();
+    rs.style.opacity = isLeader() ? "1" : "0.6";
     document.getElementById("profileModal").style.display = "flex";
   }
 
-  function openRanks(){
+  function openRanks() {
     document.getElementById("rankName").value = "";
     document.getElementById("rankColor").value = "#FFD966";
     renderRanksList();
     document.getElementById("ranksModal").style.display = "flex";
   }
 
-  function openUserManager(){
+  function openUserManager() {
     if (!isLeader()) return alert("Только Руководитель проекта может управлять пользователями");
     document.getElementById("usersSearchInput").value = "";
     document.getElementById("usersModal").style.display = "flex";
     loadUsersList();
   }
 
-  function renderRanksList(){
+  function renderRanksList() {
     const box = document.getElementById("ranksList");
     const ranks = (cache.ranks || []).filter(r => r.id !== "rank_none");
-    if (ranks.length === 0) {
+    if (!ranks.length) {
       box.innerHTML = "<div style='color:#8A94B0;font-weight:800;margin-top:10px;'>Рангов пока нет.</div>";
       return;
     }
@@ -603,30 +629,26 @@
           <button class="icon-btn" title="Редактировать" onclick="uiEditRank('${esc(r.id)}')"><i class="fas fa-edit"></i></button>
           <button class="icon-btn danger" title="Удалить" onclick="uiDeleteRank('${esc(r.id)}')"><i class="fas fa-trash-alt"></i></button>
         </div>
-      </div>
-    `).join("");
+      </div>`).join("");
   }
 
-  async function uiEditRank(rankId){
-    const r = (cache.ranks||[]).find(x=>x.id===rankId);
-    if(!r) return;
+  async function uiEditRank(rankId) {
+    const r = (cache.ranks || []).find(x => x.id === rankId);
+    if (!r) return;
     const name = prompt("Название ранга:", r.name || "");
     if (name === null) return;
-    const color = prompt("Цвет (hex), например #FFD966:", r.color || "#FFD966");
+    const color = prompt("Цвет (hex):", r.color || "#FFD966");
     if (color === null) return;
     try {
       await updateRank(rankId, String(name).trim(), String(color).trim());
       renderRanksList();
       fillRankSelect(document.getElementById("profileRank"), cache.profile.rankId || "rank_none");
       refreshMiniProfile();
-    } catch (e) {
-      console.error(e);
-      alert("Нет прав (только Руководитель проекта)");
-    }
+    } catch (e) { console.error(e); alert("Нет прав (только Руководитель проекта)"); }
   }
 
-  async function uiDeleteRank(rankId){
-    if(!confirm("Удалить ранг?")) return;
+  async function uiDeleteRank(rankId) {
+    if (!confirm("Удалить ранг?")) return;
     try {
       await deleteRank(rankId);
       if (cache.profile.rankId === rankId) cache.profile.rankId = "rank_none";
@@ -634,175 +656,160 @@
       renderRanksList();
       fillRankSelect(document.getElementById("profileRank"), cache.profile.rankId || "rank_none");
       refreshMiniProfile();
-    } catch (e) {
-      console.error(e);
-      alert("Нет прав (только Руководитель проекта)");
-    }
+    } catch (e) { console.error(e); alert("Нет прав (только Руководитель проекта)"); }
   }
 
-  function showMain(){
+  // ─── СТРАНИЦЫ ─────────────────────────────────────────────────────────────
+  function showMain() {
     setBack(showMain);
-    currentView = { type:"main" };
-
-    let html =
-      '<div class="content-left">' +
-        '<div class="section-card">' +
-          '<div class="section-title"><i class="fas fa-server"></i> Игровые сервера</div>' +
-          '<div class="server-card" onclick="showServer()">' +
-            '<div class="server-name"><i class="fas fa-star-of-life"></i> Сервер №1 | Химки</div>' +
-            '<div class="server-status"><i class="fas fa-circle" style="color:#4CAF50; font-size:0.6rem;"></i> Онлайн</div>' +
-          '</div>' +
-        '</div>' +
-        '<div class="section-card">' +
-          '<div class="section-title"><i class="fas fa-layer-group"></i> Разделы форума</div>' +
-          '<div class="category-list">';
-
-    for (let i=0;i<forumSections.length;i++){
-      const s = forumSections[i];
-      html +=
-        '<div class="category-item" onclick="showCategory(\''+s.id+'\')">' +
-          '<div class="cat-info"><h3><i class="'+s.icon+'"></i> '+esc(s.name)+'</h3><p>'+esc(s.desc)+'</p></div>' +
-          '<div class="cat-stats"><i class="fas fa-folder"></i></div>' +
-        '</div>';
-    }
-
-    html += '</div></div></div>' +
-      '<div class="content-right"><div class="voice-card"><i class="fas fa-microphone-alt"></i> <strong>Голосовое объединение</strong><div style="margin-top:10px">Подключитесь к Discord</div></div></div>';
-
-    document.getElementById("main-content").innerHTML = html;
+    currentView = { type: "main" };
+    document.getElementById("main-content").innerHTML = `
+      <div class="content-left">
+        <div class="section-card">
+          <div class="section-title"><i class="fas fa-server"></i> Игровые сервера</div>
+          <div class="server-card" onclick="showServer()">
+            <div class="server-name"><i class="fas fa-star-of-life"></i> Сервер №1 | Химки</div>
+            <div class="server-status"><i class="fas fa-circle" style="color:#4CAF50;font-size:0.6rem;"></i> Онлайн</div>
+          </div>
+        </div>
+        <div class="section-card">
+          <div class="section-title"><i class="fas fa-layer-group"></i> Разделы форума</div>
+          <div class="category-list">
+            ${forumSections.map(s => `
+              <div class="category-item" onclick="showCategory('${s.id}')">
+                <div class="cat-info"><h3><i class="${s.icon}"></i> ${esc(s.name)}</h3><p>${esc(s.desc)}</p></div>
+                <div class="cat-stats"><i class="fas fa-folder"></i></div>
+              </div>`).join("")}
+          </div>
+        </div>
+      </div>
+      <div class="content-right">
+        <div class="voice-card"><i class="fas fa-microphone-alt"></i> <strong>Голосовое объединение</strong><div style="margin-top:10px">Подключитесь к Discord</div></div>
+      </div>`;
   }
 
-  function showServer(){
+  function showServer() {
     setBack(showMain);
-    currentView = { type:"server" };
-
+    currentView = { type: "server" };
     const subs = getAllSubs();
-    let html =
-      '<div class="content-left" style="width:100%">' +
-        '<button class="back-btn" onclick="goBack()"><i class="fas fa-arrow-left"></i> Назад</button>' +
-        '<div class="section-card">' +
-          '<div class="section-title"><i class="fas fa-server"></i> Сервер №1 | Химки ' +
-            '<span class="add-section-btn" onclick="event.stopPropagation(); document.getElementById(\'sectionModal\').style.display=\'flex\'"><i class="fas fa-plus"></i> Добавить раздел</span>' +
-          '</div>' +
-          '<div class="category-list">';
-
-    for (let i=0;i<subs.length;i++){
-      const s = subs[i];
-      html +=
-        '<div class="category-item">' +
-          '<div class="cat-info" onclick="showSub(\''+s.id+'\')"><h3><i class="'+s.icon+'"></i> '+esc(s.name)+'</h3><p>'+esc(s.desc)+'</p></div>' +
-          (s.removable
-            ? '<div class="cat-actions"><button class="icon-btn danger" onclick="event.stopPropagation(); if(confirm(\'Удалить раздел?\')){ deleteCustomSub(\''+s.id+'\'); }"><i class="fas fa-trash-alt"></i></button></div>'
-            : ''
-          ) +
-        '</div>';
-    }
-
-    html += '</div></div></div>';
-    document.getElementById("main-content").innerHTML = html;
+    document.getElementById("main-content").innerHTML = `
+      <div class="content-left" style="width:100%">
+        <button class="back-btn" onclick="goBack()"><i class="fas fa-arrow-left"></i> Назад</button>
+        <div class="section-card">
+          <div class="section-title">
+            <i class="fas fa-server"></i> Сервер №1 | Химки
+            <span class="add-section-btn" onclick="event.stopPropagation(); document.getElementById('sectionModal').style.display='flex'"><i class="fas fa-plus"></i> Добавить раздел</span>
+          </div>
+          <div class="category-list">
+            ${subs.map(s => `
+              <div class="category-item">
+                <div class="cat-info" onclick="showSub('${s.id}')"><h3><i class="${s.icon}"></i> ${esc(s.name)}</h3><p>${esc(s.desc)}</p></div>
+                ${s.removable ? `<div class="cat-actions"><button class="icon-btn danger" onclick="event.stopPropagation(); if(confirm('Удалить раздел?')){ deleteCustomSub('${s.id}'); }"><i class="fas fa-trash-alt"></i></button></div>` : ""}
+              </div>`).join("")}
+          </div>
+        </div>
+      </div>`;
   }
 
-  function deleteCustomSub(id){
-    customSubs = customSubs.filter(s=>s.id!==id);
+  function deleteCustomSub(id) {
+    customSubs = customSubs.filter(s => s.id !== id);
     saveCustomSubs();
     showServer();
   }
 
-  function showSub(id){
+  function showSub(id) {
     setBack(showServer);
-    const s = getAllSubs().find(x=>x.id===id);
+    const s = getAllSubs().find(x => x.id === id);
     if (s) renderTopics(id, s.name + " - Химки", showServer);
   }
 
-  function showCategory(id){
+  function showCategory(id) {
     setBack(showMain);
-    const s = forumSections.find(x=>x.id===id);
+    const s = forumSections.find(x => x.id === id);
     if (s) renderTopics(id, s.name, showMain);
   }
 
-  async function renderTopics(cat, title, back){
+  // ─── СПИСОК ТЕМ ───────────────────────────────────────────────────────────
+  async function renderTopics(cat, title, back) {
     setBack(back);
     setViewTopics(cat, title, back);
 
-    document.getElementById("main-content").innerHTML =
-      '<div class="content-left" style="width:100%">' +
-        '<button class="back-btn" onclick="goBack()"><i class="fas fa-arrow-left"></i> Назад</button>' +
-        '<div class="section-card">' +
-          '<div class="section-title"><i class="fas fa-folder-open"></i> '+esc(title)+'</div>' +
-          '<div class="topics-list"><div class="empty-topics">Загрузка...</div></div>' +
-        '</div>' +
-      '</div>';
+    // Показываем скелетон сразу — без задержки
+    document.getElementById("main-content").innerHTML = `
+      <div class="content-left" style="width:100%">
+        <button class="back-btn" onclick="goBack()"><i class="fas fa-arrow-left"></i> Назад</button>
+        <div class="section-card">
+          <div class="section-title"><i class="fas fa-folder-open"></i> ${esc(title)}</div>
+          <div class="topics-list">${skeletonTopics(5)}</div>
+        </div>
+      </div>`;
 
     let arr = [];
     try {
       arr = await listTopics(cat);
-      // Сбрасываем кэш профилей авторов, чтобы их ранги подтянулись с сервера актуальными
-      const authorIds = arr.map(t => t.authorId).filter(Boolean);
-      if (cache.profilesById) {
-        authorIds.forEach(id => { delete cache.profilesById[id]; });
-      }
-      await ensureProfiles(authorIds);
+      // Собираем уникальные authorId и грузим профили батчем (только устаревшие)
+      await ensureProfiles([...new Set(arr.map(t => t.authorId).filter(Boolean))]);
     } catch (e) {
       console.error(e);
-      document.querySelector(".topics-list").innerHTML = '<div class="empty-topics">Ошибка загрузки тем</div>';
+      const tl = document.querySelector(".topics-list");
+      if (tl) tl.innerHTML = '<div class="empty-topics">Ошибка загрузки тем</div>';
       return;
     }
 
     let html = "";
-    if (arr.length === 0) {
+    if (!arr.length) {
       html = '<div class="empty-topics"><i class="fas fa-inbox"></i><p>Нет тем</p></div>';
     } else {
-      for (let i=0;i<arr.length;i++){
-        const t = arr[i];
+      html = arr.map(t => {
         const ap = profileFor(t.authorId);
         const ar = getRank(visibleRankId(ap.rankId));
-
         const canEdit = isLeader() || String(t.authorId) === String(USER_ID);
-
-        html +=
-          '<div class="topic-item">' +
-            '<div style="flex:1; min-width: 220px;" onclick="showThread(\''+cat+'\',\''+t.id+'\',\''+safeForAttr(t.title)+'\',\''+safeForAttr(title)+'\')">' +
-              '<div class="topic-title">'+esc(t.title)+'</div>' +
-              '<div class="topic-meta">' +
-                '<img class="meta-avatar" alt="ava" src="'+esc(ap.avatar)+'" />' +
-                '<span>'+esc(ap.nick)+'</span>' +
-                '<span class="meta-rank" style="color:'+esc(ar.color)+';border-color:'+esc(ar.color)+'55;background:'+esc(ar.color)+'12;">'+esc(ar.name)+'</span>' +
-                '<span>·</span>' +
-                '<span>'+esc(new Date(t.createdAt||Date.now()).toLocaleDateString())+'</span>' +
-              '</div>' +
-            '</div>' +
-            '<div class="topic-actions" onclick="event.stopPropagation();">' +
-              (canEdit
-                ? '<button class="icon-btn" title="Редактировать" onclick="openEdit(\''+cat+'\',\''+t.id+'\',\''+safeForAttr(t.title)+'\',\''+safeForAttr(t.content)+'\')"><i class="fas fa-edit"></i></button>' +
-                  '<button class="icon-btn danger" title="Удалить" onclick="delTopicUI(\''+cat+'\',\''+t.id+'\',\''+safeForAttr(title)+'\')"><i class="fas fa-trash-alt"></i></button>'
-                : '<button class="icon-btn" title="Недоступно" onclick="alert(\'Редактировать/удалять может только автор или Руководитель проекта\')"><i class="fas fa-lock"></i></button>'
-              ) +
-            '</div>' +
-          '</div>';
-      }
+        return `
+          <div class="topic-item">
+            <div style="flex:1;min-width:220px;" onclick="showThread('${cat}','${t.id}','${safeForAttr(t.title)}','${safeForAttr(title)}')">
+              <div class="topic-title">${esc(t.title)}</div>
+              <div class="topic-meta">
+                <img class="meta-avatar" alt="ava" src="${esc(ap.avatar)}" />
+                <span>${esc(ap.nick)}</span>
+                <span class="meta-rank" style="color:${esc(ar.color)};border-color:${esc(ar.color)}55;background:${esc(ar.color)}12;">${esc(ar.name)}</span>
+                <span>·</span>
+                <span>${esc(new Date(t.createdAt || Date.now()).toLocaleDateString())}</span>
+              </div>
+            </div>
+            <div class="topic-actions" onclick="event.stopPropagation();">
+              ${canEdit
+                ? `<button class="icon-btn" title="Редактировать" onclick="openEdit('${cat}','${t.id}','${safeForAttr(t.title)}','${safeForAttr(t.content)}')"><i class="fas fa-edit"></i></button>
+                   <button class="icon-btn danger" title="Удалить" onclick="delTopicUI('${cat}','${t.id}','${safeForAttr(title)}')"><i class="fas fa-trash-alt"></i></button>`
+                : `<button class="icon-btn" title="Недоступно" onclick="alert('Редактировать/удалять может только автор или Руководитель проекта')"><i class="fas fa-lock"></i></button>`
+              }
+            </div>
+          </div>`;
+      }).join("");
     }
 
-    document.querySelector(".topics-list").innerHTML = html;
+    const tl = document.querySelector(".topics-list");
+    if (tl) tl.innerHTML = html;
 
     if (canCreateTopicIn(cat)) {
-      document.querySelector(".section-card").insertAdjacentHTML("beforeend",
-        '<div style="padding:16px 22px;"><button class="create-topic-btn" onclick="openCreate(\''+cat+'\')"><i class="fas fa-plus"></i> Создать тему</button></div>'
+      const sc = document.querySelector(".section-card");
+      if (sc) sc.insertAdjacentHTML("beforeend",
+        `<div style="padding:16px 22px;"><button class="create-topic-btn" onclick="openCreate('${cat}')"><i class="fas fa-plus"></i> Создать тему</button></div>`
       );
     }
   }
 
-  async function delTopicUI(cat, topicId, listTitle){
+  async function delTopicUI(cat, topicId, listTitle) {
     if (!confirm("Удалить тему?")) return;
     try { await deleteTopic(topicId); }
     catch (e) {
       console.error(e);
-      alert(String(e.message||"").includes("forbidden") ? "Нет прав" : "Ошибка удаления");
+      alert(String(e.message || "").includes("forbidden") ? "Нет прав" : "Ошибка удаления");
       return;
     }
     renderTopics(cat, listTitle, currentView.back || showMain);
   }
 
-  function openCreate(cat){
+  function openCreate(cat) {
     if (!canCreateTopicIn(cat)) return alert("Создавать темы здесь может только Руководитель проекта");
     currentCategory = cat;
     currentTopicId = null;
@@ -812,7 +819,7 @@
     document.getElementById("topicModal").style.display = "flex";
   }
 
-  function openEdit(cat, id, title, content){
+  function openEdit(cat, id, title, content) {
     currentCategory = cat;
     currentTopicId = id;
     document.getElementById("modalTitle").innerText = "Редактировать тему";
@@ -821,225 +828,228 @@
     document.getElementById("topicModal").style.display = "flex";
   }
 
-  async function showThread(cat, id, topicTitle, listTitle){
-    setBack(function(){ renderTopics(cat, listTitle, currentView.back || showMain); });
+  // ─── ТРЕД ─────────────────────────────────────────────────────────────────
+  async function showThread(cat, id, topicTitle, listTitle) {
+    setBack(() => renderTopics(cat, listTitle, currentView.back || showMain));
 
-    document.getElementById("main-content").innerHTML =
-      '<div class="content-left" style="width:100%">' +
-        '<button class="back-btn" onclick="goBack()"><i class="fas fa-arrow-left"></i> Назад</button>' +
-        '<div class="thread-view"><div class="thread-title">'+esc(topicTitle)+'</div><div class="thread-content">Загрузка...</div></div>' +
-      '</div>';
+    // Скелетон сразу
+    document.getElementById("main-content").innerHTML = `
+      <div class="content-left" style="width:100%">
+        <button class="back-btn" onclick="goBack()"><i class="fas fa-arrow-left"></i> Назад</button>
+        <div class="thread-view">
+          <div class="thread-title">${esc(topicTitle)}</div>
+          <div class="skeleton skeleton-line medium" style="margin:14px 0 8px;"></div>
+          <div class="skeleton skeleton-line"></div>
+          <div class="skeleton skeleton-line short"></div>
+        </div>
+      </div>`;
 
-    let topic = null;
-    let cmts = [];
+    let topic = null, cmts = [];
     try {
-      topic = await getTopic(id);
-      cmts = await listComments(id);
-      const ids = [];
-      if (topic.authorId) ids.push(topic.authorId);
-      cmts.forEach(c => c.authorId && ids.push(c.authorId));
-      // Сбрасываем кэш этих профилей, чтобы их ранги подтянулись с сервера актуальными
-      if (cache.profilesById) {
-        ids.forEach(uid => { delete cache.profilesById[uid]; });
-      }
+      // Параллельно грузим тему и комментарии
+      [topic, cmts] = await Promise.all([getTopic(id), listComments(id)]);
+
+      const ids = [...new Set([topic.authorId, ...cmts.map(c => c.authorId)].filter(Boolean))];
       await ensureProfiles(ids);
     } catch (e) {
       console.error(e);
-      document.querySelector(".thread-content").innerHTML = "Ошибка загрузки";
+      const tv = document.querySelector(".thread-view");
+      if (tv) tv.innerHTML = `<div class="thread-title">${esc(topicTitle)}</div><div class="thread-content">Ошибка загрузки</div>`;
       return;
     }
 
-    const view = document.querySelector(".thread-view");
     const author = profileFor(topic.authorId);
     const authorRank = getRank(visibleRankId(author.rankId));
     const canTopicEdit = isLeader() || String(topic.authorId) === String(USER_ID);
 
-    view.innerHTML =
-      '<div class="thread-title">'+esc(topic.title)+'</div>' +
-      '<div class="thread-meta">' +
-        '<div class="thread-author">' +
-          '<img alt="ava" src="'+esc(author.avatar)+'" />' +
-          '<span>'+esc(author.nick)+'</span>' +
-          '<span class="meta-rank" style="color:'+esc(authorRank.color)+';border-color:'+esc(authorRank.color)+'55;background:'+esc(authorRank.color)+'12;">'+esc(authorRank.name)+'</span>' +
-          '<span>·</span><span>'+esc(new Date(topic.createdAt||Date.now()).toLocaleString())+'</span>' +
-        '</div>' +
-        '<div class="topic-actions" onclick="event.stopPropagation();">' +
-          (canTopicEdit
-            ? '<button class="icon-btn" title="Редактировать" onclick="openEdit(\''+cat+'\',\''+topic.id+'\',\''+safeForAttr(topic.title)+'\',\''+safeForAttr(topic.content)+'\')"><i class="fas fa-edit"></i></button>' +
-              '<button class="icon-btn danger" title="Удалить" onclick="delTopicUI(\''+cat+'\',\''+topic.id+'\',\''+safeForAttr(listTitle)+'\')"><i class="fas fa-trash-alt"></i></button>'
-            : '<button class="icon-btn" title="Недоступно" onclick="alert(\'Редактировать/удалять может только автор или Руководитель проекта\')"><i class="fas fa-lock"></i></button>'
-          ) +
-        '</div>' +
-      '</div>' +
-      '<div class="thread-content">'+esc(topic.content).replace(/\n/g,"<br>")+'</div>' +
-      '<div class="comments-wrap" id="commentsWrap"></div>';
+    const tv = document.querySelector(".thread-view");
+    if (!tv) return;
+    tv.innerHTML = `
+      <div class="thread-title">${esc(topic.title)}</div>
+      <div class="thread-meta">
+        <div class="thread-author">
+          <img alt="ava" src="${esc(author.avatar)}" />
+          <span>${esc(author.nick)}</span>
+          <span class="meta-rank" style="color:${esc(authorRank.color)};border-color:${esc(authorRank.color)}55;background:${esc(authorRank.color)}12;">${esc(authorRank.name)}</span>
+          <span>·</span><span>${esc(new Date(topic.createdAt || Date.now()).toLocaleString())}</span>
+        </div>
+        <div class="topic-actions" onclick="event.stopPropagation();">
+          ${canTopicEdit
+            ? `<button class="icon-btn" title="Редактировать" onclick="openEdit('${cat}','${topic.id}','${safeForAttr(topic.title)}','${safeForAttr(topic.content)}')"><i class="fas fa-edit"></i></button>
+               <button class="icon-btn danger" title="Удалить" onclick="delTopicUI('${cat}','${topic.id}','${safeForAttr(listTitle)}')"><i class="fas fa-trash-alt"></i></button>`
+            : `<button class="icon-btn" title="Недоступно" onclick="alert('Редактировать/удалять может только автор или Руководитель проекта')"><i class="fas fa-lock"></i></button>`
+          }
+        </div>
+      </div>
+      <div class="thread-content">${esc(topic.content).replace(/\n/g, "<br>")}</div>
+      <div class="comments-wrap" id="commentsWrap"></div>`;
 
     renderComments(cat, topic.id, topic.title, listTitle, cmts);
   }
 
-  function renderComments(cat, topicId, topicTitle, listTitle, cmts){
+  function renderComments(cat, topicId, topicTitle, listTitle, cmts) {
     const wrap = document.getElementById("commentsWrap");
     if (!wrap) return;
 
-    let html = '<div class="comments-title"><i class="fas fa-comments" style="color:#FFD966;"></i> Комментарии ('+cmts.length+')</div>';
+    let html = `<div class="comments-title"><i class="fas fa-comments" style="color:#FFD966;"></i> Комментарии (${cmts.length})</div>`;
 
-    if (cmts.length === 0) {
+    if (!cmts.length) {
       html += '<div style="color:#8A94B0;font-weight:800;margin:6px 0 12px;">Пока нет комментариев. Будь первым.</div>';
     } else {
       html += cmts.map(c => {
         const ap = profileFor(c.authorId);
         const ar = getRank(visibleRankId(ap.rankId));
         const canEdit = isLeader() || String(c.authorId) === String(USER_ID);
-        return (
-          '<div class="comment">' +
-            '<img class="comment-avatar" alt="ava" src="'+esc(ap.avatar)+'"/>' +
-            '<div class="comment-main">' +
-              '<div class="comment-head">' +
-                '<div class="comment-author">' +
-                  '<span>'+esc(ap.nick)+'</span>' +
-                  '<span class="meta-rank" style="color:'+esc(ar.color)+';border-color:'+esc(ar.color)+'55;background:'+esc(ar.color)+'12;">'+esc(ar.name)+'</span>' +
-                  '<span class="comment-date">'+esc(new Date(c.createdAt||Date.now()).toLocaleString())+'</span>' +
-                '</div>' +
-                '<div class="comment-actions">' +
-                  (canEdit
-                    ? '<button class="icon-btn" title="Редактировать" onclick="uiEditComment(\''+esc(c.id)+'\',\''+safeForAttr(c.text)+'\',\''+esc(cat)+'\',\''+esc(topicId)+'\',\''+safeForAttr(topicTitle)+'\',\''+safeForAttr(listTitle)+'\')"><i class="fas fa-edit"></i></button>' +
-                      '<button class="icon-btn danger" title="Удалить" onclick="uiDeleteComment(\''+esc(c.id)+'\',\''+esc(cat)+'\',\''+esc(topicId)+'\',\''+safeForAttr(topicTitle)+'\',\''+safeForAttr(listTitle)+'\')"><i class="fas fa-trash-alt"></i></button>'
-                    : ''
-                  ) +
-                '</div>' +
-              '</div>' +
-              '<div class="comment-text">'+esc(c.text).replace(/\n/g,"<br>")+'</div>' +
-            '</div>' +
-          '</div>'
-        );
+        return `
+          <div class="comment">
+            <img class="comment-avatar" alt="ava" src="${esc(ap.avatar)}" />
+            <div class="comment-main">
+              <div class="comment-head">
+                <div class="comment-author">
+                  <span>${esc(ap.nick)}</span>
+                  <span class="meta-rank" style="color:${esc(ar.color)};border-color:${esc(ar.color)}55;background:${esc(ar.color)}12;">${esc(ar.name)}</span>
+                  <span class="comment-date">${esc(new Date(c.createdAt || Date.now()).toLocaleString())}</span>
+                </div>
+                <div class="comment-actions">
+                  ${canEdit
+                    ? `<button class="icon-btn" title="Редактировать" onclick="uiEditComment('${esc(c.id)}','${safeForAttr(c.text)}','${esc(cat)}','${esc(topicId)}','${safeForAttr(topicTitle)}','${safeForAttr(listTitle)}')"><i class="fas fa-edit"></i></button>
+                       <button class="icon-btn danger" title="Удалить" onclick="uiDeleteComment('${esc(c.id)}','${esc(cat)}','${esc(topicId)}','${safeForAttr(topicTitle)}','${safeForAttr(listTitle)}')"><i class="fas fa-trash-alt"></i></button>`
+                    : ""
+                  }
+                </div>
+              </div>
+              <div class="comment-text">${esc(c.text).replace(/\n/g, "<br>")}</div>
+            </div>
+          </div>`;
       }).join("");
     }
 
-    html +=
-      '<div class="comment-form">' +
-        '<textarea id="commentText" placeholder="Написать комментарий..."></textarea>' +
-        '<div class="row">' +
-          '<div class="hint">Пишешь как: <span style="color:#FFD966;">'+esc(cache.profile.nick)+'</span></div>' +
-          '<button class="chip-btn" onclick="submitComment(\''+esc(cat)+'\',\''+esc(topicId)+'\',\''+safeForAttr(topicTitle)+'\',\''+safeForAttr(listTitle)+'\')"><i class="fas fa-paper-plane"></i> Отправить</button>' +
-        '</div>' +
-      '</div>';
+    html += `
+      <div class="comment-form">
+        <textarea id="commentText" placeholder="Написать комментарий..."></textarea>
+        <div class="row">
+          <div class="hint">Пишешь как: <span style="color:#FFD966;">${esc(cache.profile.nick)}</span></div>
+          <button class="chip-btn" onclick="submitComment('${esc(cat)}','${esc(topicId)}','${safeForAttr(topicTitle)}','${safeForAttr(listTitle)}')"><i class="fas fa-paper-plane"></i> Отправить</button>
+        </div>
+      </div>`;
 
     wrap.innerHTML = html;
   }
 
-  async function submitComment(cat, topicId, topicTitle, listTitle){
+  async function submitComment(cat, topicId, topicTitle, listTitle) {
     const ta = document.getElementById("commentText");
-    const text = (ta && ta.value ? ta.value.trim() : "");
+    const text = ta && ta.value ? ta.value.trim() : "";
     if (!text) return alert("Напиши комментарий");
     try { await createComment(topicId, text); await showThread(cat, topicId, topicTitle, listTitle); }
     catch (e) { console.error(e); alert("Ошибка отправки"); }
   }
 
-  async function uiEditComment(commentId, currentText, cat, topicId, topicTitle, listTitle){
+  async function uiEditComment(commentId, currentText, cat, topicId, topicTitle, listTitle) {
     const text = prompt("Редактировать комментарий:", currentText || "");
     if (text === null) return;
     if (!String(text).trim()) return alert("Текст пустой");
     try { await updateComment(commentId, String(text)); await showThread(cat, topicId, topicTitle, listTitle); }
-    catch (e) { console.error(e); alert(String(e.message||"").includes("forbidden") ? "Нет прав" : "Ошибка редактирования"); }
+    catch (e) { console.error(e); alert(String(e.message || "").includes("forbidden") ? "Нет прав" : "Ошибка редактирования"); }
   }
 
-  async function uiDeleteComment(commentId, cat, topicId, topicTitle, listTitle){
+  async function uiDeleteComment(commentId, cat, topicId, topicTitle, listTitle) {
     if (!confirm("Удалить комментарий?")) return;
     try { await deleteComment(commentId); await showThread(cat, topicId, topicTitle, listTitle); }
-    catch (e) { console.error(e); alert(String(e.message||"").includes("forbidden") ? "Нет прав" : "Ошибка удаления"); }
+    catch (e) { console.error(e); alert(String(e.message || "").includes("forbidden") ? "Нет прав" : "Ошибка удаления"); }
   }
 
-  function showTech(){
+  // ─── ТЕХПОДДЕРЖКА / ЖАЛОБЫ ────────────────────────────────────────────────
+  function showTech() {
     setBack(showMain);
-    currentView = { type:"tech" };
-    let html =
-      '<div class="content-left" style="width:100%"><button class="back-btn" onclick="goBack()"><i class="fas fa-arrow-left"></i> Назад</button>' +
-      '<div class="section-card"><div class="section-title"><i class="fas fa-headset"></i> Техническая поддержка</div><div class="category-list">';
-    for (let i=0;i<tech.length;i++){
-      const t = tech[i];
-      html += '<div class="category-item" onclick="renderTopics(\''+t.id+'\',\''+safeForAttr(t.name)+'\', showTech)">' +
-        '<div class="cat-info"><h3><i class="'+t.icon+'"></i> '+esc(t.name)+'</h3><p>'+esc(t.desc)+'</p></div>' +
-        '<div class="cat-stats"><i class="fas fa-folder"></i></div></div>';
-    }
-    html += '</div></div></div>';
-    document.getElementById("main-content").innerHTML = html;
+    currentView = { type: "tech" };
+    document.getElementById("main-content").innerHTML = `
+      <div class="content-left" style="width:100%">
+        <button class="back-btn" onclick="goBack()"><i class="fas fa-arrow-left"></i> Назад</button>
+        <div class="section-card">
+          <div class="section-title"><i class="fas fa-headset"></i> Техническая поддержка</div>
+          <div class="category-list">
+            ${tech.map(t => `
+              <div class="category-item" onclick="renderTopics('${t.id}','${safeForAttr(t.name)}', showTech)">
+                <div class="cat-info"><h3><i class="${t.icon}"></i> ${esc(t.name)}</h3><p>${esc(t.desc)}</p></div>
+                <div class="cat-stats"><i class="fas fa-folder"></i></div>
+              </div>`).join("")}
+          </div>
+        </div>
+      </div>`;
   }
 
-  function showComplaints(){
+  function showComplaints() {
     setBack(showMain);
-    currentView = { type:"complaints" };
-    let html =
-      '<div class="content-left" style="width:100%"><button class="back-btn" onclick="goBack()"><i class="fas fa-arrow-left"></i> Назад</button>' +
-      '<div class="section-card"><div class="section-title"><i class="fas fa-file-alt"></i> Жалобы и заявления</div><div class="category-list">';
-    for (let i=0;i<complaintsList.length;i++){
-      const c = complaintsList[i];
-      html += '<div class="category-item" onclick="renderTopics(\''+c.id+'\',\''+safeForAttr(c.name)+'\', showComplaints)">' +
-        '<div class="cat-info"><h3><i class="'+c.icon+'"></i> '+esc(c.name)+'</h3><p>'+esc(c.desc)+'</p></div>' +
-        '<div class="cat-stats"><i class="fas fa-folder"></i></div></div>';
-    }
-    html += '</div></div></div>';
-    document.getElementById("main-content").innerHTML = html;
+    currentView = { type: "complaints" };
+    document.getElementById("main-content").innerHTML = `
+      <div class="content-left" style="width:100%">
+        <button class="back-btn" onclick="goBack()"><i class="fas fa-arrow-left"></i> Назад</button>
+        <div class="section-card">
+          <div class="section-title"><i class="fas fa-file-alt"></i> Жалобы и заявления</div>
+          <div class="category-list">
+            ${complaintsList.map(c => `
+              <div class="category-item" onclick="renderTopics('${c.id}','${safeForAttr(c.name)}', showComplaints)">
+                <div class="cat-info"><h3><i class="${c.icon}"></i> ${esc(c.name)}</h3><p>${esc(c.desc)}</p></div>
+                <div class="cat-stats"><i class="fas fa-folder"></i></div>
+              </div>`).join("")}
+          </div>
+        </div>
+      </div>`;
   }
 
-  document.getElementById("submitSectionBtn").onclick = function(){
+  // ─── ОБРАБОТЧИКИ ФОРМ ─────────────────────────────────────────────────────
+  document.getElementById("submitSectionBtn").onclick = function () {
     const name = document.getElementById("sectionName").value.trim();
     const desc = document.getElementById("sectionDesc").value.trim();
-    if(!name) return alert("Введите название");
-    customSubs.push({ id: "c_" + Date.now(), name, desc: desc || "Пользовательский раздел", icon:"fas fa-folder", removable:true });
+    if (!name) return alert("Введите название");
+    customSubs.push({ id: "c_" + Date.now(), name, desc: desc || "Пользовательский раздел", icon: "fas fa-folder", removable: true });
     saveCustomSubs();
     closeModal();
     showServer();
   };
 
-  document.getElementById("submitTopicBtn").onclick = async function(){
+  document.getElementById("submitTopicBtn").onclick = async function () {
     const title = document.getElementById("topicTitle").value.trim();
     const content = document.getElementById("topicContent").value.trim();
-    if(!title || !content) return alert("Заполните поля");
+    if (!title || !content) return alert("Заполните поля");
     try {
-      if(currentTopicId) await updateTopic(currentTopicId, title, content);
+      if (currentTopicId) await updateTopic(currentTopicId, title, content);
       else await createTopic(currentCategory, title, content);
-    } catch(e){
+    } catch (e) {
       console.error(e);
-      alert(String(e.message||"").includes("forbidden") ? "Нет прав создавать темы в этом разделе" : "Ошибка сохранения");
+      alert(String(e.message || "").includes("forbidden") ? "Нет прав создавать темы в этом разделе" : "Ошибка сохранения");
       return;
     }
     closeModal();
     refreshView();
   };
 
-  document.getElementById("saveProfileBtn").onclick = async function(){
+  document.getElementById("saveProfileBtn").onclick = async function () {
     const nick = document.getElementById("profileNick").value.trim();
     const ava = document.getElementById("profileAvatar").value.trim();
     const rankId = document.getElementById("profileRank").value;
-    if(!nick) return alert("Введи ник");
+    if (!nick) return alert("Введи ник");
 
     cache.profile = { id: USER_ID, nick, avatar: ava || DEFAULT_AVATAR, rankId: rankId || "rank_none" };
     cache.profilesById = cache.profilesById || {};
     cache.profilesById[USER_ID] = { userId: USER_ID, nick: cache.profile.nick, avatar: cache.profile.avatar, rankId: cache.profile.rankId };
+    invalidateProfile(USER_ID);
     cacheSave();
 
-    const payload = { 
-        userId: USER_ID, 
-        actorId: USER_ID,
-        nick: cache.profile.nick, 
-        avatar: cache.profile.avatar 
-    };
-    if (isLeader()) {
-        payload.rankId = cache.profile.rankId;
-    }
-    
-    try { await api("upsertProfile", payload); }
-    catch(e){ console.error(e); alert("Ошибка сохранения профиля"); }
+    const payload = { userId: USER_ID, actorId: USER_ID, nick: cache.profile.nick, avatar: cache.profile.avatar };
+    if (isLeader()) payload.rankId = cache.profile.rankId;
+
+    try { await api("upsertProfile", payload); } catch (e) { console.error(e); alert("Ошибка сохранения профиля"); }
 
     if (!isLeader()) {
-        try {
-            const freshProfile = await api("getProfile", { userId: USER_ID });
-            if (freshProfile && freshProfile.profile) {
-                cache.profile.rankId = freshProfile.profile.rankId || "rank_none";
-                cacheSave();
-                refreshMiniProfile();
-            }
-        } catch(e) { console.error(e); }
+      try {
+        const fresh = await api("getProfile", { userId: USER_ID });
+        if (fresh && fresh.profile) {
+          cache.profile.rankId = fresh.profile.rankId || "rank_none";
+          invalidateProfile(USER_ID);
+          cacheSave();
+        }
+      } catch (e) { console.error(e); }
     }
 
     refreshMiniProfile();
@@ -1047,36 +1057,41 @@
     refreshView();
   };
 
-  document.getElementById("addRankBtn").onclick = async function(){
+  document.getElementById("addRankBtn").onclick = async function () {
     const name = document.getElementById("rankName").value.trim();
-    const color = (document.getElementById("rankColor").value.trim() || "#FFD966");
-    if(!name) return alert("Введите название ранга");
+    const color = document.getElementById("rankColor").value.trim() || "#FFD966";
+    if (!name) return alert("Введите название ранга");
     try { await createRank(name, color); renderRanksList(); }
-    catch(e){ console.error(e); alert("Нет прав (только Руководитель проекта)"); }
+    catch (e) { console.error(e); alert("Нет прав (только Руководитель проекта)"); }
   };
 
+  // ─── ИНИЦИАЛИЗАЦИЯ ────────────────────────────────────────────────────────
   (async () => {
     cacheLoad();
-    await loadRanks();
-    await ensureProfiles([USER_ID]);
 
-    const p = profileFor(USER_ID);
-    cache.profile = { id: USER_ID, nick: p.nick, avatar: p.avatar, rankId: p.rankId };
-    cacheSave();
-
-    fillRankSelect(document.getElementById("profileRank"), cache.profile.rankId || "rank_none");
+    // Показываем главную сразу из кэша — пользователь видит контент моментально
     refreshMiniProfile();
     document.getElementById("ranksBtn").style.display = isLeader() ? "inline-flex" : "none";
     document.getElementById("usersBtn").style.display = isLeader() ? "inline-flex" : "none";
-    showMain();
-  })().catch(e => {
-    console.error(e);
-    cacheLoad();
-    refreshMiniProfile();
-    document.getElementById("ranksBtn").style.display = isLeader() ? "inline-flex" : "none";
-    document.getElementById("usersBtn").style.display = isLeader() ? "inline-flex" : "none";
-    showMain();
-  });
+    showMain(); // рендерим из кэша немедленно
+
+    // Фоновая загрузка свежих данных
+    try {
+      await Promise.all([
+        loadRanks(),
+        ensureProfiles([USER_ID])
+      ]);
+
+      const p = profileFor(USER_ID);
+      cache.profile = { id: USER_ID, nick: p.nick, avatar: p.avatar, rankId: p.rankId };
+      cacheSave();
+
+      fillRankSelect(document.getElementById("profileRank"), cache.profile.rankId || "rank_none");
+      refreshMiniProfile();
+    } catch (e) {
+      console.error("Init error:", e);
+    }
+  })();
 </script>
 </body>
 </html>
