@@ -41,6 +41,7 @@
     .cat-info p { font-size: 0.75rem; color: #8A94B0; font-weight: 600; }
     .cat-stats { font-size: 0.75rem; background: #0C0F18; padding: 4px 12px; border-radius: 40px; font-weight: 800; }
     .cat-actions { display: flex; gap: 8px; }
+
     .topics-list { padding: 0 22px; }
     .topic-item { padding: 12px 0; border-bottom: 1px solid #20232F; cursor: pointer; transition: 0.1s; display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
     .topic-item:hover { background: #191E2B; margin: 0 -22px; padding: 12px 22px; }
@@ -74,6 +75,7 @@
     .server-name { font-size: 1.3rem; font-weight: 900; color: #FFD966; margin-bottom: 8px; }
     .server-status { font-size: 0.75rem; color: #4CAF50; margin-bottom: 12px; font-weight: 900; }
     .voice-card { background: #13161F; border-radius: 20px; padding: 18px; border: 1px solid #2C3040; margin-bottom: 28px; text-align: center; font-weight: 800; }
+
     .comments-wrap { margin-top: 18px; border-top: 1px solid #232732; padding-top: 16px; }
     .comments-title { font-weight: 900; color: #E0E4F0; display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
     .comment { display: flex; gap: 12px; padding: 12px; border-radius: 16px; border: 1px solid rgba(35,39,50,0.9); background: rgba(12,15,24,0.35); margin-bottom: 10px; }
@@ -87,10 +89,10 @@
     .comment-form textarea { width: 100%; min-height: 88px; resize: vertical; padding: 10px; background: #1E232F; border: 1px solid #232732; border-radius: 12px; color: white; font-family: 'Inter', sans-serif; font-weight: 700; outline: none; }
     .comment-form .row { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
     .comment-form .hint { color: #8A94B0; font-size: 0.78rem; font-weight: 800; }
+
     @media (max-width: 800px) { .forum-main { flex-direction: column; } .topic-actions { width: 100%; justify-content: flex-end; } .mini-name { max-width: 160px; } }
   </style>
 </head>
-
 <body>
 <div class="forum-container">
   <div class="forum-header">
@@ -164,7 +166,7 @@
     <span class="close-modal" onclick="closeModal()">&times;</span>
     <h3 style="color:#FFD966;">Ранги (управление)</h3>
     <div style="color:#8A94B0; font-weight:800; font-size:0.85rem; margin-top:6px;">
-      Добавление рангов идёт в Google Sheets.
+      Ранги берутся из Google Sheets. Добавление — тоже в Sheets.
     </div>
     <input type="text" id="rankName" placeholder="Название ранга (например: Администратор)">
     <input type="text" id="rankColor" placeholder="Цвет (hex, например: #FFD966)">
@@ -178,48 +180,75 @@
   const API_URL = "https://script.google.com/macros/s/AKfycbxvrqybl3Oc7DJB3lw4E9EYfp0pt0Obv_fz7FtBhH3PP83xA8qO-xmezyuHFz_vEbVu3g/exec";
   const API_KEY = "rsrp_12345";
 
-  async function api(action, payload = {}) {
-    const res = await fetch(API_URL + "?action=" + encodeURIComponent(action), {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ key: API_KEY, ...payload })
+  function api(action, payload = {}) {
+    return new Promise((resolve, reject) => {
+      const cbName = "__rsrp_cb_" + Date.now() + "_" + Math.random().toString(16).slice(2);
+
+      const script = document.createElement("script");
+
+      window[cbName] = (data) => {
+        try {
+          if (!data || !data.ok) throw new Error((data && data.error) || "api_error");
+          resolve(data);
+        } catch (e) {
+          reject(e);
+        } finally {
+          delete window[cbName];
+          script.remove();
+        }
+      };
+
+      const params = new URLSearchParams();
+      params.set("action", action);
+      params.set("key", API_KEY);
+      params.set("callback", cbName);
+
+      Object.keys(payload).forEach(k => {
+        if (payload[k] !== undefined && payload[k] !== null) params.set(k, String(payload[k]));
+      });
+
+      script.src = API_URL + "?" + params.toString();
+      script.onerror = () => {
+        delete window[cbName];
+        script.remove();
+        reject(new Error("jsonp_load_failed"));
+      };
+
+      document.head.appendChild(script);
     });
-    const data = await res.json();
-    if (!data.ok) throw new Error(data.error || "api_error");
-    return data;
   }
 
   const USER_ID = (localStorage.getItem("rsrp_user_id") || ("u_" + Date.now() + "_" + Math.random().toString(16).slice(2)));
   localStorage.setItem("rsrp_user_id", USER_ID);
 
-  // ====== локальный кэш профиля/рангов (для UI) ======
-  var DB_KEY = "rsrp_cache_v1";
-  function defaultDb(){
+  // ====== local cache for UI ======
+  const CACHE_KEY = "rsrp_cache_v2";
+  function defaultCache(){
     return {
       profile: { id: USER_ID, nick: "Игрок", avatar: "https://i.imgur.com/1Xq9BiO.png", rankId: "rank_none" },
-      ranks: [{ id:"rank_none", name:"Без ранга", color:"#FFD966" }]
+      ranks: [{ id: "rank_none", name: "Без ранга", color: "#FFD966" }]
     };
   }
-  var db = defaultDb();
-  function dbLoad(){ try{ db = JSON.parse(localStorage.getItem(DB_KEY) || "null") || defaultDb(); }catch(e){ db = defaultDb(); } }
-  function dbSave(){ localStorage.setItem(DB_KEY, JSON.stringify(db)); }
+  let cache = defaultCache();
+  function cacheLoad(){ try{ cache = JSON.parse(localStorage.getItem(CACHE_KEY) || "null") || defaultCache(); }catch(e){ cache = defaultCache(); } }
+  function cacheSave(){ localStorage.setItem(CACHE_KEY, JSON.stringify(cache)); }
 
-  // ====== категории ======
-  var forumSections = [
+  // ====== categories ======
+  const forumSections = [
     { id: "rules_common", name: "Общие правила проекта", desc: "Основные правила поведения", icon: "fas fa-gavel" },
     { id: "rules_criminal", name: "Общие правила криминальных организаций", desc: "Правила для банд и мафии", icon: "fas fa-skull" },
     { id: "rules_gov", name: "Общие правила государственных организаций", desc: "Правила для полиции и госструктур", icon: "fas fa-building" }
   ];
-  var baseSubs = [
+  const baseSubs = [
     { id: "khimki_criminal", name: "Криминальные организации", desc: "Банды, мафия, криминальные семьи", icon: "fas fa-mask", removable: false },
     { id: "khimki_gov", name: "Государственные организации", desc: "Полиция, мэрия, скорая, пожарные", icon: "fas fa-landmark", removable: false }
   ];
-  var tech = [
+  const tech = [
     { id: "tech_help", name: "Помощь", desc: "Вопросы по игре", icon: "fas fa-question-circle" },
     { id: "tech_bugs", name: "Сообщить о баге", desc: "Ошибки и проблемы", icon: "fas fa-bug" },
     { id: "tech_support", name: "Техподдержка", desc: "Связь с администрацией", icon: "fas fa-headset" }
   ];
-  var complaintsList = [
+  const complaintsList = [
     { id: "complaint_admin", name: "Жалобы на администрацию", desc: "Нарушения админов", icon: "fas fa-user-shield" },
     { id: "complaint_players", name: "Жалобы на игроков", desc: "Нарушения правил игроками", icon: "fas fa-users" },
     { id: "complaint_leaders", name: "Жалобы на лидеров", desc: "Нарушения лидеров", icon: "fas fa-crown" },
@@ -227,39 +256,42 @@
     { id: "moderator_app", name: "Заявление на пост модератора", desc: "Заявка в модерацию", icon: "fas fa-user-tie" },
     { id: "leader_app", name: "Заявление на пост лидера", desc: "Заявка на лидерство", icon: "fas fa-chart-line" }
   ];
-  var customSubs = JSON.parse(localStorage.getItem("rsrp_custom_subs") || "[]");
+
+  let customSubs = JSON.parse(localStorage.getItem("rsrp_custom_subs") || "[]");
   function saveCustomSubs(){ localStorage.setItem("rsrp_custom_subs", JSON.stringify(customSubs)); }
   function getAllSubs(){ return baseSubs.concat(customSubs); }
 
-  // ====== view state ======
-  var currentCategory = null, currentTopicId = null;
-  var currentBackFn = showMain;
-  function setBack(fn){ currentBackFn = (typeof fn === 'function') ? fn : showMain; }
+  // ====== state ======
+  let currentCategory = null;
+  let currentTopicId = null;
+
+  let currentBackFn = showMain;
+  function setBack(fn){ currentBackFn = (typeof fn === "function") ? fn : showMain; }
   function goBack(){ currentBackFn(); }
-  var currentView = { type: "main", cat: null, title: null, back: showMain, listTitle: null };
-  function setViewTopics(cat, title, back){ currentView = { type: "topics", cat, title, back, listTitle: title }; }
+
+  let currentView = { type:"main", cat:null, title:null, back: showMain };
+  function setViewTopics(cat, title, back){ currentView = { type:"topics", cat, title, back }; }
   function refreshView(){
-    if(currentView.type==="topics") return renderTopics(currentView.cat, currentView.title, currentView.back);
-    if(currentView.type==="server") return showServer();
-    if(currentView.type==="tech") return showTech();
-    if(currentView.type==="complaints") return showComplaints();
+    if(currentView.type === "topics") return renderTopics(currentView.cat, currentView.title, currentView.back);
+    if(currentView.type === "server") return showServer();
+    if(currentView.type === "tech") return showTech();
+    if(currentView.type === "complaints") return showComplaints();
     return showMain();
   }
 
-  function esc(s){
-    return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
-  }
+  // ====== helpers ======
+  function esc(s){ return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
 
   function getRank(rankId){
-    return (db.ranks||[]).find(r=>r.id===rankId) || (db.ranks||[])[0] || { id:"rank_none", name:"Без ранга", color:"#FFD966" };
+    return (cache.ranks||[]).find(r => r.id === rankId) || (cache.ranks||[])[0] || { id:"rank_none", name:"Без ранга", color:"#FFD966" };
   }
 
   function refreshMiniProfile(){
-    var p = db.profile || {};
-    var r = getRank(p.rankId);
+    const p = cache.profile || {};
+    const r = getRank(p.rankId);
     document.getElementById("miniAvatar").src = p.avatar || "https://i.imgur.com/1Xq9BiO.png";
     document.getElementById("miniName").innerText = p.nick || "Игрок";
-    var el = document.getElementById("miniRank");
+    const el = document.getElementById("miniRank");
     el.innerText = r.name || "Без ранга";
     el.style.borderColor = (r.color || "#FFD966") + "55";
     el.style.color = r.color || "#FFD966";
@@ -267,26 +299,34 @@
 
   function fillRankSelect(selectEl, selectedId){
     selectEl.innerHTML = "";
-    (db.ranks||[]).forEach(function(r){
-      var opt = document.createElement("option");
+    (cache.ranks||[]).forEach(r => {
+      const opt = document.createElement("option");
       opt.value = r.id;
       opt.innerText = r.name;
-      if(r.id === selectedId) opt.selected = true;
+      if (r.id === selectedId) opt.selected = true;
       selectEl.appendChild(opt);
     });
   }
 
   async function loadRanks(){
     const r = await api("listRanks");
-    db.ranks = (r.ranks||[]).map(x=>({ id:x.rankId, name:x.name, color:x.color }));
-    if(!db.ranks.find(x=>x.id==="rank_none")) db.ranks.unshift({ id:"rank_none", name:"Без ранга", color:"#FFD966" });
-    dbSave();
+    cache.ranks = (r.ranks||[]).map(x => ({ id:x.rankId, name:x.name, color:x.color }));
+    if(!cache.ranks.find(x=>x.id==="rank_none")) cache.ranks.unshift({ id:"rank_none", name:"Без ранга", color:"#FFD966" });
+    cacheSave();
+  }
+
+  // ====== UI modals ======
+  function closeModal(){
+    document.getElementById("topicModal").style.display = "none";
+    document.getElementById("sectionModal").style.display = "none";
+    document.getElementById("profileModal").style.display = "none";
+    document.getElementById("ranksModal").style.display = "none";
   }
 
   function openProfile(){
-    document.getElementById("profileNick").value = db.profile.nick || "";
-    document.getElementById("profileAvatar").value = db.profile.avatar || "";
-    fillRankSelect(document.getElementById("profileRank"), db.profile.rankId || "rank_none");
+    document.getElementById("profileNick").value = cache.profile.nick || "";
+    document.getElementById("profileAvatar").value = cache.profile.avatar || "";
+    fillRankSelect(document.getElementById("profileRank"), cache.profile.rankId || "rank_none");
     document.getElementById("profileModal").style.display = "flex";
   }
 
@@ -298,8 +338,8 @@
   }
 
   function renderRanksList(){
-    var box = document.getElementById("ranksList");
-    var ranks = (db.ranks||[]).filter(r=>r.id!=="rank_none");
+    const box = document.getElementById("ranksList");
+    const ranks = (cache.ranks||[]).filter(r=>r.id!=="rank_none");
     if(ranks.length===0){
       box.innerHTML = "<div style='color:#8A94B0;font-weight:800;margin-top:10px;'>Рангов пока нет.</div>";
       return;
@@ -315,10 +355,12 @@
     ).join("");
   }
 
+  // ====== sheets api wrappers ======
   async function listTopics(categoryId){
     const r = await api("listTopics", { categoryId });
-    return (r.topics || []).map(t => ({
+    return (r.topics||[]).map(t => ({
       id: t.topicId,
+      categoryId: t.categoryId,
       title: t.title,
       content: t.content,
       authorId: t.authorId,
@@ -350,35 +392,41 @@
     return r.comment;
   }
 
-  function closeModal(){
-    document.getElementById("topicModal").style.display = "none";
-    document.getElementById("sectionModal").style.display = "none";
-    document.getElementById("profileModal").style.display = "none";
-    document.getElementById("ranksModal").style.display = "none";
-  }
-
+  // ====== pages ======
   function showMain(){
     setBack(showMain);
     currentView = { type:"main" };
 
-    var html = '<div class="content-left">' +
-      '<div class="section-card"><div class="section-title"><i class="fas fa-server"></i> Игровые сервера</div>' +
-        '<div class="server-card" onclick="showServer()">' +
-          '<div class="server-name"><i class="fas fa-star-of-life"></i> Сервер №1 | Химки</div>' +
-          '<div class="server-status"><i class="fas fa-circle" style="color:#4CAF50; font-size:0.6rem;"></i> Онлайн</div>' +
-        '</div></div>' +
-      '<div class="section-card"><div class="section-title"><i class="fas fa-layer-group"></i> Разделы форума</div><div class="category-list">';
+    let html =
+      '<div class="content-left">' +
+        '<div class="section-card">' +
+          '<div class="section-title"><i class="fas fa-server"></i> Игровые сервера</div>' +
+          '<div class="server-card" onclick="showServer()">' +
+            '<div class="server-name"><i class="fas fa-star-of-life"></i> Сервер №1 | Химки</div>' +
+            '<div class="server-status"><i class="fas fa-circle" style="color:#4CAF50; font-size:0.6rem;"></i> Онлайн</div>' +
+          '</div>' +
+        '</div>' +
 
-    for(var i=0;i<forumSections.length;i++){
-      var s = forumSections[i];
-      html += '<div class="category-item" onclick="showCategory(\''+s.id+'\')">' +
-        '<div class="cat-info"><h3><i class="'+s.icon+'"></i> '+esc(s.name)+'</h3><p>'+esc(s.desc)+'</p></div>' +
-        '<div class="cat-stats"><i class="fas fa-folder"></i></div>' +
-      '</div>';
+        '<div class="section-card">' +
+          '<div class="section-title"><i class="fas fa-layer-group"></i> Разделы форума</div>' +
+          '<div class="category-list">';
+
+    for (let i=0;i<forumSections.length;i++){
+      const s = forumSections[i];
+      html +=
+        '<div class="category-item" onclick="showCategory(\''+s.id+'\')">' +
+          '<div class="cat-info"><h3><i class="'+s.icon+'"></i> '+esc(s.name)+'</h3><p>'+esc(s.desc)+'</p></div>' +
+          '<div class="cat-stats"><i class="fas fa-folder"></i></div>' +
+        '</div>';
     }
 
-    html += '</div></div></div>' +
-      '<div class="content-right"><div class="voice-card"><i class="fas fa-microphone-alt"></i> <strong>Голосовое объединение</strong><div style="margin-top:10px">Подключитесь к Discord</div></div></div>';
+    html +=
+          '</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="content-right">' +
+        '<div class="voice-card"><i class="fas fa-microphone-alt"></i> <strong>Голосовое объединение</strong><div style="margin-top:10px">Подключитесь к Discord</div></div>' +
+      '</div>';
 
     document.getElementById("main-content").innerHTML = html;
   }
@@ -387,18 +435,26 @@
     setBack(showMain);
     currentView = { type:"server" };
 
-    var subs = getAllSubs();
-    var html = '<div class="content-left" style="width:100%">' +
-      '<button class="back-btn" onclick="goBack()"><i class="fas fa-arrow-left"></i> Назад</button>' +
-      '<div class="section-card"><div class="section-title"><i class="fas fa-server"></i> Сервер №1 | Химки ' +
-      '<span class="add-section-btn" onclick="event.stopPropagation(); document.getElementById(\'sectionModal\').style.display=\'flex\'"><i class="fas fa-plus"></i> Добавить раздел</span></div><div class="category-list">';
+    const subs = getAllSubs();
+    let html =
+      '<div class="content-left" style="width:100%">' +
+        '<button class="back-btn" onclick="goBack()"><i class="fas fa-arrow-left"></i> Назад</button>' +
+        '<div class="section-card">' +
+          '<div class="section-title"><i class="fas fa-server"></i> Сервер №1 | Химки ' +
+            '<span class="add-section-btn" onclick="event.stopPropagation(); document.getElementById(\'sectionModal\').style.display=\'flex\'"><i class="fas fa-plus"></i> Добавить раздел</span>' +
+          '</div>' +
+          '<div class="category-list">';
 
-    for(var i=0;i<subs.length;i++){
-      var s = subs[i];
-      html += '<div class="category-item">' +
-        '<div class="cat-info" onclick="showSub(\''+s.id+'\')"><h3><i class="'+s.icon+'"></i> '+esc(s.name)+'</h3><p>'+esc(s.desc)+'</p></div>' +
-        (s.removable ? '<div class="cat-actions"><button class="icon-btn danger" onclick="event.stopPropagation(); if(confirm(\'Удалить раздел?\')){ deleteCustomSub(\''+s.id+'\'); }"><i class="fas fa-trash-alt"></i></button></div>' : '') +
-      '</div>';
+    for (let i=0;i<subs.length;i++){
+      const s = subs[i];
+      html +=
+        '<div class="category-item">' +
+          '<div class="cat-info" onclick="showSub(\''+s.id+'\')"><h3><i class="'+s.icon+'"></i> '+esc(s.name)+'</h3><p>'+esc(s.desc)+'</p></div>' +
+          (s.removable
+            ? '<div class="cat-actions"><button class="icon-btn danger" onclick="event.stopPropagation(); if(confirm(\'Удалить раздел?\')){ deleteCustomSub(\''+s.id+'\'); }"><i class="fas fa-trash-alt"></i></button></div>'
+            : ''
+          ) +
+        '</div>';
     }
 
     html += '</div></div></div>';
@@ -413,14 +469,14 @@
 
   function showSub(id){
     setBack(showServer);
-    var s = getAllSubs().find(x=>x.id===id);
-    if(s) renderTopics(id, s.name + " - Химки", showServer);
+    const s = getAllSubs().find(x=>x.id===id);
+    if (s) renderTopics(id, s.name + " - Химки", showServer);
   }
 
   function showCategory(id){
     setBack(showMain);
-    var s = forumSections.find(x=>x.id===id);
-    if(s) renderTopics(id, s.name, showMain);
+    const s = forumSections.find(x=>x.id===id);
+    if (s) renderTopics(id, s.name, showMain);
   }
 
   async function renderTopics(cat, title, back){
@@ -428,35 +484,40 @@
     setViewTopics(cat, title, back);
 
     document.getElementById("main-content").innerHTML =
-      '<div class="content-left" style="width:100%"><button class="back-btn" onclick="goBack()"><i class="fas fa-arrow-left"></i> Назад</button>' +
-      '<div class="section-card"><div class="section-title"><i class="fas fa-folder-open"></i> '+esc(title)+'</div>' +
-      '<div class="topics-list"><div class="empty-topics">Загрузка...</div></div></div></div>';
+      '<div class="content-left" style="width:100%">' +
+        '<button class="back-btn" onclick="goBack()"><i class="fas fa-arrow-left"></i> Назад</button>' +
+        '<div class="section-card">' +
+          '<div class="section-title"><i class="fas fa-folder-open"></i> '+esc(title)+'</div>' +
+          '<div class="topics-list"><div class="empty-topics">Загрузка...</div></div>' +
+        '</div>' +
+      '</div>';
 
     let arr = [];
     try {
       arr = await listTopics(cat);
     } catch (e) {
       console.error(e);
-      document.querySelector(".topics-list").innerHTML = '<div class="empty-topics">Ошибка загрузки тем (F12 консоль)</div>';
+      document.querySelector(".topics-list").innerHTML = '<div class="empty-topics">Ошибка загрузки тем</div>';
       return;
     }
 
-    var html = '';
-    if(arr.length===0){
+    let html = "";
+    if (arr.length === 0) {
       html = '<div class="empty-topics"><i class="fas fa-inbox"></i><p>Нет тем</p></div>';
     } else {
-      for (var i=0;i<arr.length;i++){
-        var t = arr[i];
-        html += '<div class="topic-item">' +
-          '<div style="flex:1; min-width: 220px;" onclick="showThread(\''+cat+'\',\''+t.id+'\',\''+(t.title||"").replace(/'/g,"\\'")+'\',\''+(title||"").replace(/'/g,"\\'")+'\')">' +
-            '<div class="topic-title">'+esc(t.title)+'</div>' +
-            '<div class="topic-meta"><i class="fas fa-user"></i> '+esc(db.profile.nick)+' · '+esc(new Date(t.createdAt||Date.now()).toLocaleDateString())+'</div>' +
-          '</div>' +
-          '<div class="topic-actions" onclick="event.stopPropagation();">' +
-            '<button class="icon-btn" title="Редактировать" onclick="openEdit(\''+cat+'\',\''+t.id+'\',\''+(t.title||"").replace(/'/g,"\\'")+'\',\''+(t.content||"").replace(/'/g,"\\'")+'\')"><i class="fas fa-edit"></i></button>' +
-            '<button class="icon-btn danger" title="Удалить" onclick="delTopicUI(\''+cat+'\',\''+t.id+'\',\''+(title||"").replace(/'/g,"\\'")+'\')"><i class="fas fa-trash-alt"></i></button>' +
-          '</div>' +
-        '</div>';
+      for (let i=0;i<arr.length;i++){
+        const t = arr[i];
+        html +=
+          '<div class="topic-item">' +
+            '<div style="flex:1; min-width: 220px;" onclick="showThread(\''+cat+'\',\''+t.id+'\',\''+(t.title||"").replace(/'/g,"\\'")+'\',\''+(title||"").replace(/'/g,"\\'")+'\')">' +
+              '<div class="topic-title">'+esc(t.title)+'</div>' +
+              '<div class="topic-meta"><i class="fas fa-user"></i> '+esc(cache.profile.nick)+' · '+esc(new Date(t.createdAt||Date.now()).toLocaleDateString())+'</div>' +
+            '</div>' +
+            '<div class="topic-actions" onclick="event.stopPropagation();">' +
+              '<button class="icon-btn" title="Редактировать" onclick="openEdit(\''+cat+'\',\''+t.id+'\',\''+(t.title||"").replace(/'/g,"\\'")+'\',\''+(t.content||"").replace(/'/g,"\\'")+'\')"><i class="fas fa-edit"></i></button>' +
+              '<button class="icon-btn danger" title="Удалить" onclick="delTopicUI(\''+cat+'\',\''+t.id+'\',\''+(title||"").replace(/'/g,"\\'")+'\')"><i class="fas fa-trash-alt"></i></button>' +
+            '</div>' +
+          '</div>';
       }
     }
 
@@ -467,8 +528,14 @@
   }
 
   async function delTopicUI(cat, topicId, listTitle){
-    if(!confirm("Удалить тему?")) return;
-    try { await deleteTopic(topicId); } catch(e){ console.error(e); alert("Ошибка удаления (F12)"); return; }
+    if (!confirm("Удалить тему?")) return;
+    try {
+      await deleteTopic(topicId);
+    } catch (e) {
+      console.error(e);
+      alert("Ошибка удаления");
+      return;
+    }
     renderTopics(cat, listTitle, currentView.back || showMain);
   }
 
@@ -494,38 +561,43 @@
     setBack(function(){ renderTopics(cat, listTitle, currentView.back || showMain); });
 
     document.getElementById("main-content").innerHTML =
-      '<div class="content-left" style="width:100%"><button class="back-btn" onclick="goBack()"><i class="fas fa-arrow-left"></i> Назад</button>' +
-      '<div class="thread-view"><div class="thread-title">'+esc(topicTitle)+'</div><div class="thread-content">Загрузка...</div></div></div>';
+      '<div class="content-left" style="width:100%">' +
+        '<button class="back-btn" onclick="goBack()"><i class="fas fa-arrow-left"></i> Назад</button>' +
+        '<div class="thread-view">' +
+          '<div class="thread-title">'+esc(topicTitle)+'</div>' +
+          '<div class="thread-content">Загрузка...</div>' +
+        '</div>' +
+      '</div>';
 
-    // грузим все темы категории и ищем нужную (просто)
     let topics = [];
     try { topics = await listTopics(cat); } catch(e){ console.error(e); }
-    const topic = topics.find(t=>t.id===id);
+    const topic = topics.find(t => t.id === id);
 
-    const content = topic ? topic.content : "";
     const view = document.querySelector(".thread-view");
-    view.querySelector(".thread-content").innerHTML = esc(content).replace(/\n/g,"<br>");
+    view.querySelector(".thread-content").innerHTML = esc(topic ? topic.content : "").replace(/\n/g,"<br>");
 
-    // comments
     let cmts = [];
     try { cmts = await listComments(id); } catch(e){ console.error(e); }
 
     view.insertAdjacentHTML("beforeend",
       '<div class="comments-wrap">' +
         '<div class="comments-title"><i class="fas fa-comments" style="color:#FFD966;"></i> Комментарии ('+cmts.length+')</div>' +
-        (cmts.length ? cmts.map(c =>
-          '<div class="comment">' +
-            '<img class="comment-avatar" alt="ava" src="'+esc(db.profile.avatar)+'"/>' +
-            '<div class="comment-main">' +
-              '<div class="comment-head"><div><span class="comment-author">'+esc(db.profile.nick)+'</span> <span class="comment-date">'+esc(new Date(c.createdAt||Date.now()).toLocaleString())+'</span></div></div>' +
-              '<div class="comment-text">'+esc(c.text).replace(/\n/g,"<br>")+'</div>' +
-            '</div>' +
-          '</div>'
-        ).join("") : '<div style="color:#8A94B0;font-weight:800;margin:6px 0 12px;">Пока нет комментариев. Будь первым.</div>') +
+        (cmts.length
+          ? cmts.map(c =>
+              '<div class="comment">' +
+                '<img class="comment-avatar" alt="ava" src="'+esc(cache.profile.avatar)+'"/>' +
+                '<div class="comment-main">' +
+                  '<div class="comment-head"><div><span class="comment-author">'+esc(cache.profile.nick)+'</span> <span class="comment-date">'+esc(new Date(c.createdAt||Date.now()).toLocaleString())+'</span></div></div>' +
+                  '<div class="comment-text">'+esc(c.text).replace(/\n/g,"<br>")+'</div>' +
+                '</div>' +
+              '</div>'
+            ).join("")
+          : '<div style="color:#8A94B0;font-weight:800;margin:6px 0 12px;">Пока нет комментариев. Будь первым.</div>'
+        ) +
         '<div class="comment-form">' +
           '<textarea id="commentText" placeholder="Написать комментарий..."></textarea>' +
           '<div class="row">' +
-            '<div class="hint">Пишешь как: <span style="color:#FFD966;">'+esc(db.profile.nick)+'</span></div>' +
+            '<div class="hint">Пишешь как: <span style="color:#FFD966;">'+esc(cache.profile.nick)+'</span></div>' +
             '<button class="chip-btn" onclick="submitComment(\''+cat+'\',\''+id+'\',\''+topicTitle.replace(/'/g,"\\'")+'\',\''+listTitle.replace(/'/g,"\\'")+'\')"><i class="fas fa-paper-plane"></i> Отправить</button>' +
           '</div>' +
         '</div>' +
@@ -536,23 +608,37 @@
   async function submitComment(cat, topicId, topicTitle, listTitle){
     const ta = document.getElementById("commentText");
     const text = (ta && ta.value ? ta.value.trim() : "");
-    if(!text) return alert("Напиши комментарий");
-    try { await createComment(topicId, text); } catch(e){ console.error(e); alert("Ошибка отправки (F12)"); return; }
+    if (!text) return alert("Напиши комментарий");
+    try {
+      await createComment(topicId, text);
+    } catch(e){
+      console.error(e);
+      alert("Ошибка отправки");
+      return;
+    }
     showThread(cat, topicId, topicTitle, listTitle);
   }
 
   function showTech(){
     setBack(showMain);
     currentView = { type:"tech" };
-    var html = '<div class="content-left" style="width:100%"><button class="back-btn" onclick="goBack()"><i class="fas fa-arrow-left"></i> Назад</button>' +
-      '<div class="section-card"><div class="section-title"><i class="fas fa-headset"></i> Техническая поддержка</div><div class="category-list">';
-    for(var i=0;i<tech.length;i++){
-      var t = tech[i];
-      html += '<div class="category-item" onclick="renderTopics(\''+t.id+'\',\''+(t.name||"").replace(/'/g,"\\'")+'\', showTech)">' +
-        '<div class="cat-info"><h3><i class="'+t.icon+'"></i> '+esc(t.name)+'</h3><p>'+esc(t.desc)+'</p></div>' +
-        '<div class="cat-stats"><i class="fas fa-file-alt"></i></div>' +
-      '</div>';
+
+    let html =
+      '<div class="content-left" style="width:100%">' +
+        '<button class="back-btn" onclick="goBack()"><i class="fas fa-arrow-left"></i> Назад</button>' +
+        '<div class="section-card">' +
+          '<div class="section-title"><i class="fas fa-headset"></i> Техническая поддержка</div>' +
+          '<div class="category-list">';
+
+    for (let i=0;i<tech.length;i++){
+      const t = tech[i];
+      html +=
+        '<div class="category-item" onclick="renderTopics(\''+t.id+'\',\''+(t.name||"").replace(/'/g,"\\'")+'\', showTech)">' +
+          '<div class="cat-info"><h3><i class="'+t.icon+'"></i> '+esc(t.name)+'</h3><p>'+esc(t.desc)+'</p></div>' +
+          '<div class="cat-stats"><i class="fas fa-folder"></i></div>' +
+        '</div>';
     }
+
     html += '</div></div></div>';
     document.getElementById("main-content").innerHTML = html;
   }
@@ -560,32 +646,41 @@
   function showComplaints(){
     setBack(showMain);
     currentView = { type:"complaints" };
-    var html = '<div class="content-left" style="width:100%"><button class="back-btn" onclick="goBack()"><i class="fas fa-arrow-left"></i> Назад</button>' +
-      '<div class="section-card"><div class="section-title"><i class="fas fa-file-alt"></i> Жалобы и заявления</div><div class="category-list">';
-    for(var i=0;i<complaintsList.length;i++){
-      var c = complaintsList[i];
-      html += '<div class="category-item" onclick="renderTopics(\''+c.id+'\',\''+(c.name||"").replace(/'/g,"\\'")+'\', showComplaints)">' +
-        '<div class="cat-info"><h3><i class="'+c.icon+'"></i> '+esc(c.name)+'</h3><p>'+esc(c.desc)+'</p></div>' +
-        '<div class="cat-stats"><i class="fas fa-file-alt"></i></div>' +
-      '</div>';
+
+    let html =
+      '<div class="content-left" style="width:100%">' +
+        '<button class="back-btn" onclick="goBack()"><i class="fas fa-arrow-left"></i> Назад</button>' +
+        '<div class="section-card">' +
+          '<div class="section-title"><i class="fas fa-file-alt"></i> Жалобы и заявления</div>' +
+          '<div class="category-list">';
+
+    for (let i=0;i<complaintsList.length;i++){
+      const c = complaintsList[i];
+      html +=
+        '<div class="category-item" onclick="renderTopics(\''+c.id+'\',\''+(c.name||"").replace(/'/g,"\\'")+'\', showComplaints)">' +
+          '<div class="cat-info"><h3><i class="'+c.icon+'"></i> '+esc(c.name)+'</h3><p>'+esc(c.desc)+'</p></div>' +
+          '<div class="cat-stats"><i class="fas fa-folder"></i></div>' +
+        '</div>';
     }
+
     html += '</div></div></div>';
     document.getElementById("main-content").innerHTML = html;
   }
 
+  // ====== buttons ======
   document.getElementById("submitSectionBtn").onclick = function(){
-    var name = document.getElementById("sectionName").value.trim();
-    var desc = document.getElementById("sectionDesc").value.trim();
+    const name = document.getElementById("sectionName").value.trim();
+    const desc = document.getElementById("sectionDesc").value.trim();
     if(!name) return alert("Введите название");
-    customSubs.push({ id: "c_" + Date.now(), name: name, desc: desc || "Пользовательский раздел", icon:"fas fa-folder", removable:true });
+    customSubs.push({ id: "c_" + Date.now(), name, desc: desc || "Пользовательский раздел", icon:"fas fa-folder", removable:true });
     saveCustomSubs();
     closeModal();
     showServer();
   };
 
   document.getElementById("submitTopicBtn").onclick = async function(){
-    var title = document.getElementById("topicTitle").value.trim();
-    var content = document.getElementById("topicContent").value.trim();
+    const title = document.getElementById("topicTitle").value.trim();
+    const content = document.getElementById("topicContent").value.trim();
     if(!title || !content) return alert("Заполните поля");
 
     try {
@@ -593,7 +688,7 @@
       else await createTopic(currentCategory, title, content);
     } catch(e){
       console.error(e);
-      alert("Ошибка сохранения темы (F12 консоль)");
+      alert("Ошибка сохранения темы");
       return;
     }
 
@@ -602,22 +697,22 @@
   };
 
   document.getElementById("saveProfileBtn").onclick = async function(){
-    var nick = document.getElementById("profileNick").value.trim();
-    var ava = document.getElementById("profileAvatar").value.trim();
-    var rankId = document.getElementById("profileRank").value;
+    const nick = document.getElementById("profileNick").value.trim();
+    const ava = document.getElementById("profileAvatar").value.trim();
+    const rankId = document.getElementById("profileRank").value;
     if(!nick) return alert("Введи ник");
 
-    db.profile.id = USER_ID;
-    db.profile.nick = nick;
-    db.profile.avatar = ava || "https://i.imgur.com/1Xq9BiO.png";
-    db.profile.rankId = rankId || "rank_none";
-    dbSave();
+    cache.profile.id = USER_ID;
+    cache.profile.nick = nick;
+    cache.profile.avatar = ava || "https://i.imgur.com/1Xq9BiO.png";
+    cache.profile.rankId = rankId || "rank_none";
+    cacheSave();
 
     try {
-      await api("upsertProfile", { userId: USER_ID, nick: db.profile.nick, avatar: db.profile.avatar, rankId: db.profile.rankId });
+      await api("upsertProfile", { userId: USER_ID, nick: cache.profile.nick, avatar: cache.profile.avatar, rankId: cache.profile.rankId });
     } catch(e){
       console.error(e);
-      alert("Ошибка сохранения профиля (F12)");
+      alert("Ошибка сохранения профиля");
     }
 
     refreshMiniProfile();
@@ -625,29 +720,32 @@
   };
 
   document.getElementById("addRankBtn").onclick = async function(){
-    var name = document.getElementById("rankName").value.trim();
-    var color = document.getElementById("rankColor").value.trim() || "#FFD966";
+    const name = document.getElementById("rankName").value.trim();
+    const color = (document.getElementById("rankColor").value.trim() || "#FFD966");
     if(!name) return alert("Введите название ранга");
+
     try {
       await api("createRank", { name, color });
       await loadRanks();
       renderRanksList();
-      fillRankSelect(document.getElementById("profileRank"), db.profile.rankId || "rank_none");
+      fillRankSelect(document.getElementById("profileRank"), cache.profile.rankId || "rank_none");
       refreshMiniProfile();
     } catch(e){
       console.error(e);
-      alert("Ошибка добавления ранга (F12)");
+      alert("Ошибка добавления ранга");
     }
   };
 
+  // ====== init ======
   (async () => {
-    dbLoad();
+    cacheLoad();
     await loadRanks();
+    fillRankSelect(document.getElementById("profileRank"), cache.profile.rankId || "rank_none");
     refreshMiniProfile();
     showMain();
   })().catch(e => {
     console.error(e);
-    dbLoad();
+    cacheLoad();
     refreshMiniProfile();
     showMain();
   });
