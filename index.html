@@ -77,7 +77,7 @@
     .create-topic-btn { background: #FFD96620; border: 1px solid #FFD966; color: #FFD966; padding: 10px 16px; border-radius: 30px; cursor: pointer; margin-top: 16px; font-weight: 900; display: inline-flex; align-items: center; gap: 10px; }
     .create-topic-btn:hover { background: #FFD9662B; }
     .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); justify-content: center; align-items: center; z-index: 1000; padding: 18px; }
-    .modal-content { background: #13161F; padding: 28px; border-radius: 24px; width: 100%; max-width: 560px; border: 1px solid rgba(255,217,102,0.65); max-height: 90vh; overflow-y: auto; }
+    .modal-content { background: #13161F; padding: 32px; border-radius: 24px; width: 100%; max-width: 860px; border: 1px solid rgba(255,217,102,0.65); max-height: 92vh; overflow-y: auto; }
     .modal-content h3 { font-weight: 900; }
     .modal-content input, .modal-content textarea, .modal-content select { width: 100%; padding: 10px; margin: 10px 0; background: #1E232F; border: 1px solid #232732; border-radius: 12px; color: white; font-family: 'Inter', sans-serif; font-weight: 700; outline: none; }
     .modal-content button { background: #FFD966; color: #0B0C10; border: none; padding: 10px 20px; border-radius: 30px; cursor: pointer; font-weight: 900; margin-top: 10px; margin-right: 10px; }
@@ -761,9 +761,9 @@
   <div class="modal-content">
     <span class="close-modal" onclick="closeModal()">&times;</span>
     <h3 id="modalTitle" style="color:#FFD966;">Создать тему</h3>
-    <input type="text" id="topicTitle" placeholder="Название темы">
+    <input type="text" id="topicTitle" placeholder="Название темы" style="font-size:1rem;padding:12px 14px;">
     <div id="topicFormatToolbar" style="margin-top:10px;"></div>
-    <textarea id="topicContent" rows="6" placeholder="Текст сообщения... (поддерживается **жирный**, _курсив_, `код`)"></textarea>
+    <textarea id="topicContent" rows="18" style="min-height:320px;resize:vertical;" placeholder="Текст сообщения... (поддерживается **жирный**, _курсив_, `код`)"></textarea>
     <button id="submitTopicBtn">Сохранить</button>
     <button class="cancel" onclick="closeModal()">Отмена</button>
   </div>
