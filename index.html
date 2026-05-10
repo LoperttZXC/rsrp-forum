@@ -846,7 +846,9 @@
         if (payload[k] !== undefined && payload[k] !== null) params.set(k, String(payload[k]));
       }
 
-      script.src = API_URL + "?" + params.toString();
+      const fullUrl = API_URL + "?" + params.toString();
+      console.log("API request URL length:", fullUrl.length, "action:", action);
+      script.src = fullUrl;
       script.onerror = () => {
         if (done) return;
         done = true;
@@ -862,7 +864,7 @@
   // ─── JSONP с поддержкой длинного контента (чанкинг) ─────────────────────────
   // Apps Script принимает content по частям и собирает на сервере
   // Чанк = 1500 символов (безопасный лимит URL)
-  const CHUNK_SIZE = 1500;
+  const CHUNK_SIZE = 400;  // кириллица занимает x3 в URL, поэтому 400*3=1200 — безопасно
 
   async function apiChunked(action, payload = {}) {
     const longFields = ['content', 'text', 'title', 'about', 'nick', 'avatar'];
@@ -2014,10 +2016,11 @@
     const content = document.getElementById("topicContent").value.trim();
     if (!title || !content) return alert("Заполните поля");
     try {
+      console.log("Saving topic:", { currentTopicId, titleLen: title.length, contentLen: content.length });
       if (currentTopicId) await updateTopic(currentTopicId, title, content);
       else await createTopic(currentCategory, title, content);
     } catch (e) {
-      console.error(e);
+      console.error("Save error:", e);
       alert(String(e.message || "").includes("forbidden") ? "Нет прав создавать темы в этом разделе" : "Ошибка сохранения");
       return;
     }
