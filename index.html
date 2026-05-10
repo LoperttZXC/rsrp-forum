@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>RussiaSoulRP | RSRP — Форум</title>
+  <title>RSRP — Форум</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%23111420'/><text y='46' x='8' font-size='44' font-family='Arial'>🏙️</text></svg>">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <style>
@@ -311,6 +312,55 @@
     .activity-title { font-size: 0.8rem; font-weight: 800; color: #E0E4F0; }
     .activity-meta { font-size: 0.68rem; color: #5A6380; font-weight: 700; margin-top: 2px; }
 
+
+    /* ── Анимация переходов ─────────────────────────────────────────────────── */
+    @keyframes pageFadeIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+    .page-fade { animation: pageFadeIn 0.22s ease; }
+
+    /* ── Баннер правил ───────────────────────────────────────────────────────── */
+    .rules-banner { background: linear-gradient(135deg, rgba(255,215,0,0.08) 0%, rgba(255,140,0,0.05) 100%); border: 1px solid rgba(255,215,0,0.25); border-radius: 18px; padding: 18px 22px; margin-bottom: 20px; display: flex; align-items: center; gap: 16px; cursor: pointer; transition: 0.2s; }
+    .rules-banner:hover { background: linear-gradient(135deg, rgba(255,215,0,0.13) 0%, rgba(255,140,0,0.08) 100%); border-color: rgba(255,215,0,0.4); transform: translateY(-1px); }
+    .rules-banner-icon { width: 48px; height: 48px; border-radius: 14px; background: rgba(255,215,0,0.12); border: 1px solid rgba(255,215,0,0.25); display: flex; align-items: center; justify-content: center; font-size: 1.4rem; flex: 0 0 auto; }
+    .rules-banner-text h3 { font-size: 1rem; font-weight: 900; color: #FFD966; margin-bottom: 3px; }
+    .rules-banner-text p { font-size: 0.78rem; color: #8A94B0; font-weight: 700; }
+    .rules-banner-arrow { margin-left: auto; color: #FFD966; font-size: 1rem; opacity: 0.6; }
+
+    /* ── Модалка правил ──────────────────────────────────────────────────────── */
+    .rules-modal { display: none; position: fixed; inset: 0; z-index: 600; padding: 24px 20px; overflow-y: auto; background: rgba(0,0,0,0.8); backdrop-filter: blur(6px); }
+    .rules-modal.open { display: flex; align-items: flex-start; justify-content: center; }
+    .rules-modal-card { background: #13161F; border: 1px solid rgba(255,215,0,0.2); border-radius: 24px; width: 100%; max-width: 680px; overflow: hidden; box-shadow: 0 24px 80px rgba(0,0,0,0.7); }
+    .rules-modal-header { background: linear-gradient(135deg, #1A1E2A, #12141C); padding: 20px 24px; border-bottom: 2px solid rgba(255,215,0,0.2); display: flex; align-items: center; gap: 12px; justify-content: space-between; }
+    .rules-modal-title { font-size: 1.2rem; font-weight: 900; color: #FFD966; display: flex; align-items: center; gap: 10px; }
+    .rules-modal-body { padding: 24px; max-height: 65vh; overflow-y: auto; }
+    .rules-section { margin-bottom: 22px; }
+    .rules-section h4 { font-size: 0.85rem; font-weight: 900; color: #FFD966; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+    .rules-section h4 i { font-size: 0.75rem; }
+    .rules-section ol { padding-left: 18px; display: flex; flex-direction: column; gap: 6px; }
+    .rules-section ol li { font-size: 0.85rem; font-weight: 700; color: #C0C9E0; line-height: 1.5; }
+    .rules-section ol li strong { color: #FFD966; }
+
+    /* ── Последние темы (виджет) ─────────────────────────────────────────────── */
+    .latest-card { background: #13161F; border-radius: 20px; border: 1px solid #2C3040; margin-bottom: 28px; overflow: hidden; }
+    .latest-header { padding: 13px 18px; background: #1A1E2A; border-bottom: 1px solid #232732; font-weight: 800; font-size: 0.95rem; color: #E0E4F0; display: flex; align-items: center; gap: 8px; }
+    .latest-header i { color: #FFD966; }
+    .latest-item { padding: 10px 16px; border-bottom: 1px solid #1A1E2A; cursor: pointer; transition: background 0.1s; }
+    .latest-item:last-child { border-bottom: none; }
+    .latest-item:hover { background: rgba(255,217,102,0.04); }
+    .latest-item-title { font-size: 0.82rem; font-weight: 800; color: #E0E4F0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 3px; }
+    .latest-item-meta { font-size: 0.68rem; color: #5A6380; font-weight: 700; display: flex; gap: 6px; align-items: center; }
+    .latest-skeleton { padding: 10px 16px; }
+
+    /* ── Footer соцсети ──────────────────────────────────────────────────────── */
+    .forum-footer-links { display: flex; gap: 12px; justify-content: center; margin-top: 10px; flex-wrap: wrap; }
+    .footer-link { display: inline-flex; align-items: center; gap: 6px; color: #5A6380; font-size: 0.75rem; font-weight: 800; text-decoration: none; padding: 5px 12px; border-radius: 999px; border: 1px solid #1E232F; transition: 0.15s; cursor: pointer; }
+    .footer-link:hover { color: #FFD966; border-color: rgba(255,217,102,0.3); background: rgba(255,217,102,0.05); }
+    .footer-link i { font-size: 0.85rem; }
+    .footer-edit-btn { font-size: 0.65rem; color: #3A4060; cursor: pointer; margin-left: 8px; transition: color 0.15s; }
+    .footer-edit-btn:hover { color: #FFD966; }
+
+    /* ── Счётчик ответов реальный ────────────────────────────────────────────── */
+    .reply-count-real { font-size: 0.7rem; background: #0C0F18; padding: 2px 8px; border-radius: 20px; border: 1px solid #232732; color: #6A74A0; font-weight: 800; display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }
+
     /* ── Просмотр профиля другого игрока ───────────────────────────────────── */
     .view-profile-page { display: none; position: fixed; inset: 0; z-index: 500; overflow-y: auto; padding: 32px 20px; }
     .view-profile-page.open { display: block; }
@@ -418,7 +468,10 @@
   </div>
 
   <div id="main-content" class="forum-main"></div>
-  <div class="forum-footer">RussiaSoul RP · Криминальная Москва 2026 · <span style="color:#FFD966;">Официальный форум RSRP</span></div>
+  <div class="forum-footer">
+    RussiaSoul RP · Криминальная Москва 2026 · <span style="color:#FFD966;">Официальный форум RSRP</span>
+    <div class="forum-footer-links" id="footerLinks"></div>
+  </div>
 </div>
 
 <!-- Страница профиля -->
@@ -547,6 +600,75 @@
   </div>
 </div>
 
+
+<!-- Модалка правил -->
+<div id="rulesModal" class="rules-modal">
+  <div class="rules-modal-card">
+    <div class="rules-modal-header">
+      <div class="rules-modal-title"><i class="fas fa-gavel"></i> Основные правила RSRP</div>
+      <button class="dm-close" onclick="closeRules()"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="rules-modal-body">
+      <div class="rules-section">
+        <h4><i class="fas fa-user"></i> Поведение на сервере</h4>
+        <ol>
+          <li>Уважайте других игроков и администрацию.</li>
+          <li>Запрещён мат и оскорбления в адрес участников проекта.</li>
+          <li>Запрещён читерство, использование багов и эксплойтов в личных целях.</li>
+          <li>Запрещён выход из игры во избежание последствий (DCing).</li>
+        </ol>
+      </div>
+      <div class="rules-section">
+        <h4><i class="fas fa-comments"></i> Правила форума</h4>
+        <ol>
+          <li>Темы создавать только в соответствующих разделах.</li>
+          <li>Запрещён флуд, спам и оффтоп в темах.</li>
+          <li>Жалобы подавать только с доказательствами (скриншоты, видео).</li>
+          <li>Запрещено создавать дублирующие темы.</li>
+        </ol>
+      </div>
+      <div class="rules-section">
+        <h4><i class="fas fa-skull"></i> Криминальные организации</h4>
+        <ol>
+          <li>Деятельность банды должна быть обоснована РП-причинами.</li>
+          <li>Запрещено убивать без РП-предпосылок (RDM).</li>
+          <li>Захват территорий только в установленное время.</li>
+        </ol>
+      </div>
+      <div class="rules-section">
+        <h4><i class="fas fa-landmark"></i> Государственные структуры</h4>
+        <ol>
+          <li>Соблюдать устав своей организации.</li>
+          <li>Запрещено злоупотреблять должностными полномочиями.</li>
+          <li>Обязательное ношение формы при исполнении обязанностей.</li>
+        </ol>
+      </div>
+      <div style="text-align:center;margin-top:8px;">
+        <span style="font-size:0.78rem;color:#5A6380;font-weight:700;">Полные правила доступны в разделе "Разделы форума" → "Общие правила проекта"</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Модалка редактирования ссылок footer -->
+<div id="footerLinksModal" class="rules-modal">
+  <div class="rules-modal-card" style="max-width:480px;">
+    <div class="rules-modal-header">
+      <div class="rules-modal-title"><i class="fas fa-link"></i> Ссылки форума</div>
+      <button class="dm-close" onclick="closeFooterLinksModal()"><i class="fas fa-times"></i></button>
+    </div>
+    <div style="padding:20px;">
+      <div class="profile-field"><label>Discord (URL)</label><input type="text" id="footerDiscord" placeholder="https://discord.gg/..."></div>
+      <div class="profile-field"><label>VK (URL)</label><input type="text" id="footerVk" placeholder="https://vk.com/..."></div>
+      <div class="profile-field"><label>Telegram (URL)</label><input type="text" id="footerTelegram" placeholder="https://t.me/..."></div>
+      <div class="profile-field"><label>Сайт (URL)</label><input type="text" id="footerSite" placeholder="https://..."></div>
+      <div style="margin-top:16px;display:flex;gap:10px;">
+        <button class="profile-save-btn" onclick="saveFooterLinks()"><i class="fas fa-save"></i> Сохранить</button>
+        <button class="profile-cancel-btn" onclick="closeFooterLinksModal()">Отмена</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- Кнопка наверх -->
 <button id="scrollTopBtn" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Наверх">
@@ -1163,6 +1285,16 @@
     const st = document.getElementById("profileSaveStatus");
     st.classList.remove("show");
 
+    // Дата регистрации
+    const regTs = USER_ID.split("_")[1];
+    const statDaysEl = document.getElementById("profileStatDays");
+    if (regTs && statDaysEl) {
+      const regDate = new Date(parseInt(regTs));
+      const days = Math.floor((Date.now() - regDate) / 86400000);
+      statDaysEl.innerText = days;
+      statDaysEl.title = 'Зарегистрирован: ' + regDate.toLocaleDateString('ru-RU', {day:'numeric',month:'long',year:'numeric'});
+    }
+
     // Баннер
     const pickerEl = document.getElementById("profileBannerPicker");
     if (pickerEl) pickerEl.innerHTML = renderBannerPicker();
@@ -1313,8 +1445,17 @@
   function showMain() {
     setBack(showMain);
     currentView = { type: "main" };
+    setPageTitle('main');
     document.getElementById("main-content").innerHTML = `
       <div class="content-left">
+        <div class="rules-banner" onclick="openRules()">
+          <div class="rules-banner-icon">📋</div>
+          <div class="rules-banner-text">
+            <h3>Правила проекта</h3>
+            <p>Ознакомьтесь с правилами перед игрой — это обязательно</p>
+          </div>
+          <div class="rules-banner-arrow"><i class="fas fa-chevron-right"></i></div>
+        </div>
         <div class="section-card">
           <div class="section-title"><i class="fas fa-server"></i> Игровые сервера</div>
           <div class="server-card" onclick="showServer()">
@@ -1334,6 +1475,10 @@
         </div>
       </div>
       <div class="content-right">
+        <div class="latest-card">
+          <div class="latest-header"><i class="fas fa-clock"></i> Последние темы</div>
+          <div id="latestTopicsList"></div>
+        </div>
         <div class="team-card">
           <div class="team-card-header">
             <div class="team-card-title"><i class="fas fa-shield-alt"></i> Команда онлайн</div>
@@ -1352,6 +1497,7 @@
   function showServer() {
     setBack(showMain);
     currentView = { type: "server" };
+    setPageTitle('server');
     const subs = getAllSubs();
     document.getElementById("main-content").innerHTML = `
       <div class="content-left" style="width:100%">
@@ -1396,7 +1542,9 @@
     setViewTopics(cat, title, back);
 
     // Показываем скелетон сразу — без задержки
-    document.getElementById("main-content").innerHTML = `
+    const mc = document.getElementById("main-content");
+    mc.style.opacity = '0'; mc.style.transform = 'translateY(6px)'; mc.style.transition = 'opacity 0.15s, transform 0.15s';
+    mc.innerHTML = `
       <div class="content-left" style="width:100%">
         <button class="back-btn" onclick="goBack()"><i class="fas fa-arrow-left"></i> Назад</button>
         <div class="section-card">
@@ -1404,6 +1552,8 @@
           <div class="topics-list">${skeletonTopics(5)}</div>
         </div>
       </div>`;
+    setTimeout(() => { mc.style.opacity='1'; mc.style.transform='translateY(0)'; }, 30);
+    setPageTitle(title);
 
     let arr = [];
     try {
@@ -1447,7 +1597,7 @@
             '</div>' +
           '</div>' +
           '<div class="topic-actions" onclick="event.stopPropagation();">' +
-            '<span class="reply-count"><i class="fas fa-comment"></i>0</span>' +
+            '<span class="reply-count"><i class="fas fa-comment"></i><span data-reply-count="' + t.id + '">...</span></span>' +
             (isAdmin() ? statusSelectHtml(t.id, status) : '') +
             (isAdmin() ? '<button class="icon-btn' + (pins.has(t.id) ? ' pin-btn pinned' : ' pin-btn') + '" title="' + (pins.has(t.id)?'Открепить':'Закрепить') + '" onclick="togglePin(\'' + t.id + '\')"><i class="fas fa-thumbtack"></i></button>' : '') +
             (canEdit
@@ -1462,6 +1612,9 @@
 
     const tl = document.querySelector(".topics-list");
     if (tl) tl.innerHTML = html;
+
+    // Загружаем реальные счётчики комментариев асинхронно
+    setTimeout(() => loadReplyCounts(pageTopics), 100);
 
     // Добавляем пагинацию
     const sc2 = document.querySelector(".section-card");
@@ -1655,6 +1808,7 @@
   function showTech() {
     setBack(showMain);
     currentView = { type: "tech" };
+    setPageTitle('tech');
     document.getElementById("main-content").innerHTML = `
       <div class="content-left" style="width:100%">
         <button class="back-btn" onclick="goBack()"><i class="fas fa-arrow-left"></i> Назад</button>
@@ -1674,6 +1828,7 @@
   function showComplaints() {
     setBack(showMain);
     currentView = { type: "complaints" };
+    setPageTitle('complaints');
     document.getElementById("main-content").innerHTML = `
       <div class="content-left" style="width:100%">
         <button class="back-btn" onclick="goBack()"><i class="fas fa-arrow-left"></i> Назад</button>
@@ -2409,6 +2564,170 @@
   }
 
 
+
+  // ─── ДИНАМИЧЕСКИЙ TITLE ───────────────────────────────────────────────────
+  function setPageTitle(section) {
+    const titles = {
+      main: 'RSRP — Форум',
+      tech: 'RSRP — Техподдержка',
+      complaints: 'RSRP — Жалобы и заявления',
+      server: 'RSRP — Сервер Химки',
+    };
+    document.title = titles[section] || ('RSRP — ' + (section || 'Форум'));
+  }
+
+  // ─── АНИМАЦИЯ ПЕРЕХОДОВ ────────────────────────────────────────────────────
+  function fadeContent(html) {
+    const el = document.getElementById('main-content');
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(6px)';
+    el.style.transition = 'opacity 0.15s ease, transform 0.15s ease';
+    setTimeout(() => {
+      el.innerHTML = html;
+      el.style.opacity = '1';
+      el.style.transform = 'translateY(0)';
+    }, 120);
+  }
+
+  // ─── ПРАВИЛА ──────────────────────────────────────────────────────────────
+  function openRules() {
+    document.getElementById('rulesModal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeRules() {
+    document.getElementById('rulesModal').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  // ─── FOOTER СОЦСЕТИ ────────────────────────────────────────────────────────
+  const FOOTER_LINKS_KEY = 'rsrp_footer_links';
+  const FOOTER_ICONS = {
+    discord:  { icon: 'fab fa-discord',  label: 'Discord',  color: '#5865F2' },
+    vk:       { icon: 'fab fa-vk',       label: 'VK',       color: '#0077FF' },
+    telegram: { icon: 'fab fa-telegram', label: 'Telegram', color: '#26A5E4' },
+    site:     { icon: 'fas fa-globe',    label: 'Сайт',     color: '#4CAF50' },
+  };
+
+  function loadFooterLinks() {
+    try { return JSON.parse(localStorage.getItem(FOOTER_LINKS_KEY) || '{}'); } catch(e) { return {}; }
+  }
+
+  function renderFooterLinks() {
+    const el = document.getElementById('footerLinks');
+    if (!el) return;
+    const links = loadFooterLinks();
+    let html = '';
+    for (const [key, cfg] of Object.entries(FOOTER_ICONS)) {
+      if (links[key]) {
+        html += '<a class="footer-link" href="' + esc(links[key]) + '" target="_blank" rel="noopener" style="color:' + cfg.color + ';border-color:' + cfg.color + '22;">' +
+          '<i class="' + cfg.icon + '"></i>' + cfg.label + '</a>';
+      }
+    }
+    // Кнопка редактирования — только для лидеров
+    if (isLeader()) {
+      html += '<span class="footer-edit-btn" onclick="openFooterLinksModal()" title="Редактировать ссылки"><i class="fas fa-pen"></i> Управление ссылками</span>';
+    }
+    if (!html) {
+      if (isLeader()) {
+        html = '<span class="footer-edit-btn" onclick="openFooterLinksModal()" style="font-size:0.72rem;"><i class="fas fa-plus"></i> Добавить ссылки</span>';
+      }
+    }
+    el.innerHTML = html;
+  }
+
+  function openFooterLinksModal() {
+    if (!isLeader()) return alert('Только Основатель и Руководитель проекта могут менять ссылки');
+    const links = loadFooterLinks();
+    document.getElementById('footerDiscord').value  = links.discord  || '';
+    document.getElementById('footerVk').value       = links.vk       || '';
+    document.getElementById('footerTelegram').value = links.telegram || '';
+    document.getElementById('footerSite').value     = links.site     || '';
+    document.getElementById('footerLinksModal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeFooterLinksModal() {
+    document.getElementById('footerLinksModal').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  function saveFooterLinks() {
+    if (!isLeader()) return alert('Нет прав');
+    const links = {
+      discord:  document.getElementById('footerDiscord').value.trim(),
+      vk:       document.getElementById('footerVk').value.trim(),
+      telegram: document.getElementById('footerTelegram').value.trim(),
+      site:     document.getElementById('footerSite').value.trim(),
+    };
+    // Валидация URL
+    for (const [k, v] of Object.entries(links)) {
+      if (v && !v.startsWith('http')) {
+        alert('Ссылка ' + k + ' должна начинаться с http:// или https://');
+        return;
+      }
+    }
+    localStorage.setItem(FOOTER_LINKS_KEY, JSON.stringify(links));
+    addLog('links', 'Обновлены ссылки форума');
+    closeFooterLinksModal();
+    renderFooterLinks();
+  }
+
+  // ─── ПОСЛЕДНИЕ ТЕМЫ ────────────────────────────────────────────────────────
+  async function loadLatestTopics() {
+    const el = document.getElementById('latestTopicsList');
+    if (!el) return;
+
+    // Скелетон
+    el.innerHTML = [1,2,3,4,5].map(() =>
+      '<div class="latest-skeleton"><div class="skeleton skeleton-line medium" style="margin-bottom:4px;"></div><div class="skeleton skeleton-line short"></div></div>'
+    ).join('');
+
+    try {
+      // Берём из открытых разделов параллельно
+      const openCats = [
+        {id:'tech_help',name:'Техподдержка'},{id:'tech_bugs',name:'Баги'},
+        {id:'tech_support',name:'Техподдержка'},{id:'complaint_admin',name:'Жалобы'},
+        {id:'complaint_players',name:'Жалобы'},{id:'amnesty',name:'Амнистия'},
+        {id:'moderator_app',name:'Заявление'},{id:'leader_app',name:'Заявление'},
+      ];
+      const results = await Promise.all(openCats.map(c =>
+        listTopics(c.id).then(arr => arr.map(t => ({...t, catName: c.name, catId: c.id}))).catch(() => [])
+      ));
+      const all = results.flat()
+        .sort((a,b) => new Date(b.createdAt||0) - new Date(a.createdAt||0))
+        .slice(0, 5);
+
+      if (!all.length) {
+        el.innerHTML = '<div style="padding:12px 16px;color:#4A5270;font-size:0.8rem;font-weight:700;">Пока нет тем</div>';
+        return;
+      }
+
+      el.innerHTML = all.map(t =>
+        '<div class="latest-item" onclick="showThread(\'' + t.catId + '\',\'' + t.id + '\',\'' + safeForAttr(t.title) + '\',\'' + safeForAttr(t.catName) + '\')">' +
+          '<div class="latest-item-title">' + esc(t.title) + '</div>' +
+          '<div class="latest-item-meta"><i class="fas fa-folder" style="font-size:0.6rem;"></i>' + esc(t.catName) + '<span>·</span>' + timeAgoShort(new Date(t.createdAt||Date.now()).getTime()) + '</div>' +
+        '</div>'
+      ).join('');
+    } catch(e) {
+      console.error(e);
+      el.innerHTML = '<div style="padding:12px 16px;color:#4A5270;font-size:0.8rem;font-weight:700;">Ошибка загрузки</div>';
+    }
+  }
+
+  // ─── РЕАЛЬНЫЙ СЧЁТЧИК КОММЕНТАРИЕВ ────────────────────────────────────────
+  // Загружаем счётчики асинхронно после рендера списка тем
+  async function loadReplyCounts(topics) {
+    for (const t of topics) {
+      const el = document.querySelector('[data-reply-count="' + t.id + '"]');
+      if (!el) continue;
+      try {
+        const cmts = await listComments(t.id);
+        el.innerText = cmts.length;
+      } catch(e) {}
+    }
+  }
+
+
   // ─── ИНИЦИАЛИЗАЦИЯ ────────────────────────────────────────────────────────
   (async () => {
     cacheLoad();
@@ -2417,6 +2736,7 @@
     refreshMiniProfile();
     updateAdminButtons();
     showMain();
+    renderFooterLinks();
     writeHeartbeat();
     updateNotifDot();
     setInterval(writeHeartbeat, 5 * 60 * 1000);
@@ -2440,6 +2760,8 @@
       // Перерендериваем главную с актуальными правами, потом грузим команду
       if (currentView.type === "main") showMain();
       loadTeamOnline();
+      loadLatestTopics();
+      renderFooterLinks();
     } catch (e) {
       console.error("Init error:", e);
     }
