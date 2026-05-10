@@ -132,6 +132,91 @@
 
 
 
+
+    /* ── Поиск ──────────────────────────────────────────────────────────────── */
+    .search-bar-wrap { padding: 16px 32px; background: #0C0E14; border-bottom: 1px solid #20232E; }
+    .search-bar { display: flex; align-items: center; gap: 10px; background: #13161F; border: 1px solid #232732; border-radius: 14px; padding: 10px 16px; transition: border-color 0.15s; }
+    .search-bar:focus-within { border-color: rgba(255,217,102,0.45); }
+    .search-bar i { color: #5A6380; font-size: 0.9rem; }
+    .search-bar input { flex: 1; background: none; border: none; outline: none; color: #E0E4F0; font-family: 'Inter', sans-serif; font-weight: 700; font-size: 0.88rem; }
+    .search-bar input::placeholder { color: #4A5270; }
+    .search-results { max-width: 1320px; margin: 0 auto; }
+    .search-result-item { padding: 12px 22px; border-bottom: 1px solid #20232F; cursor: pointer; transition: background 0.1s; }
+    .search-result-item:hover { background: #191E2B; }
+    .search-result-title { font-weight: 900; color: #FFD966; margin-bottom: 3px; }
+    .search-result-meta { font-size: 0.72rem; color: #6A74A0; font-weight: 700; }
+    .search-highlight { background: rgba(255,217,102,0.25); border-radius: 3px; padding: 0 2px; }
+
+    /* ── Статусы тем ─────────────────────────────────────────────────────────── */
+    .topic-status { font-size: 0.65rem; font-weight: 900; padding: 2px 8px; border-radius: 999px; display: inline-flex; align-items: center; gap: 4px; margin-left: 6px; vertical-align: middle; }
+    .status-open    { background: rgba(100,180,255,0.12); border: 1px solid rgba(100,180,255,0.3); color: #64B4FF; }
+    .status-review  { background: rgba(255,180,30,0.12);  border: 1px solid rgba(255,180,30,0.3);  color: #FFB41E; }
+    .status-solved  { background: rgba(76,175,80,0.12);   border: 1px solid rgba(76,175,80,0.3);   color: #4CAF50; }
+    .status-closed  { background: rgba(150,150,170,0.12); border: 1px solid rgba(150,150,170,0.3); color: #9696AA; }
+    .status-select  { background: #0C0F18; border: 1px solid rgba(255,217,102,0.4); color: #FFD966; border-radius: 8px; padding: 4px 8px; font-size: 0.72rem; font-weight: 800; cursor: pointer; outline: none; }
+
+    /* ── Пагинация ───────────────────────────────────────────────────────────── */
+    .pagination { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 16px 22px; flex-wrap: wrap; }
+    .page-btn { width: 36px; height: 36px; border-radius: 10px; border: 1px solid #232732; background: #0C0F18; color: #8A94B0; cursor: pointer; font-weight: 800; font-size: 0.85rem; display: flex; align-items: center; justify-content: center; transition: 0.12s; }
+    .page-btn:hover { border-color: rgba(255,217,102,0.5); color: #FFD966; }
+    .page-btn.active { background: rgba(255,217,102,0.15); border-color: #FFD966; color: #FFD966; }
+    .page-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+    /* ── Уведомления ─────────────────────────────────────────────────────────── */
+    .notif-dot { position: absolute; top: -3px; right: -3px; width: 9px; height: 9px; border-radius: 50%; background: #FF5252; border: 2px solid #0C0E14; display: none; }
+    .notif-dot.show { display: block; }
+    .notif-panel { position: fixed; top: 90px; right: 24px; width: 340px; max-height: 420px; background: #13161F; border: 1px solid rgba(255,217,102,0.25); border-radius: 20px; z-index: 800; overflow: hidden; box-shadow: 0 16px 48px rgba(0,0,0,0.6); display: none; }
+    .notif-panel.open { display: block; animation: fadeSlideDown 0.18s ease; }
+    @keyframes fadeSlideDown { from { opacity:0; transform:translateY(-8px); } to { opacity:1; transform:translateY(0); } }
+    .notif-header { padding: 14px 18px; background: #1A1E2A; border-bottom: 1px solid #232732; font-weight: 900; font-size: 0.9rem; display: flex; justify-content: space-between; align-items: center; }
+    .notif-header i { color: #FFD966; }
+    .notif-clear { font-size: 0.72rem; color: #6A74A0; cursor: pointer; font-weight: 800; }
+    .notif-clear:hover { color: #FFD966; }
+    .notif-list { max-height: 340px; overflow-y: auto; }
+    .notif-item { padding: 12px 18px; border-bottom: 1px solid #1A1E2A; cursor: pointer; transition: background 0.1s; display: flex; gap: 10px; align-items: flex-start; }
+    .notif-item:hover { background: #191E2B; }
+    .notif-item.unread { border-left: 3px solid #FFD966; }
+    .notif-icon { width: 32px; height: 32px; border-radius: 50%; background: rgba(255,217,102,0.1); border: 1px solid rgba(255,217,102,0.2); display: flex; align-items: center; justify-content: center; flex: 0 0 auto; }
+    .notif-icon i { color: #FFD966; font-size: 0.8rem; }
+    .notif-text { flex: 1; font-size: 0.78rem; font-weight: 700; color: #C0C9E0; line-height: 1.4; }
+    .notif-time { font-size: 0.65rem; color: #5A6380; font-weight: 800; margin-top: 3px; }
+    .notif-empty { padding: 28px; text-align: center; color: #5A6380; font-weight: 800; font-size: 0.85rem; }
+    .chip-btn-wrap { position: relative; display: inline-flex; }
+
+    /* ── Кликабельный автор (ник в теме/комменте) ───────────────────────────── */
+    .author-link { cursor: pointer; transition: color 0.12s; }
+    .author-link:hover { color: #FFD966; text-decoration: underline; }
+
+    /* ── Кастомный баннер профиля ───────────────────────────────────────────── */
+    .banner-color-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 8px; }
+    .banner-color-opt { width: 32px; height: 32px; border-radius: 8px; cursor: pointer; border: 2px solid transparent; transition: 0.15s; }
+    .banner-color-opt:hover, .banner-color-opt.selected { border-color: #FFD966; transform: scale(1.1); }
+
+    /* ── Статистика в профиле ───────────────────────────────────────────────── */
+    .profile-stats-row { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 18px; }
+    .profile-stat { flex: 1; min-width: 80px; background: #0C0F18; border: 1px solid #232732; border-radius: 12px; padding: 12px; text-align: center; }
+    .profile-stat-val { font-size: 1.4rem; font-weight: 900; color: #FFD966; }
+    .profile-stat-lbl { font-size: 0.68rem; font-weight: 800; color: #5A6380; text-transform: uppercase; letter-spacing: 0.08em; margin-top: 2px; }
+
+    /* ── Мобилка ─────────────────────────────────────────────────────────────── */
+    @media (max-width: 600px) {
+      .forum-header { padding: 16px; }
+      .logo-area h1 { font-size: 1.4rem; }
+      .logo-area p { display: none; }
+      .header-actions { gap: 6px; }
+      .badge-rp { display: none; }
+      .mini-name { max-width: 90px; }
+      .forum-nav { padding: 10px 16px; gap: 16px; font-size: 0.8rem; }
+      .forum-main { padding: 14px 12px; gap: 18px; }
+      .search-bar-wrap { padding: 10px 16px; }
+      .notif-panel { right: 8px; width: calc(100vw - 16px); }
+      .section-title { font-size: 1rem; padding: 12px 14px; }
+      .category-item { padding: 12px 14px; }
+      .topics-list { padding: 0 14px; }
+      .thread-view { padding: 16px; }
+      .profile-stats-row { gap: 8px; }
+    }
+
     /* ── Виджет "Команда онлайн" ───────────────────────────────────────────── */
     .team-card { background: #13161F; border-radius: 20px; padding: 0; border: 1px solid #2C3040; margin-bottom: 28px; overflow: hidden; }
     .team-card-header { padding: 14px 18px; background: #1A1E2A; border-bottom: 1px solid #232732; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
@@ -230,6 +315,10 @@
           <div class="mini-name" id="miniName">Игрок</div>
           <div class="mini-rank" id="miniRank">Без ранга</div>
         </div>
+        <div class="chip-btn-wrap">
+          <button class="chip-btn" onclick="toggleNotifPanel()"><i class="fas fa-bell"></i></button>
+          <span class="notif-dot" id="notifDot"></span>
+        </div>
         <button class="chip-btn" onclick="openProfile()"><i class="fas fa-user"></i> Профиль</button>
         <button id="ranksBtn" class="chip-btn" onclick="openRanks()" style="display:none;"><i class="fas fa-award"></i> Ранги</button>
         <button id="usersBtn" class="chip-btn" onclick="openUserManager()" style="display:none;"><i class="fas fa-users"></i> Пользователи</button>
@@ -242,6 +331,13 @@
     <a onclick="showMain()"><i class="fas fa-home"></i> Главная</a>
     <a onclick="showTech()"><i class="fas fa-headset"></i> Техподдержка</a>
     <a onclick="showComplaints()"><i class="fas fa-file-alt"></i> Жалобы и заявления</a>
+  </div>
+  <div class="search-bar-wrap">
+    <div class="search-bar">
+      <i class="fas fa-search"></i>
+      <input type="text" id="globalSearch" placeholder="Поиск по форуму..." oninput="onSearchInput(this.value)" onkeydown="if(event.key==='Escape'){clearSearch()}">
+      <span id="searchClearBtn" style="cursor:pointer;color:#5A6380;display:none;" onclick="clearSearch()"><i class="fas fa-times"></i></span>
+    </div>
   </div>
 
   <div id="main-content" class="forum-main"></div>
@@ -272,6 +368,12 @@
         <hr class="profile-divider">
         <div class="profile-sections">
 
+          <div class="profile-stats-row">
+            <div class="profile-stat"><div class="profile-stat-val" id="profileStatTopics">—</div><div class="profile-stat-lbl">Тем</div></div>
+            <div class="profile-stat"><div class="profile-stat-val" id="profileStatComments">—</div><div class="profile-stat-lbl">Комментов</div></div>
+            <div class="profile-stat"><div class="profile-stat-val" id="profileStatDays">—</div><div class="profile-stat-lbl">Дней на форуме</div></div>
+          </div>
+
           <div>
             <div class="profile-section-title"><i class="fas fa-user-edit"></i> Основная информация</div>
             <div class="profile-field">
@@ -296,6 +398,10 @@
             </div>
           </div>
 
+          <div id="profileBannerSection">
+            <div id="profileBannerPicker"></div>
+          </div>
+
           <div id="profileRankSection" style="display:none;">
             <div class="profile-section-title"><i class="fas fa-award"></i> Ранг</div>
             <div class="profile-field">
@@ -313,6 +419,17 @@
         </div>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- Панель уведомлений -->
+<div id="notifPanel" class="notif-panel">
+  <div class="notif-header">
+    <span><i class="fas fa-bell"></i> Уведомления</span>
+    <span class="notif-clear" onclick="clearAllNotifs()">Очистить все</span>
+  </div>
+  <div class="notif-list" id="notifList">
+    <div class="notif-empty"><i class="fas fa-check-circle" style="color:#4CAF50;font-size:1.2rem;"></i><br>Нет новых уведомлений</div>
   </div>
 </div>
 
@@ -557,7 +674,10 @@
   function setBack(fn) { currentBackFn = typeof fn === "function" ? fn : showMain; }
   function goBack() { if (currentBackFn) currentBackFn(); else showMain(); }
 
-  function setViewTopics(cat, title, back) { currentView = { type: "topics", cat, title, back }; }
+  function setViewTopics(cat, title, back) {
+    if (!currentView || currentView.cat !== cat) currentPage = 1; // сброс страницы при смене раздела
+    currentView = { type: "topics", cat, title, back };
+  }
   function refreshView() {
     if (currentView.type === "topics") return renderTopics(currentView.cat, currentView.title, currentView.back);
     if (currentView.type === "server") return showServer();
@@ -918,6 +1038,20 @@
     const st = document.getElementById("profileSaveStatus");
     st.classList.remove("show");
 
+    // Баннер
+    const pickerEl = document.getElementById("profileBannerPicker");
+    if (pickerEl) pickerEl.innerHTML = renderBannerPicker();
+    applyBannerColor();
+
+    // Статистика
+    const regDate = USER_ID.split("_")[1];
+    if (regDate) {
+      const days = Math.floor((Date.now() - parseInt(regDate)) / 86400000);
+      const statDays = document.getElementById("profileStatDays");
+      if (statDays) statDays.innerText = days;
+    }
+    loadProfileStats(USER_ID);
+
     document.getElementById("profilePage").classList.add("open");
     document.body.style.overflow = "hidden";
   }
@@ -1158,39 +1292,52 @@
       return;
     }
 
+    // Пагинация
+    allTopicsCache = arr;
+    const totalTopics = arr.length;
+    const startIdx = (currentPage - 1) * PAGE_SIZE;
+    const pageTopics = arr.slice(startIdx, startIdx + PAGE_SIZE);
+
     let html = "";
     if (!arr.length) {
       html = '<div class="empty-topics"><i class="fas fa-inbox"></i><p>Нет тем</p></div>';
     } else {
-      html = arr.map(t => {
+      html = pageTopics.map(t => {
         const ap = profileFor(t.authorId);
         const ar = getRank(visibleRankId(ap.rankId));
         const canEdit = canEditContent(t.authorId);
-        return `
-          <div class="topic-item">
-            <div style="flex:1;min-width:220px;" onclick="showThread('${cat}','${t.id}','${safeForAttr(t.title)}','${safeForAttr(title)}')">
-              <div class="topic-title">${esc(t.title)}</div>
-              <div class="topic-meta">
-                <img class="meta-avatar" alt="ava" src="${esc(ap.avatar)}" />
-                <span>${esc(ap.nick)}</span>
-                <span class="meta-rank" style="color:${esc(ar.color)};border-color:${esc(ar.color)}55;background:${esc(ar.color)}12;">${esc(ar.name)}</span>
-                <span>·</span>
-                <span>${esc(new Date(t.createdAt || Date.now()).toLocaleDateString())}</span>
-              </div>
-            </div>
-            <div class="topic-actions" onclick="event.stopPropagation();">
-              ${canEdit
-                ? `<button class="icon-btn" title="Редактировать" onclick="openEdit('${cat}','${t.id}','${safeForAttr(t.title)}','${safeForAttr(t.content)}')"><i class="fas fa-edit"></i></button>
-                   <button class="icon-btn danger" title="Удалить" onclick="delTopicUI('${cat}','${t.id}','${safeForAttr(title)}')"><i class="fas fa-trash-alt"></i></button>`
-                : `<button class="icon-btn" title="Недоступно" onclick="alert('Редактировать/удалять может только автор или Руководитель проекта')"><i class="fas fa-lock"></i></button>`
-              }
-            </div>
-          </div>`;
+        const status = getTopicStatus(t.id);
+        return '<div class="topic-item">' +
+          '<div style="flex:1;min-width:220px;" onclick="showThread(\'' + cat + '\',\'' + t.id + '\',\'' + safeForAttr(t.title) + '\',\'' + safeForAttr(title) + '\')">' +
+            '<div class="topic-title">' + esc(t.title) + getStatusBadge(status) + '</div>' +
+            '<div class="topic-meta">' +
+              '<img class="meta-avatar" alt="ava" src="' + esc(ap.avatar) + '" />' +
+              '<span class="author-link" onclick="event.stopPropagation();openAuthorProfile(\'' + t.authorId + '\')">' + esc(ap.nick) + '</span>' +
+              '<span class="meta-rank" style="color:' + esc(ar.color) + ';border-color:' + esc(ar.color) + '55;background:' + esc(ar.color) + '12;">' + esc(ar.name) + '</span>' +
+              '<span>·</span>' +
+              '<span>' + esc(new Date(t.createdAt || Date.now()).toLocaleDateString()) + '</span>' +
+            '</div>' +
+          '</div>' +
+          '<div class="topic-actions" onclick="event.stopPropagation();">' +
+            (isAdmin() ? statusSelectHtml(t.id, status) : '') +
+            (canEdit
+              ? '<button class="icon-btn" title="Редактировать" onclick="openEdit(\'' + cat + '\',\'' + t.id + '\',\'' + safeForAttr(t.title) + '\',\'' + safeForAttr(t.content) + '\')"><i class="fas fa-edit"></i></button>' +
+                '<button class="icon-btn danger" title="Удалить" onclick="delTopicUI(\'' + cat + '\',\'' + t.id + '\',\'' + safeForAttr(title) + '\')"><i class="fas fa-trash-alt"></i></button>'
+              : '<button class="icon-btn" title="Недоступно" onclick="alert(\'Редактировать/удалять может только автор или Руководитель проекта\')"><i class="fas fa-lock"></i></button>'
+            ) +
+          '</div>' +
+        '</div>';
       }).join("");
     }
 
     const tl = document.querySelector(".topics-list");
     if (tl) tl.innerHTML = html;
+
+    // Добавляем пагинацию
+    const sc2 = document.querySelector(".section-card");
+    if (sc2 && totalTopics > PAGE_SIZE) {
+      sc2.insertAdjacentHTML("beforeend", renderPagination(totalTopics, currentPage, cat, title));
+    }
 
     if (canCreateTopicIn(cat)) {
       const sc = document.querySelector(".section-card");
@@ -1308,7 +1455,7 @@
             <div class="comment-main">
               <div class="comment-head">
                 <div class="comment-author">
-                  <span>${esc(ap.nick)}</span>
+                  <span class="author-link" onclick="openAuthorProfile('${c.authorId}')">${esc(ap.nick)}</span>
                   <span class="meta-rank" style="color:${esc(ar.color)};border-color:${esc(ar.color)}55;background:${esc(ar.color)}12;">${esc(ar.name)}</span>
                   <span class="comment-date">${esc(new Date(c.createdAt || Date.now()).toLocaleString())}</span>
                 </div>
@@ -1342,7 +1489,17 @@
     const ta = document.getElementById("commentText");
     const text = ta && ta.value ? ta.value.trim() : "";
     if (!text) return alert("Напиши комментарий");
-    try { await createComment(topicId, text); await showThread(cat, topicId, topicTitle, listTitle); }
+    try {
+      await createComment(topicId, text);
+      // Уведомление для автора темы (если это не сам автор)
+      try {
+        const topic = await getTopic(topicId);
+        if (topic && String(topic.authorId) !== String(USER_ID)) {
+          // Просто логируем локально что мы ответили (в реальности нужен push)
+        }
+      } catch(e) {}
+      await showThread(cat, topicId, topicTitle, listTitle);
+    }
     catch (e) { console.error(e); alert("Ошибка отправки"); }
   }
 
@@ -1501,6 +1658,290 @@
     document.getElementById("usersBtn").style.display = isLeader() ? "inline-flex" : "none";
   }
 
+
+  // ─── ПОИСК ────────────────────────────────────────────────────────────────
+  let searchTimer = null;
+  const ALL_CATEGORIES = [
+    {id:"rules_common",name:"Общие правила проекта"},{id:"rules_criminal",name:"Правила криминальных орг."},{id:"rules_gov",name:"Правила госорганизаций"},
+    {id:"khimki_criminal",name:"Криминальные организации - Химки"},{id:"khimki_gov",name:"Госорганизации - Химки"},
+    {id:"tech_help",name:"Техподдержка: Помощь"},{id:"tech_bugs",name:"Техподдержка: Баги"},{id:"tech_support",name:"Техподдержка"},
+    {id:"complaint_admin",name:"Жалобы на администрацию"},{id:"complaint_players",name:"Жалобы на игроков"},
+    {id:"complaint_leaders",name:"Жалобы на лидеров"},{id:"amnesty",name:"Амнистия"},
+    {id:"moderator_app",name:"Заявление на модератора"},{id:"leader_app",name:"Заявление на лидера"}
+  ];
+
+  function onSearchInput(val) {
+    const clearBtn = document.getElementById("searchClearBtn");
+    if (clearBtn) clearBtn.style.display = val ? "inline" : "none";
+    clearTimeout(searchTimer);
+    if (!val.trim()) { clearSearch(); return; }
+    searchTimer = setTimeout(() => runSearch(val.trim()), 400);
+  }
+
+  function clearSearch() {
+    const inp = document.getElementById("globalSearch");
+    if (inp) inp.value = "";
+    const clearBtn = document.getElementById("searchClearBtn");
+    if (clearBtn) clearBtn.style.display = "none";
+    refreshView();
+  }
+
+  async function runSearch(query) {
+    document.getElementById("main-content").innerHTML =
+      '<div class="content-left" style="width:100%">' +
+      '<div class="section-card">' +
+      '<div class="section-title"><i class="fas fa-search"></i> Поиск: ' + esc(query) + '</div>' +
+      '<div class="topics-list">' + skeletonTopics(4) + '</div>' +
+      '</div></div>';
+
+    const q = query.toLowerCase();
+    let results = [];
+    try {
+      // Ищем по всем категориям параллельно (батчами по 4)
+      const chunks = [];
+      for (let i = 0; i < ALL_CATEGORIES.length; i += 4) chunks.push(ALL_CATEGORIES.slice(i, i+4));
+      for (const chunk of chunks) {
+        const found = await Promise.all(chunk.map(async cat => {
+          try {
+            const topics = await listTopics(cat.id);
+            return topics
+              .filter(t => t.title.toLowerCase().includes(q) || (t.content||"").toLowerCase().includes(q))
+              .map(t => ({ ...t, catName: cat.name, catId: cat.id }));
+          } catch(e) { return []; }
+        }));
+        results = results.concat(found.flat());
+      }
+    } catch(e) { console.error(e); }
+
+    const tl = document.querySelector(".topics-list");
+    if (!tl) return;
+    if (!results.length) {
+      tl.innerHTML = '<div class="empty-topics"><i class="fas fa-search"></i><p>Ничего не найдено по запросу «' + esc(query) + '»</p></div>';
+      return;
+    }
+
+    function highlight(text, q) {
+      const idx = text.toLowerCase().indexOf(q.toLowerCase());
+      if (idx === -1) return esc(text);
+      return esc(text.slice(0, idx)) + '<span class="search-highlight">' + esc(text.slice(idx, idx+q.length)) + '</span>' + esc(text.slice(idx+q.length));
+    }
+
+    tl.innerHTML = results.map(t => {
+      const preview = (t.content||"").slice(0, 120).replace(/\n/g," ");
+      return '<div class="search-result-item" onclick="showThread(\'' + t.catId + '\',\'' + t.id + '\',\'' + safeForAttr(t.title) + '\',\'' + safeForAttr(t.catName) + '\')">' +
+        '<div class="search-result-title">' + highlight(t.title, query) + getStatusBadge(t.status) + '</div>' +
+        '<div class="search-result-meta"><i class="fas fa-folder" style="margin-right:4px;"></i>' + esc(t.catName) + ' · ' + highlight(preview, query) + '</div>' +
+      '</div>';
+    }).join("");
+  }
+
+  // ─── СТАТУСЫ ТЕМ ──────────────────────────────────────────────────────────
+  const STATUSES = {
+    open:   { label: "Открыта",        cls: "status-open",   icon: "fas fa-circle-dot" },
+    review: { label: "Рассматривается",cls: "status-review", icon: "fas fa-hourglass-half" },
+    solved: { label: "Решено",         cls: "status-solved", icon: "fas fa-check-circle" },
+    closed: { label: "Закрыта",        cls: "status-closed", icon: "fas fa-lock" },
+  };
+
+  function getStatusBadge(status) {
+    if (!status || status === "open") return "";
+    const s = STATUSES[status];
+    if (!s) return "";
+    return ' <span class="topic-status ' + s.cls + '"><i class="' + s.icon + '"></i>' + s.label + '</span>';
+  }
+
+  function statusSelectHtml(topicId, current) {
+    if (!isAdmin()) return "";
+    const cur = current || "open";
+    return '<select class="status-select" onchange="changeTopicStatus(\'' + topicId + '\',this.value)" onclick="event.stopPropagation()" title="Сменить статус">' +
+      Object.entries(STATUSES).map(([k,v]) => '<option value="' + k + '"' + (k===cur?' selected':'') + '>' + v.label + '</option>').join("") +
+    '</select>';
+  }
+
+  function changeTopicStatus(topicId, status) {
+    // Сохраняем статус локально (нет отдельного поля в БД — используем localStorage)
+    const key = "rsrp_status_" + topicId;
+    localStorage.setItem(key, status);
+    refreshView();
+  }
+
+  function getTopicStatus(topicId) {
+    return localStorage.getItem("rsrp_status_" + topicId) || "open";
+  }
+
+  // ─── ПАГИНАЦИЯ ────────────────────────────────────────────────────────────
+  const PAGE_SIZE = 15;
+  let currentPage = 1;
+  let allTopicsCache = [];
+
+  function renderPagination(total, page, cat, title, back) {
+    const totalPages = Math.ceil(total / PAGE_SIZE);
+    if (totalPages <= 1) return "";
+    let html = '<div class="pagination">';
+    html += '<button class="page-btn" ' + (page<=1?'disabled':'onclick="gotoPage('+cat+','+title+','+back+','+(page-1)+')"') + '><i class="fas fa-chevron-left"></i></button>';
+    for (let i = 1; i <= totalPages; i++) {
+      if (i === 1 || i === totalPages || Math.abs(i-page) <= 1) {
+        html += '<button class="page-btn' + (i===page?' active':'') + '" onclick="gotoPage(\'' + cat + '\',\'' + title + '\',' + i + ')">' + i + '</button>';
+      } else if (Math.abs(i-page) === 2) {
+        html += '<span style="color:#5A6380;align-self:center;">…</span>';
+      }
+    }
+    html += '<button class="page-btn" ' + (page>=totalPages?'disabled':'onclick="gotoPage(\''+cat+'\',\''+title+'\','+(page+1)+')"') + '><i class="fas fa-chevron-right"></i></button>';
+    html += '</div>';
+    return html;
+  }
+
+  function gotoPage(cat, title, page) {
+    currentPage = page;
+    renderTopics(cat, title, currentView.back || showMain);
+  }
+
+  // ─── УВЕДОМЛЕНИЯ ──────────────────────────────────────────────────────────
+  const NOTIF_KEY = "rsrp_notifs";
+
+  function loadNotifs() {
+    try { return JSON.parse(localStorage.getItem(NOTIF_KEY) || "[]"); } catch(e) { return []; }
+  }
+  function saveNotifs(n) { localStorage.setItem(NOTIF_KEY, JSON.stringify(n)); }
+
+  function addNotif(text, catId, topicId, topicTitle) {
+    const notifs = loadNotifs();
+    notifs.unshift({ id: Date.now(), text, catId, topicId, topicTitle, time: Date.now(), read: false });
+    if (notifs.length > 30) notifs.pop();
+    saveNotifs(notifs);
+    updateNotifDot();
+  }
+
+  function updateNotifDot() {
+    const dot = document.getElementById("notifDot");
+    if (!dot) return;
+    const notifs = loadNotifs();
+    const hasUnread = notifs.some(n => !n.read);
+    dot.classList.toggle("show", hasUnread);
+  }
+
+  function toggleNotifPanel() {
+    const panel = document.getElementById("notifPanel");
+    if (!panel) return;
+    const isOpen = panel.classList.contains("open");
+    if (!isOpen) {
+      renderNotifPanel();
+      panel.classList.add("open");
+      // Закрываем по клику снаружи
+      setTimeout(() => document.addEventListener("click", closeNotifOnOutside), 50);
+    } else {
+      panel.classList.remove("open");
+      document.removeEventListener("click", closeNotifOnOutside);
+    }
+  }
+
+  function closeNotifOnOutside(e) {
+    const panel = document.getElementById("notifPanel");
+    if (panel && !panel.contains(e.target)) {
+      panel.classList.remove("open");
+      document.removeEventListener("click", closeNotifOnOutside);
+    }
+  }
+
+  function renderNotifPanel() {
+    const list = document.getElementById("notifList");
+    const notifs = loadNotifs();
+    // Помечаем все как прочитанные
+    notifs.forEach(n => n.read = true);
+    saveNotifs(notifs);
+    updateNotifDot();
+
+    if (!notifs.length) {
+      list.innerHTML = '<div class="notif-empty"><i class="fas fa-check-circle" style="color:#4CAF50;font-size:1.2rem;"></i><br>Нет новых уведомлений</div>';
+      return;
+    }
+
+    function timeAgo(ts) {
+      const d = Date.now() - ts;
+      if (d < 60000) return "только что";
+      if (d < 3600000) return Math.floor(d/60000) + " мин назад";
+      if (d < 86400000) return Math.floor(d/3600000) + " ч назад";
+      return Math.floor(d/86400000) + " дн назад";
+    }
+
+    list.innerHTML = notifs.map(n => '<div class="notif-item' + (n.read?'':' unread') + '" onclick="openNotif(\'' + n.catId + '\',\'' + n.topicId + '\',\'' + safeForAttr(n.topicTitle) + '\')">' +
+      '<div class="notif-icon"><i class="fas fa-comment"></i></div>' +
+      '<div class="notif-text">' + esc(n.text) + '<div class="notif-time">' + timeAgo(n.time) + '</div></div>' +
+    '</div>').join("");
+  }
+
+  function openNotif(catId, topicId, topicTitle) {
+    document.getElementById("notifPanel").classList.remove("open");
+    showThread(catId, topicId, topicTitle, "Форум");
+  }
+
+  function clearAllNotifs() {
+    saveNotifs([]);
+    updateNotifDot();
+    renderNotifPanel();
+  }
+
+  // ─── КЛИКАБЕЛЬНЫЙ АВТОР ────────────────────────────────────────────────────
+  function openAuthorProfile(userId) {
+    const p = cache.profilesById && cache.profilesById[userId];
+    if (!p) return;
+    const rank = getRank(visibleRankId(p.rankId));
+    const onlineIds = getOnlineUserIds();
+    viewUserProfile(userId, p.nick, p.avatar, rank.name, rank.color, p.about||"", String(onlineIds.has(String(userId))));
+  }
+
+  // ─── СТАТИСТИКА ПРОФИЛЯ ────────────────────────────────────────────────────
+  async function loadProfileStats(userId) {
+    let topics = 0, comments = 0;
+    try {
+      // Считаем по всем категориям
+      const results = await Promise.all(ALL_CATEGORIES.map(cat =>
+        listTopics(cat.id).catch(() => [])
+      ));
+      results.forEach(arr => arr.forEach(t => { if (String(t.authorId) === String(userId)) topics++; }));
+    } catch(e) {}
+    document.getElementById("profileStatTopics").innerText = topics;
+    document.getElementById("profileStatComments").innerText = "—";
+  }
+
+  // ─── БАННЕР ПРОФИЛЯ ────────────────────────────────────────────────────────
+  const BANNER_COLORS = [
+    "linear-gradient(135deg,#0d0f18,#1a1628,#12150f)",
+    "linear-gradient(135deg,#0d1a0f,#1a2818,#0f150d)",
+    "linear-gradient(135deg,#1a0d0d,#281818,#150d0f)",
+    "linear-gradient(135deg,#0d0f1a,#181a28,#0d0f15)",
+    "linear-gradient(135deg,#1a180d,#282315,#15120d)",
+    "linear-gradient(135deg,#1a0d1a,#280f28,#150d15)",
+  ];
+  const BANNER_KEY = "rsrp_banner_" + (typeof USER_ID !== 'undefined' ? USER_ID : "");
+
+  function applyBannerColor() {
+    const saved = localStorage.getItem(BANNER_KEY) || BANNER_COLORS[0];
+    const banners = document.querySelectorAll(".profile-banner");
+    banners.forEach(b => b.style.background = saved);
+  }
+
+  function renderBannerPicker() {
+    return '<div class="profile-section-title"><i class="fas fa-palette"></i> Цвет баннера</div>' +
+      '<div class="banner-color-row">' +
+      BANNER_COLORS.map((c, i) => {
+        const saved = localStorage.getItem(BANNER_KEY) || BANNER_COLORS[0];
+        const sel = c === saved ? " selected" : "";
+        return '<div class="banner-color-opt' + sel + '" style="background:' + c + '" onclick="selectBannerColor(\'' + i + '\')" title="Цвет ' + (i+1) + '"></div>';
+      }).join("") +
+    '</div>';
+  }
+
+  function selectBannerColor(idx) {
+    localStorage.setItem(BANNER_KEY, BANNER_COLORS[idx]);
+    applyBannerColor();
+    // Обновляем выделение
+    document.querySelectorAll(".banner-color-opt").forEach((el, i) => {
+      el.classList.toggle("selected", String(i) === String(idx));
+    });
+  }
+
+
   // ─── ИНИЦИАЛИЗАЦИЯ ────────────────────────────────────────────────────────
   (async () => {
     cacheLoad();
@@ -1510,6 +1951,7 @@
     updateAdminButtons();
     showMain();
     writeHeartbeat();
+    updateNotifDot();
     setInterval(writeHeartbeat, 5 * 60 * 1000);
 
     // Фоновая загрузка свежих данных
