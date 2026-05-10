@@ -163,25 +163,53 @@
     .page-btn.active { background: rgba(255,217,102,0.15); border-color: #FFD966; color: #FFD966; }
     .page-btn:disabled { opacity: 0.3; cursor: not-allowed; }
 
-    /* ── Уведомления ─────────────────────────────────────────────────────────── */
-    .notif-dot { position: absolute; top: -3px; right: -3px; width: 9px; height: 9px; border-radius: 50%; background: #FF5252; border: 2px solid #0C0E14; display: none; }
-    .notif-dot.show { display: block; }
-    .notif-panel { position: fixed; top: 90px; right: 24px; width: 340px; max-height: 420px; background: #13161F; border: 1px solid rgba(255,217,102,0.25); border-radius: 20px; z-index: 800; overflow: hidden; box-shadow: 0 16px 48px rgba(0,0,0,0.6); display: none; }
+
+    /* ── Улучшенные уведомления ─────────────────────────────────────────────── */
+    .notif-panel { position: fixed; top: 70px; right: 24px; width: 360px; max-height: 480px; background: #0F1117; border: 1px solid rgba(255,217,102,0.2); border-radius: 20px; z-index: 800; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,217,102,0.05) inset; display: none; }
     .notif-panel.open { display: block; animation: fadeSlideDown 0.18s ease; }
-    @keyframes fadeSlideDown { from { opacity:0; transform:translateY(-8px); } to { opacity:1; transform:translateY(0); } }
-    .notif-header { padding: 14px 18px; background: #1A1E2A; border-bottom: 1px solid #232732; font-weight: 900; font-size: 0.9rem; display: flex; justify-content: space-between; align-items: center; }
-    .notif-header i { color: #FFD966; }
-    .notif-clear { font-size: 0.72rem; color: #6A74A0; cursor: pointer; font-weight: 800; }
-    .notif-clear:hover { color: #FFD966; }
-    .notif-list { max-height: 340px; overflow-y: auto; }
-    .notif-item { padding: 12px 18px; border-bottom: 1px solid #1A1E2A; cursor: pointer; transition: background 0.1s; display: flex; gap: 10px; align-items: flex-start; }
-    .notif-item:hover { background: #191E2B; }
-    .notif-item.unread { border-left: 3px solid #FFD966; }
-    .notif-icon { width: 32px; height: 32px; border-radius: 50%; background: rgba(255,217,102,0.1); border: 1px solid rgba(255,217,102,0.2); display: flex; align-items: center; justify-content: center; flex: 0 0 auto; }
-    .notif-icon i { color: #FFD966; font-size: 0.8rem; }
-    .notif-text { flex: 1; font-size: 0.78rem; font-weight: 700; color: #C0C9E0; line-height: 1.4; }
-    .notif-time { font-size: 0.65rem; color: #5A6380; font-weight: 800; margin-top: 3px; }
-    .notif-empty { padding: 28px; text-align: center; color: #5A6380; font-weight: 800; font-size: 0.85rem; }
+    .notif-header { padding: 16px 20px; background: linear-gradient(135deg,#1A1E2A,#12141C); border-bottom: 1px solid #232732; display: flex; align-items: center; justify-content: space-between; }
+    .notif-header-left { display: flex; align-items: center; gap: 10px; }
+    .notif-header-icon { width: 32px; height: 32px; border-radius: 10px; background: rgba(255,217,102,0.1); border: 1px solid rgba(255,217,102,0.2); display: flex; align-items: center; justify-content: center; }
+    .notif-header-icon i { color: #FFD966; font-size: 0.85rem; }
+    .notif-header-title { font-weight: 900; font-size: 0.95rem; color: #E0E4F0; }
+    .notif-header-sub { font-size: 0.7rem; color: #5A6380; font-weight: 700; margin-top: 1px; }
+    .notif-clear { font-size: 0.72rem; color: #5A6380; cursor: pointer; font-weight: 800; padding: 4px 10px; border-radius: 20px; border: 1px solid #1E2330; transition: 0.15s; }
+    .notif-clear:hover { color: #FFD966; border-color: rgba(255,217,102,0.3); }
+    .notif-list { max-height: 380px; overflow-y: auto; }
+    .notif-item { padding: 12px 20px; border-bottom: 1px solid #13161F; cursor: pointer; transition: background 0.1s; display: flex; gap: 12px; align-items: flex-start; position: relative; }
+    .notif-item:hover { background: rgba(255,217,102,0.04); }
+    .notif-item.unread { background: rgba(255,217,102,0.03); }
+    .notif-item.unread::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: #FFD966; border-radius: 0 2px 2px 0; }
+    .notif-icon { width: 36px; height: 36px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex: 0 0 auto; }
+    .notif-icon.type-comment { background: rgba(100,180,255,0.1); border: 1px solid rgba(100,180,255,0.2); }
+    .notif-icon.type-comment i { color: #64B4FF; }
+    .notif-icon.type-dm { background: rgba(76,175,80,0.1); border: 1px solid rgba(76,175,80,0.2); }
+    .notif-icon.type-dm i { color: #4CAF50; }
+    .notif-icon.type-warn { background: rgba(255,82,82,0.1); border: 1px solid rgba(255,82,82,0.2); }
+    .notif-icon.type-warn i { color: #FF5252; }
+    .notif-icon.type-status { background: rgba(255,180,30,0.1); border: 1px solid rgba(255,180,30,0.2); }
+    .notif-icon.type-status i { color: #FFB41E; }
+    .notif-body { flex: 1; min-width: 0; }
+    .notif-body-title { font-size: 0.82rem; font-weight: 800; color: #E0E4F0; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .notif-body-text { font-size: 0.75rem; font-weight: 700; color: #6A74A0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .notif-body-time { font-size: 0.65rem; color: #3A4060; font-weight: 800; margin-top: 3px; }
+    .notif-empty { padding: 36px 20px; text-align: center; }
+    .notif-empty-icon { font-size: 2rem; margin-bottom: 10px; opacity: 0.4; }
+    .notif-empty-text { color: #4A5270; font-weight: 700; font-size: 0.85rem; }
+
+    /* ── Вкладка ЛС в навигации ──────────────────────────────────────────────── */
+    .dm-nav-btn { position: relative; }
+    .dm-nav-dot { position: absolute; top: -3px; right: -3px; width: 7px; height: 7px; border-radius: 50%; background: #4CAF50; border: 2px solid #0C0E14; display: none; }
+    .dm-nav-dot.show { display: block; }
+
+    /* ── Статусы и закреплённые — видны всем ────────────────────────────────── */
+    .topic-status-inline { display: inline-flex; align-items: center; gap: 4px; font-size: 0.65rem; font-weight: 900; padding: 2px 7px; border-radius: 999px; margin-left: 6px; vertical-align: middle; }
+    .status-badge-open    { display: none; }
+    .status-badge-review  { background: rgba(255,180,30,0.12);  border: 1px solid rgba(255,180,30,0.35);  color: #FFB41E; }
+    .status-badge-solved  { background: rgba(76,175,80,0.12);   border: 1px solid rgba(76,175,80,0.35);   color: #4CAF50; }
+    .status-badge-closed  { background: rgba(150,150,170,0.12); border: 1px solid rgba(150,150,170,0.35); color: #9696AA; }
+    .pin-badge { display: inline-flex; align-items: center; gap: 3px; font-size: 0.65rem; font-weight: 900; padding: 2px 7px; border-radius: 999px; background: rgba(255,217,102,0.1); border: 1px solid rgba(255,217,102,0.3); color: #FFD966; margin-left: 4px; vertical-align: middle; }
+
     .chip-btn-wrap { position: relative; display: inline-flex; }
 
     /* ── Кликабельный автор (ник в теме/комменте) ───────────────────────────── */
@@ -508,6 +536,7 @@
     <a onclick="showMain()"><i class="fas fa-home"></i> Главная</a>
     <a onclick="showTech()"><i class="fas fa-headset"></i> Техподдержка</a>
     <a onclick="showComplaints()"><i class="fas fa-file-alt"></i> Жалобы и заявления</a>
+    <a class="dm-nav-btn" onclick="showDMList()" title="Личные сообщения"><i class="fas fa-paper-plane"></i> Сообщения<span class="dm-nav-dot" id="dmNavDot"></span></a>
   </div>
   <div class="search-bar-wrap">
     <div class="search-bar">
@@ -605,11 +634,20 @@
 <!-- Панель уведомлений -->
 <div id="notifPanel" class="notif-panel">
   <div class="notif-header">
-    <span><i class="fas fa-bell"></i> Уведомления</span>
-    <span class="notif-clear" onclick="clearAllNotifs()">Очистить все</span>
+    <div class="notif-header-left">
+      <div class="notif-header-icon"><i class="fas fa-bell"></i></div>
+      <div>
+        <div class="notif-header-title">Уведомления</div>
+        <div class="notif-header-sub" id="notifSubtitle">Нет новых</div>
+      </div>
+    </div>
+    <span class="notif-clear" onclick="clearAllNotifs()">Очистить</span>
   </div>
   <div class="notif-list" id="notifList">
-    <div class="notif-empty"><i class="fas fa-check-circle" style="color:#4CAF50;font-size:1.2rem;"></i><br>Нет новых уведомлений</div>
+    <div class="notif-empty">
+      <div class="notif-empty-icon">🔔</div>
+      <div class="notif-empty-text">Уведомлений пока нет</div>
+    </div>
   </div>
 </div>
 
@@ -1788,7 +1826,7 @@
         const isPinned = pins.has(t.id);
         return '<div class="topic-item' + (isPinned ? ' topic-pinned' : '') + '">' +
           '<div style="flex:1;min-width:220px;" onclick="showThread(\'' + cat + '\',\'' + t.id + '\',\'' + safeForAttr(t.title) + '\',\'' + safeForAttr(title) + '\')">' +
-            '<div class="topic-title">' + esc(t.title) + getStatusBadge(status) + '</div>' +
+            '<div class="topic-title">' + esc(t.title) + getStatusBadgePublic(t.id) + '</div>' +
             '<div class="topic-meta">' +
               '<img class="meta-avatar" alt="ava" src="' + esc(ap.avatar) + '" />' +
               '<span class="author-link" onclick="event.stopPropagation();openAuthorProfile(\'' + t.authorId + '\')">' + esc(ap.nick) + '</span>' +
@@ -3082,6 +3120,122 @@
   }
 
 
+
+
+
+  // --- УЛУЧШЕННЫЕ УВЕДОМЛЕНИЯ ---
+  const NOTIF_TYPE_CONFIG = {
+    comment: { cls: 'type-comment', icon: 'fas fa-comment-alt', label: 'Новый ответ' },
+    dm:      { cls: 'type-dm',      icon: 'fas fa-envelope',    label: 'Сообщение'   },
+    warn:    { cls: 'type-warn',    icon: 'fas fa-exclamation', label: 'Предупреждение' },
+    status:  { cls: 'type-status',  icon: 'fas fa-tag',         label: 'Статус темы' },
+    pin:     { cls: 'type-status',  icon: 'fas fa-thumbtack',   label: 'Тема закреплена' },
+  };
+
+  function renderNotifPanel() {
+    const list = document.getElementById("notifList");
+    const sub  = document.getElementById("notifSubtitle");
+    const notifs = loadNotifs();
+    notifs.forEach(function(n){ n.read = true; });
+    saveNotifs(notifs);
+    updateNotifDot();
+
+    if (sub) sub.innerText = notifs.length ? (notifs.length + " уведомл.") : "Нет новых";
+
+    if (!notifs.length) {
+      list.innerHTML = "<div class=\"notif-empty\"><div class=\"notif-empty-icon\">🔔</div><div class=\"notif-empty-text\">Уведомлений пока нет</div></div>";
+      return;
+    }
+
+    list.innerHTML = notifs.map(function(n) {
+      var cfg = NOTIF_TYPE_CONFIG[n.type] || NOTIF_TYPE_CONFIG.comment;
+      var catId = safeForAttr(n.catId || "");
+      var topicId = safeForAttr(n.topicId || "");
+      var topicTitle = safeForAttr(n.topicTitle || "");
+      var unreadCls = n.read ? "" : " unread";
+      return "<div class=\"notif-item" + unreadCls + "\" onclick=\"openNotif('" + catId + "','" + topicId + "','" + topicTitle + "')\">" +
+        "<div class=\"notif-icon " + cfg.cls + "\"><i class=\"" + cfg.icon + "\" style=\"font-size:0.8rem;\"></i></div>" +
+        "<div class=\"notif-body\">" +
+          "<div class=\"notif-body-title\">" + cfg.label + "</div>" +
+          "<div class=\"notif-body-text\">" + esc(n.text || "") + "</div>" +
+          "<div class=\"notif-body-time\">" + timeAgoShort(n.time) + "</div>" +
+        "</div>" +
+      "</div>";
+    }).join("");
+  }
+
+  // --- СПИСОК ЛС ---
+  function showDMList() {
+    setBack(showMain);
+    currentView = { type: 'dms' };
+    setPageTitle('Сообщения');
+
+    const allDMs = JSON.parse(localStorage.getItem('rsrp_dms') || '{}');
+    const myConvos = [];
+
+    for (const key of Object.keys(allDMs)) {
+      const msgs = allDMs[key];
+      if (!msgs || !msgs.length) continue;
+      const parts = key.split('_').filter(function(p){ return p.startsWith('u_'); });
+      const otherId = parts.find(function(p){ return p !== USER_ID; });
+      if (!otherId) continue;
+      const lastMsg = msgs[msgs.length - 1];
+      myConvos.push({ key, otherId, profile: profileFor(otherId), lastMsg });
+    }
+
+    myConvos.sort(function(a,b){ return (b.lastMsg.time||0) - (a.lastMsg.time||0); });
+
+    let rows = '';
+    myConvos.forEach(function(c) {
+      const p = c.profile;
+      const rank = getRank(visibleRankId(p.rankId));
+      const preview = esc((c.lastMsg.text || '').slice(0, 60));
+      const mine = String(c.lastMsg.from) === String(USER_ID);
+      const ago = timeAgoShort(c.lastMsg.time || 0);
+      const uid = safeForAttr(c.otherId);
+      const nick = safeForAttr(p.nick);
+      const ava = safeForAttr(p.avatar);
+
+      rows += '<div class="category-item" onclick="openDM(\'' + uid + '\',\'' + nick + '\',\'' + ava + '\')">'+  
+        '<div style="display:flex;align-items:center;gap:12px;flex:1;min-width:0;">' +
+          '<img src="' + esc(p.avatar) + '" style="width:44px;height:44px;border-radius:50%;object-fit:cover;border:2px solid rgba(255,217,102,0.15);flex:0 0 auto;">' +
+          '<div style="flex:1;min-width:0;">' +
+            '<div style="font-weight:900;color:#E0E4F0;font-size:0.9rem;">' + esc(p.nick) + '</div>' +
+            '<div style="font-size:0.72rem;color:' + esc(rank.color) + ';font-weight:800;">' + esc(rank.name) + '</div>' +
+            '<div style="font-size:0.78rem;color:#5A6380;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' +
+              (mine ? '<span style="color:#4A5270;">Вы: </span>' : '') + preview +
+            '</div>' +
+          '</div>' +
+        '</div>' +
+        '<div style="font-size:0.65rem;color:#3A4060;font-weight:800;white-space:nowrap;">' + ago + '</div>' +
+      '</div>';
+    });
+
+    const empty = myConvos.length ? rows : '<div class="empty-topics"><i class="fas fa-inbox"></i><p>Нет переписок</p></div>';
+
+    document.getElementById('main-content').innerHTML =
+      '<div class="content-left" style="width:100%">' +
+        '<button class="back-btn" onclick="goBack()"><i class="fas fa-arrow-left"></i> Назад</button>' +
+        '<div class="section-card">' +
+          '<div class="section-title"><i class="fas fa-paper-plane"></i> Личные сообщения</div>' +
+          empty +
+        '</div>' +
+      '</div>';
+  }
+  // --- СТАТУСЫ И ЗАКРЕПЛЁННЫЕ ВИДНЫ ВСЕМ ---
+  function getStatusBadgePublic(topicId) {
+    const status = getTopicStatus(topicId);
+    const pins = getPinned();
+    let html = '';
+    if (pins.has(topicId)) {
+      html += '<span class="pin-badge"><i class="fas fa-thumbtack" style="font-size:0.55rem;"></i> Закреплено</span>';
+    }
+    if (status && status !== 'open') {
+      const s = STATUSES[status];
+      if (s) html += '<span class="topic-status-inline status-badge-' + status + '"><i class="' + s.icon + '" style="font-size:0.55rem;"></i> ' + s.label + '</span>';
+    }
+    return html;
+  }
 
 
   // ─── КАСТОМНЫЕ БЛОКИ ГЛАВНОЙ (хранятся в Google Sheets) ──────────────────
