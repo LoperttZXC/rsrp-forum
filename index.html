@@ -2598,79 +2598,153 @@
     return new Date(ts).toLocaleDateString();
   }
 
-  // ─── ЛИЧНЫЕ СООБЩЕНИЯ ─────────────────────────────────────────────────────
+  // ─── ЛИЧНЫЕ СООБЩЕНИЯ (Google Sheets) ────────────────────────────────────────
   let dmTargetId = null;
-  const DM_KEY = 'rsrp_dms';
+  let dmTargetNick = "";
+  let dmTargetAvatar = "";
+  let dmPollTimer = null;
+  let dmLastCount = 0;
 
-  function getDMs(userId) {
-    try {
-      const all = JSON.parse(localStorage.getItem(DM_KEY)||'{}');
-      const key = [USER_ID, userId].sort().join('|||');
-      return all[key] || [];
-    } catch(e) { return []; }
-  }
-
-  function saveDM(userId, msg) {
-    try {
-      const all = JSON.parse(localStorage.getItem(DM_KEY)||'{}');
-      const key = [USER_ID, userId].sort().join('|||');
-      if (!all[key]) all[key] = [];
-      all[key].push(msg);
-      if (all[key].length > 200) all[key].shift();
-      localStorage.setItem(DM_KEY, JSON.stringify(all));
-    } catch(e) {}
-  }
-
-  function openDM(userId, nick, avatar) {
+  // Открыть чат с игроком
+  async function openDM(userId, nick, avatar) {
     dmTargetId = userId;
-    document.getElementById('dmHeaderName').innerText = nick || 'Игрок';
-    document.getElementById('dmHeaderAvatar').src = avatar || DEFAULT_AVATAR;
-    document.getElementById('dmInput').value = '';
-    renderDMMessages(userId);
-    document.getElementById('dmPage').classList.add('open');
-    document.body.style.overflow = 'hidden';
-    // Добавляем уведомление о непрочитанных
-    updateNotifDot();
+    dmTargetNick = nick || "Игрок";
+    dmTargetAvatar = avatar || DEFAULT_AVATAR;
+
+    document.getElementById("dmHeaderName").innerText = dmTargetNick;
+    document.getElementById("dmHeaderAvatar").src = dmTargetAvatar;
+    document.getElementById("dmInput").value = "";
+
+    document.getElementById("dmPage").classList.add("open");
+    document.body.style.overflow = "hidden";
+
+    await loadDMMessages();
+
+    // Опрос новых сообщений каждые 5 секунд пока чат открыт
+    clearInterval(dmPollTimer);
+    dmPollTimer = setInterval(loadDMMessages, 5000);
   }
 
   function closeDM() {
-    document.getElementById('dmPage').classList.remove('open');
-    document.body.style.overflow = '';
+    document.getElementById("dmPage").classList.remove("open");
+    document.body.style.overflow = "";
+    clearInterval(dmPollTimer);
     dmTargetId = null;
   }
 
-  function renderDMMessages(userId) {
-    const msgs = getDMs(userId);
-    const box = document.getElementById('dmMessages');
+  async function loadDMMessages() {
+    if (!dmTargetId) return;
+    const box = document.getElementById("dmMessages");
+    try {
+      const r = await api("getMessages", { userId: USER_ID, otherId: dmTargetId });
+      const msgs = r.msgs || [];
+      if (msgs.length === dmLastCount) return; // нет новых
+      dmLastCount = msgs.length;
+      renderDMMessagesFromServer(msgs);
+    } catch(e) {
+      console.error("loadDMMessages:", e);
+    }
+  }
+
+  function renderDMMessagesFromServer(msgs) {
+    const box = document.getElementById("dmMessages");
+    if (!box) return;
     if (!msgs.length) {
       box.innerHTML = '<div class="dm-empty"><i class="fas fa-comment-dots" style="font-size:1.5rem;color:#FFD966;"></i><br>Начните переписку</div>';
       return;
     }
-    box.innerHTML = msgs.map(m => {
-      const mine = String(m.from) === String(USER_ID);
-      const ago = timeAgoShort(m.time);
-      return '<div class="dm-msg' + (mine?' mine':'') + '">' +
+    const wasAtBottom = box.scrollHeight - box.scrollTop - box.clientHeight < 60;
+    box.innerHTML = msgs.map(function(m) {
+      const mine = String(m.fromId) === String(USER_ID);
+      const ago = timeAgoShort(new Date(m.createdAt || Date.now()).getTime());
+      var cls = mine ? ' mine' : '';
+      return '<div class="dm-msg' + cls + '">' +
         '<div class="dm-msg-bubble">' + renderMarkdown(m.text) + '</div>' +
         '<div class="dm-msg-time">' + ago + '</div>' +
       '</div>';
-    }).join('');
-    box.scrollTop = box.scrollHeight;
+    }).join("");
+    if (wasAtBottom) box.scrollTop = box.scrollHeight;
   }
 
-  function sendDM() {
-    const inp = document.getElementById('dmInput');
-    const text = inp ? inp.value.trim() : '';
+  async function sendDM() {
+    const inp = document.getElementById("dmInput");
+    const text = inp ? inp.value.trim() : "";
     if (!text || !dmTargetId) return;
-    const msg = { from: USER_ID, to: dmTargetId, text, time: Date.now() };
-    saveDM(dmTargetId, msg);
-    inp.value = '';
-    inp.style.height = 'auto';
-    renderDMMessages(dmTargetId);
-    // Уведомление получателю (локально — в реальности нужен push)
-    addNotif(
-      (cache.profile.nick || 'Игрок') + ' написал вам: ' + text.slice(0, 60),
-      'dm', dmTargetId, 'Личное сообщение'
-    );
+
+    inp.value = "";
+    inp.style.height = "auto";
+
+    try {
+      await apiChunked("sendMessage", { fromId: USER_ID, toId: dmTargetId, text });
+      dmLastCount = 0; // форсируем перезагрузку
+      await loadDMMessages();
+    } catch(e) {
+      console.error("sendDM:", e);
+      alert("Ошибка отправки");
+    }
+  }
+
+  // Список переписок
+  async function showDMList() {
+    setBack(showMain);
+    currentView = { type: "dms" };
+    setPageTitle("Сообщения");
+
+    document.getElementById("main-content").innerHTML =
+      '<div class="content-left" style="width:100%">' +
+        '<button class="back-btn" onclick="goBack()"><i class="fas fa-arrow-left"></i> Назад</button>' +
+        '<div class="section-card">' +
+          '<div class="section-title"><i class="fas fa-paper-plane"></i> Личные сообщения</div>' +
+          '<div class="topics-list" id="dmConvList">' + skeletonTopics(3) + '</div>' +
+        '</div>' +
+      '</div>';
+
+    try {
+      const r = await api("getConversations", { userId: USER_ID });
+      const convs = r.convs || [];
+
+      if (!convs.length) {
+        document.getElementById("dmConvList").innerHTML =
+          '<div class="empty-topics"><i class="fas fa-inbox"></i><p>Нет переписок</p></div>';
+        return;
+      }
+
+      // Загружаем профили собеседников
+      await ensureProfiles(convs.map(function(c){ return c.otherId; }));
+
+      let rows = "";
+      convs.forEach(function(c) {
+        const p = profileFor(c.otherId);
+        const rank = getRank(visibleRankId(p.rankId));
+        const lastMsg = c.lastMsg || {};
+        const preview = esc((lastMsg.text || "").slice(0, 60));
+        const mine = String(lastMsg.fromId) === String(USER_ID);
+        const ago = timeAgoShort(new Date(lastMsg.createdAt || Date.now()).getTime());
+        const uid = safeForAttr(c.otherId);
+        const nick = safeForAttr(p.nick);
+        const ava = safeForAttr(p.avatar);
+
+        rows += '<div class="topic-item" onclick="openDM(\'' + uid + '\',\'' + nick + '\',\'' + ava + '\')">' +
+          '<div style="display:flex;align-items:center;gap:12px;flex:1;min-width:0;">' +
+            '<img src="' + esc(p.avatar) + '" style="width:44px;height:44px;border-radius:50%;object-fit:cover;border:2px solid rgba(255,217,102,0.15);flex:0 0 auto;">' +
+            '<div style="flex:1;min-width:0;">' +
+              '<div style="font-weight:900;color:#E0E4F0;font-size:0.9rem;">' + esc(p.nick) + '</div>' +
+              '<div style="font-size:0.72rem;color:' + esc(rank.color) + ';font-weight:800;">' + esc(rank.name) + '</div>' +
+              '<div style="font-size:0.78rem;color:#5A6380;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' +
+                (mine ? '<span style="color:#4A5270;">Вы: </span>' : '') + preview +
+              '</div>' +
+            '</div>' +
+          '</div>' +
+          '<div style="font-size:0.65rem;color:#3A4060;font-weight:800;white-space:nowrap;">' + ago + '</div>' +
+        '</div>';
+      });
+
+      document.getElementById("dmConvList").innerHTML = rows;
+    } catch(e) {
+      console.error(e);
+      document.getElementById("dmConvList").innerHTML =
+        '<div class="empty-topics">Ошибка загрузки</div>';
+    }
   }
 
   // ─── СИСТЕМА ПРЕДУПРЕЖДЕНИЙ ────────────────────────────────────────────────
