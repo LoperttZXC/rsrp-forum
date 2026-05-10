@@ -361,6 +361,35 @@
     /* ── Счётчик ответов реальный ────────────────────────────────────────────── */
     .reply-count-real { font-size: 0.7rem; background: #0C0F18; padding: 2px 8px; border-radius: 20px; border: 1px solid #232732; color: #6A74A0; font-weight: 800; display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }
 
+
+    /* ── Управление правами рангов ───────────────────────────────────────────── */
+    .perms-modal { display: none; position: fixed; inset: 0; z-index: 700; overflow-y: auto; padding: 24px 20px; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); }
+    .perms-modal.open { display: flex; align-items: flex-start; justify-content: center; }
+    .perms-modal-card { background: #0F1117; border: 1px solid rgba(255,215,0,0.2); border-radius: 24px; width: 100%; max-width: 780px; overflow: hidden; box-shadow: 0 32px 100px rgba(0,0,0,0.8); }
+    .perms-modal-header { background: linear-gradient(135deg, #1A1E2A, #12141C); padding: 18px 24px; border-bottom: 2px solid rgba(255,215,0,0.15); display: flex; align-items: center; gap: 12px; justify-content: space-between; }
+    .perms-modal-title { font-size: 1.1rem; font-weight: 900; color: #FFD966; display: flex; align-items: center; gap: 10px; }
+    .perms-rank-tabs { display: flex; gap: 8px; padding: 16px 20px 0; flex-wrap: wrap; border-bottom: 1px solid #1A1E2A; }
+    .perms-rank-tab { padding: 8px 16px; border-radius: 10px 10px 0 0; border: 1px solid #232732; border-bottom: none; background: #0C0F18; color: #8A94B0; cursor: pointer; font-weight: 800; font-size: 0.82rem; transition: 0.15s; }
+    .perms-rank-tab.active { background: #13161F; color: #E0E4F0; border-color: rgba(255,217,102,0.3); }
+    .perms-rank-tab:hover:not(.active) { color: #FFD966; }
+    .perms-rank-panel { display: none; padding: 16px 20px 20px; max-height: 65vh; overflow-y: auto; }
+    .perms-rank-panel.active { display: block; }
+    .perms-quick-row { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+    .perms-group { background: rgba(12,15,24,0.5); border: 1px solid #1E2330; border-radius: 14px; padding: 14px; margin-bottom: 12px; }
+    .perms-group-title { font-size: 0.72rem; font-weight: 900; color: #6A74A0; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+    .perms-group-title i { color: #FFD966; }
+    .perms-toggle-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 4px; border-bottom: 1px solid rgba(30,35,50,0.6); cursor: pointer; gap: 12px; }
+    .perms-toggle-row:last-child { border-bottom: none; padding-bottom: 0; }
+    .perms-toggle-row:hover { background: rgba(255,217,102,0.03); border-radius: 8px; }
+    .perms-toggle-info { flex: 1; }
+    .perms-toggle-label { font-size: 0.83rem; font-weight: 700; color: #C0C9E0; }
+    .perms-toggle-wrap { position: relative; flex: 0 0 auto; }
+    .perms-checkbox { position: absolute; opacity: 0; width: 0; height: 0; }
+    .perms-toggle-slider { display: block; width: 40px; height: 22px; background: #1E2330; border-radius: 11px; position: relative; transition: background 0.2s; border: 1px solid #2A3040; cursor: pointer; }
+    .perms-toggle-slider::after { content: ''; position: absolute; width: 16px; height: 16px; border-radius: 50%; background: #4A5270; top: 2px; left: 2px; transition: 0.2s; }
+    .perms-checkbox:checked + .perms-toggle-slider { background: rgba(76,175,80,0.25); border-color: rgba(76,175,80,0.5); }
+    .perms-checkbox:checked + .perms-toggle-slider::after { background: #4CAF50; transform: translateX(18px); }
+
     /* ── Просмотр профиля другого игрока ───────────────────────────────────── */
     .view-profile-page { display: none; position: fixed; inset: 0; z-index: 500; overflow-y: auto; padding: 32px 20px; }
     .view-profile-page.open { display: block; }
@@ -447,6 +476,7 @@
         </div>
         <button class="chip-btn" onclick="openProfile()"><i class="fas fa-user"></i> Профиль</button>
         <button id="ranksBtn" class="chip-btn" onclick="openRanks()" style="display:none;"><i class="fas fa-award"></i> Ранги</button>
+        <button id="permsBtn" class="chip-btn" onclick="openRankPermsManager()" style="display:none;"><i class="fas fa-shield-alt"></i> Права</button>
         <button id="usersBtn" class="chip-btn" onclick="openUserManager()" style="display:none;"><i class="fas fa-users"></i> Пользователи</button>
         <button id="logBtn" class="chip-btn" onclick="openLog()" style="display:none;"><i class="fas fa-scroll"></i> Лог</button>
         <div class="badge-rp"><i class="fas fa-shield-alt"></i> Официальный форум</div>
@@ -600,6 +630,17 @@
   </div>
 </div>
 
+
+<!-- Модалка управления правами рангов -->
+<div id="rankPermsModal" class="perms-modal">
+  <div class="perms-modal-card">
+    <div class="perms-modal-header">
+      <div class="perms-modal-title"><i class="fas fa-shield-alt"></i> Права рангов</div>
+      <button class="dm-close" onclick="closeRankPermsModal()"><i class="fas fa-times"></i></button>
+    </div>
+    <div id="rankPermsContent"></div>
+  </div>
+</div>
 
 <!-- Модалка правил -->
 <div id="rulesModal" class="rules-modal">
@@ -822,34 +863,104 @@
   const USER_ID = localStorage.getItem("rsrp_user_id") || ("u_" + Date.now() + "_" + Math.random().toString(16).slice(2));
   localStorage.setItem("rsrp_user_id", USER_ID);
 
-  // ─── СИСТЕМА ПРАВ ПО РАНГАМ ───────────────────────────────────────────────
-  // Уровень 2: Основатель (r_1778324473913) + Руководитель (r_1778321320732)
-  //            → всё: ранги, темы везде, редактирование/удаление чужого
-  // Уровень 1: Гл. администратор (r_1778320331945)
-  //            → темы везде, редактирование/удаление чужого, НО без управления рангами
-  // Уровень 0: все остальные — только свои темы/комменты в открытых разделах
+  // ─── СИСТЕМА ПРАВ ПО РАНГАМ (динамическая) ─────────────────────────────────
+  // Захардкоженные суперадмины — только они могут менять права рангов
+  const SUPER_ADMIN_RANKS = new Set(["r_1778324473913", "r_1778321320732"]);
 
-  const RANK_LEVEL = {
-    "r_1778324473913": 2,  // Основатель
-    "r_1778321320732": 2,  // Руководитель проекта
-    "r_1778320331945": 1,  // Главный администратор
+  // Все возможные права
+  const ALL_PERMISSIONS = {
+    // Модерация
+    mod_edit_others:    { label: "Редактировать чужие темы/комменты", group: "Модерация" },
+    mod_delete_others:  { label: "Удалять чужие темы/комменты",       group: "Модерация" },
+    mod_warn:           { label: "Выдавать предупреждения",            group: "Модерация" },
+    mod_pin:            { label: "Закреплять темы",                    group: "Модерация" },
+    mod_status:         { label: "Менять статусы тем",                 group: "Модерация" },
+    // Создание тем в разделах
+    topic_rules_common:   { label: "Темы: Общие правила проекта",         group: "Разделы" },
+    topic_rules_criminal: { label: "Темы: Правила криминальных орг.",      group: "Разделы" },
+    topic_rules_gov:      { label: "Темы: Правила госорганизаций",          group: "Разделы" },
+    topic_khimki_criminal:{ label: "Темы: Криминальные орг. (Химки)",      group: "Разделы" },
+    topic_khimki_gov:     { label: "Темы: Госорганизации (Химки)",          group: "Разделы" },
+    topic_tech:           { label: "Темы: Техподдержка/Баги",              group: "Разделы" },
+    topic_complaints:     { label: "Темы: Жалобы/Заявления",              group: "Разделы" },
+    // Администрирование
+    admin_ranks:        { label: "Управление рангами",                group: "Администрирование" },
+    admin_assign_ranks: { label: "Назначать ранги пользователям",     group: "Администрирование" },
+    admin_footer_links: { label: "Редактировать ссылки форума",       group: "Администрирование" },
+    admin_view_log:     { label: "Просматривать лог действий",        group: "Администрирование" },
+    admin_sections:     { label: "Управлять разделами сервера",       group: "Администрирование" },
+    admin_users:        { label: "Просматривать всех пользователей",  group: "Администрирование" },
   };
 
-  function myLevel() {
-    const rankId = (cache.profile && cache.profile.rankId) || "rank_none";
-    return RANK_LEVEL[rankId] || 0;
+  // Кэш прав рангов — загружается из Google Sheets
+  let rankPermsCache = {}; // { rankId: { perm: true/false, ... } }
+  const RANK_PERMS_LOADED = { done: false };
+
+  // Права по умолчанию для суперадминов (всё включено)
+  function superAdminPerms() {
+    const p = {};
+    Object.keys(ALL_PERMISSIONS).forEach(k => p[k] = true);
+    return p;
   }
 
-  function isAdmin()  { return myLevel() >= 1; }
-  function isLeader() { return myLevel() >= 2; }
+  // Получить права конкретного ранга
+  function getRankPerms(rankId) {
+    if (SUPER_ADMIN_RANKS.has(rankId)) return superAdminPerms();
+    return rankPermsCache[rankId] || {};
+  }
+
+  // Проверка права у текущего пользователя
+  function hasPerm(perm) {
+    const rankId = (cache.profile && cache.profile.rankId) || "rank_none";
+    if (SUPER_ADMIN_RANKS.has(rankId)) return true;
+    return !!(rankPermsCache[rankId] && rankPermsCache[rankId][perm]);
+  }
+
+  // Совместимость со старым кодом
+  function isLeader() { return SUPER_ADMIN_RANKS.has((cache.profile && cache.profile.rankId) || "rank_none"); }
+  function isAdmin()  { return isLeader() || hasPerm("mod_edit_others") || hasPerm("mod_delete_others"); }
+
+  // Маппинг категорий → право на создание темы
+  const CAT_PERM_MAP = {
+    rules_common:    "topic_rules_common",
+    rules_criminal:  "topic_rules_criminal",
+    rules_gov:       "topic_rules_gov",
+    khimki_criminal: "topic_khimki_criminal",
+    khimki_gov:      "topic_khimki_gov",
+    tech_help:       "topic_tech",
+    tech_bugs:       "topic_tech",
+    tech_support:    "topic_tech",
+    complaint_admin:   "topic_complaints",
+    complaint_players: "topic_complaints",
+    complaint_leaders: "topic_complaints",
+    amnesty:           "topic_complaints",
+    moderator_app:     "topic_complaints",
+    leader_app:        "topic_complaints",
+  };
 
   const OPEN_TOPIC_CATEGORIES = new Set([
     "tech_help","tech_bugs","tech_support",
     "complaint_admin","complaint_players","complaint_leaders",
     "amnesty","moderator_app","leader_app"
   ]);
-  function canCreateTopicIn(cat) { return isAdmin() || OPEN_TOPIC_CATEGORIES.has(String(cat)); }
-  function canEditContent(authorId) { return isAdmin() || String(authorId) === String(USER_ID); }
+
+  const OPEN_TOPIC_CATEGORIES = new Set([
+    "tech_help","tech_bugs","tech_support",
+    "complaint_admin","complaint_players","complaint_leaders",
+    "amnesty","moderator_app","leader_app"
+  ]);
+  function canCreateTopicIn(cat) {
+    if (isLeader()) return true;
+    const perm = CAT_PERM_MAP[String(cat)];
+    if (perm && hasPerm(perm)) return true;
+    return OPEN_TOPIC_CATEGORIES.has(String(cat));
+  }
+  function canEditContent(authorId) {
+    return hasPerm("mod_edit_others") || hasPerm("mod_delete_others") || String(authorId) === String(USER_ID);
+  }
+  function canDeleteContent(authorId) {
+    return hasPerm("mod_delete_others") || String(authorId) === String(USER_ID);
+  }
 
   const HIDDEN_RANKS = new Set(["r_1778324473913", "r_1778321320732"]);
   function visibleRankId(rankId) {
@@ -1387,7 +1498,7 @@
   }
 
   function openUserManager() {
-    if (!isLeader()) return alert("Только Основатель и Руководитель проекта могут управлять пользователями");
+    if (!hasPerm('admin_users') && !hasPerm('admin_assign_ranks') && !isLeader()) return alert('Нет прав');
     document.getElementById("usersSearchInput").value = "";
     document.getElementById("usersModal").style.display = "flex";
     loadUsersList();
@@ -1598,7 +1709,7 @@
           '</div>' +
           '<div class="topic-actions" onclick="event.stopPropagation();">' +
             '<span class="reply-count"><i class="fas fa-comment"></i><span data-reply-count="' + t.id + '">...</span></span>' +
-            (isAdmin() ? statusSelectHtml(t.id, status) : '') +
+            (hasPerm('mod_status') ? statusSelectHtml(t.id, status) : '') +
             (isAdmin() ? '<button class="icon-btn' + (pins.has(t.id) ? ' pin-btn pinned' : ' pin-btn') + '" title="' + (pins.has(t.id)?'Открепить':'Закрепить') + '" onclick="togglePin(\'' + t.id + '\')"><i class="fas fa-thumbtack"></i></button>' : '') +
             (canEdit
               ? '<button class="icon-btn" title="Редактировать" onclick="openEdit(\'' + cat + '\',\'' + t.id + '\',\'' + safeForAttr(t.title) + '\',\'' + safeForAttr(t.content) + '\')"><i class="fas fa-edit"></i></button>' +
@@ -1943,9 +2054,14 @@
   };
 
   function updateAdminButtons() {
-    document.getElementById("ranksBtn").style.display = isLeader() ? "inline-flex" : "none";
-    document.getElementById("usersBtn").style.display = isLeader() ? "inline-flex" : "none";
-    document.getElementById("logBtn").style.display = isLeader() ? "inline-flex" : "none";
+    const showRanks = isLeader() || hasPerm("admin_ranks");
+    const showUsers = isLeader() || hasPerm("admin_users") || hasPerm("admin_assign_ranks");
+    const showLog   = isLeader() || hasPerm("admin_view_log");
+    document.getElementById("ranksBtn").style.display = showRanks ? "inline-flex" : "none";
+    document.getElementById("usersBtn").style.display = showUsers ? "inline-flex" : "none";
+    document.getElementById("logBtn").style.display   = showLog   ? "inline-flex" : "none";
+    const permsBtn = document.getElementById("permsBtn");
+    if (permsBtn) permsBtn.style.display = isLeader() ? "inline-flex" : "none";
   }
 
 
@@ -2323,7 +2439,7 @@
   }
 
   function openLog() {
-    if (!isLeader()) return;
+    if (!hasPerm('admin_view_log')) return;
     const list = document.getElementById('logList');
     try {
       const log = JSON.parse(localStorage.getItem(LOG_KEY)||'[]');
@@ -2440,7 +2556,7 @@
   }
 
   function addWarn(userId, reason) {
-    if (!isAdmin()) return alert('Нет прав');
+    if (!hasPerm('mod_warn')) return alert('Нет прав');
     try {
       const all = JSON.parse(localStorage.getItem(WARNS_KEY)||'{}');
       const key = String(userId);
@@ -2453,7 +2569,7 @@
   }
 
   function removeWarn(userId, idx) {
-    if (!isAdmin()) return;
+    if (!hasPerm('mod_warn')) return;
     try {
       const all = JSON.parse(localStorage.getItem(WARNS_KEY)||'{}');
       const key = String(userId);
@@ -2503,7 +2619,7 @@
     // Предупреждения
     const warns = getWarns(userId);
     let warnsHtml = '';
-    if (isAdmin()) {
+    if (hasPerm('mod_warn')) {
       warnsHtml = '<hr class="profile-divider"><div class="profile-section-title" style="margin-top:4px;"><i class="fas fa-exclamation-triangle" style="color:#FF5252;"></i> Предупреждения ' +
         (warns.length ? '<span class="warn-badge"><i class="fas fa-exclamation"></i>' + warns.length + '</span>' : '') + '</div>';
       if (warns.length) {
@@ -2624,11 +2740,11 @@
       }
     }
     // Кнопка редактирования — только для лидеров
-    if (isLeader()) {
+    if (hasPerm('admin_footer_links')) {
       html += '<span class="footer-edit-btn" onclick="openFooterLinksModal()" title="Редактировать ссылки"><i class="fas fa-pen"></i> Управление ссылками</span>';
     }
     if (!html) {
-      if (isLeader()) {
+      if (hasPerm('admin_footer_links')) {
         html = '<span class="footer-edit-btn" onclick="openFooterLinksModal()" style="font-size:0.72rem;"><i class="fas fa-plus"></i> Добавить ссылки</span>';
       }
     }
@@ -2636,7 +2752,7 @@
   }
 
   function openFooterLinksModal() {
-    if (!isLeader()) return alert('Только Основатель и Руководитель проекта могут менять ссылки');
+    if (!hasPerm('admin_footer_links')) return alert('Нет прав на редактирование ссылок');
     const links = loadFooterLinks();
     document.getElementById('footerDiscord').value  = links.discord  || '';
     document.getElementById('footerVk').value       = links.vk       || '';
@@ -2652,7 +2768,7 @@
   }
 
   function saveFooterLinks() {
-    if (!isLeader()) return alert('Нет прав');
+    if (!hasPerm('admin_footer_links')) return alert('Нет прав');
     const links = {
       discord:  document.getElementById('footerDiscord').value.trim(),
       vk:       document.getElementById('footerVk').value.trim(),
@@ -2728,6 +2844,144 @@
   }
 
 
+
+  // ─── ЗАГРУЗКА ПРАВ РАНГОВ ─────────────────────────────────────────────────
+  async function loadRankPerms() {
+    try {
+      const r = await api("listRankPerms");
+      rankPermsCache = {};
+      (r.perms || []).forEach(p => {
+        if (!rankPermsCache[p.rankId]) rankPermsCache[p.rankId] = {};
+        rankPermsCache[p.rankId][p.perm] = p.value === "true" || p.value === true;
+      });
+      RANK_PERMS_LOADED.done = true;
+    } catch(e) {
+      console.warn("loadRankPerms failed:", e);
+      // Fallback — читаем из localStorage
+      try {
+        rankPermsCache = JSON.parse(localStorage.getItem("rsrp_rank_perms") || "{}");
+        RANK_PERMS_LOADED.done = true;
+      } catch(e2) {}
+    }
+  }
+
+  async function saveRankPerm(rankId, perm, value) {
+    // Сохраняем в localStorage сразу (оптимистично)
+    if (!rankPermsCache[rankId]) rankPermsCache[rankId] = {};
+    rankPermsCache[rankId][perm] = value;
+    try { localStorage.setItem("rsrp_rank_perms", JSON.stringify(rankPermsCache)); } catch(e) {}
+
+    // Сохраняем в Google Sheets
+    try {
+      await api("setRankPerm", { rankId, perm, value: String(value), actorId: USER_ID });
+    } catch(e) {
+      console.error("saveRankPerm API error:", e);
+    }
+    addLog('rank', 'Право ' + perm + ' для ранга ' + rankId + ': ' + (value ? 'включено' : 'выключено'));
+    updateAdminButtons();
+  }
+
+  // ─── UI УПРАВЛЕНИЯ ПРАВАМИ РАНГОВ ─────────────────────────────────────────
+  function openRankPermsManager() {
+    if (!isLeader()) return alert('Только Основатель и Руководитель могут управлять правами');
+    renderRankPermsModal();
+    document.getElementById("rankPermsModal").classList.add("open");
+    document.body.style.overflow = "hidden";
+  }
+
+  function closeRankPermsModal() {
+    document.getElementById("rankPermsModal").classList.remove("open");
+    document.body.style.overflow = "";
+  }
+
+  function renderRankPermsModal() {
+    const ranks = (cache.ranks || []).filter(r => r.id !== "rank_none" && !SUPER_ADMIN_RANKS.has(r.id));
+    const container = document.getElementById("rankPermsContent");
+    if (!container) return;
+
+    if (!ranks.length) {
+      container.innerHTML = '<div style="color:#5A6380;text-align:center;padding:24px;">Нет рангов для настройки.<br>Создайте ранги в разделе "Ранги".</div>';
+      return;
+    }
+
+    // Группируем права
+    const groups = {};
+    Object.entries(ALL_PERMISSIONS).forEach(([key, cfg]) => {
+      if (!groups[cfg.group]) groups[cfg.group] = [];
+      groups[cfg.group].push({ key, ...cfg });
+    });
+
+    let html = '<div class="perms-rank-tabs">' +
+      ranks.map((r, i) =>
+        '<button class="perms-rank-tab' + (i === 0 ? ' active' : '') + '" onclick="switchPermTab(\'' + r.id + '\')" id="tab_' + r.id + '" style="border-color:' + (r.color||'#FFD966') + '33;">' +
+          '<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:' + (r.color||'#FFD966') + ';margin-right:6px;"></span>' +
+          r.name +
+        '</button>'
+      ).join('') +
+    '</div>';
+
+    ranks.forEach((rank, ri) => {
+      const perms = rankPermsCache[rank.id] || {};
+      html += '<div class="perms-rank-panel' + (ri === 0 ? ' active' : '') + '" id="panel_' + rank.id + '">';
+
+      // Быстрые действия
+      html += '<div class="perms-quick-row">' +
+        '<button class="chip-btn" style="font-size:0.75rem;" onclick="setAllPerms(\'' + rank.id + '\', true)"><i class="fas fa-check-double"></i> Все права</button>' +
+        '<button class="chip-btn" style="font-size:0.75rem;border-color:rgba(255,82,82,0.4);color:#FF8080;background:rgba(255,82,82,0.08);" onclick="setAllPerms(\'' + rank.id + '\', false)"><i class="fas fa-times"></i> Снять все</button>' +
+      '</div>';
+
+      Object.entries(groups).forEach(([groupName, groupPerms]) => {
+        const groupIcons = { 'Модерация': 'fas fa-shield-alt', 'Разделы': 'fas fa-folder', 'Администрирование': 'fas fa-cog' };
+        html += '<div class="perms-group">' +
+          '<div class="perms-group-title"><i class="' + (groupIcons[groupName]||'fas fa-circle') + '"></i> ' + groupName + '</div>';
+
+        groupPerms.forEach(p => {
+          const checked = perms[p.key] === true;
+          html += '<label class="perms-toggle-row">' +
+            '<div class="perms-toggle-info">' +
+              '<span class="perms-toggle-label">' + p.label + '</span>' +
+            '</div>' +
+            '<div class="perms-toggle-wrap">' +
+              '<input type="checkbox" class="perms-checkbox" id="perm_' + rank.id + '_' + p.key + '" ' +
+                (checked ? 'checked' : '') + ' onchange="saveRankPerm(\'' + rank.id + '\',\'' + p.key + '\',this.checked)">' +
+              '<span class="perms-toggle-slider"></span>' +
+            '</div>' +
+          '</label>';
+        });
+
+        html += '</div>';
+      });
+
+      html += '</div>';
+    });
+
+    container.innerHTML = html;
+  }
+
+  function switchPermTab(rankId) {
+    document.querySelectorAll('.perms-rank-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.perms-rank-panel').forEach(p => p.classList.remove('active'));
+    const tab = document.getElementById('tab_' + rankId);
+    const panel = document.getElementById('panel_' + rankId);
+    if (tab) tab.classList.add('active');
+    if (panel) panel.classList.add('active');
+  }
+
+  async function setAllPerms(rankId, value) {
+    const checks = document.querySelectorAll('#panel_' + rankId + ' .perms-checkbox');
+    checks.forEach(cb => { cb.checked = value; });
+    if (!rankPermsCache[rankId]) rankPermsCache[rankId] = {};
+    Object.keys(ALL_PERMISSIONS).forEach(k => { rankPermsCache[rankId][k] = value; });
+    try { localStorage.setItem("rsrp_rank_perms", JSON.stringify(rankPermsCache)); } catch(e) {}
+    // Сохраняем всё батчем
+    try {
+      await api("setAllRankPerms", { rankId, value: String(value), actorId: USER_ID });
+    } catch(e) { console.error(e); }
+    addLog('rank', 'Все права ранга ' + rankId + ': ' + (value ? 'включены' : 'сняты'));
+    updateAdminButtons();
+  }
+
+
   // ─── ИНИЦИАЛИЗАЦИЯ ────────────────────────────────────────────────────────
   (async () => {
     cacheLoad();
@@ -2745,7 +2999,8 @@
     try {
       await Promise.all([
         loadRanks(),
-        ensureProfiles([USER_ID])
+        ensureProfiles([USER_ID]),
+        loadRankPerms()
       ]);
 
       // Обновляем профиль ДО loadTeamOnline — чтобы myLevel() был актуальным
