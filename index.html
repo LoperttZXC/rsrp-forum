@@ -944,11 +944,7 @@
     "amnesty","moderator_app","leader_app"
   ]);
 
-  const OPEN_TOPIC_CATEGORIES = new Set([
-    "tech_help","tech_bugs","tech_support",
-    "complaint_admin","complaint_players","complaint_leaders",
-    "amnesty","moderator_app","leader_app"
-  ]);
+  
   function canCreateTopicIn(cat) {
     if (isLeader()) return true;
     const perm = CAT_PERM_MAP[String(cat)];
