@@ -1185,7 +1185,10 @@
       '</div>';
 
     try {
-      const r = await api("listTeamMembers");
+      const r = await Promise.race([
+        api("listTeamMembers"),
+        new Promise((_, rej) => setTimeout(() => rej(new Error("timeout")), 8000))
+      ]);
       const members = r.members || [];
       const onlineIds = getOnlineUserIds();
 
@@ -1201,7 +1204,7 @@
       console.error("loadTeamOnline:", e);
       const cnt = document.getElementById("teamOnlineCount");
       if (cnt) cnt.innerText = "—";
-      if (el) el.innerHTML = '<div class="team-empty" style="color:#5A6380;">Задеплой Code.gs<br>для отображения команды</div>';
+      if (el) el.innerHTML = '<div class="team-empty" style="color:#5A6380;font-size:0.8rem;">Нет данных</div>';
     }
   }
 
@@ -2850,9 +2853,12 @@
         {id:'complaint_players',name:'Жалобы'},{id:'amnesty',name:'Амнистия'},
         {id:'moderator_app',name:'Заявление'},{id:'leader_app',name:'Заявление'},
       ];
-      const results = await Promise.all(openCats.map(c =>
-        listTopics(c.id).then(arr => arr.map(t => ({...t, catName: c.name, catId: c.id}))).catch(() => [])
-      ));
+      const results = await Promise.race([
+        Promise.all(openCats.map(c =>
+          listTopics(c.id).then(arr => arr.map(t => ({...t, catName: c.name, catId: c.id}))).catch(() => [])
+        )),
+        new Promise((_, rej) => setTimeout(() => rej(new Error("timeout")), 8000))
+      ]);
       const all = results.flat()
         .sort((a,b) => new Date(b.createdAt||0) - new Date(a.createdAt||0))
         .slice(0, 5);
@@ -2870,7 +2876,7 @@
       ).join('');
     } catch(e) {
       console.error(e);
-      el.innerHTML = '<div style="padding:12px 16px;color:#4A5270;font-size:0.8rem;font-weight:700;">Ошибка загрузки</div>';
+      if (el) el.innerHTML = '<div style="padding:12px 16px;color:#4A5270;font-size:0.8rem;font-weight:700;">Нет данных</div>';
     }
   }
 
