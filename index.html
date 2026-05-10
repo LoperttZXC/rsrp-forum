@@ -390,6 +390,26 @@
     .perms-checkbox:checked + .perms-toggle-slider { background: rgba(76,175,80,0.25); border-color: rgba(76,175,80,0.5); }
     .perms-checkbox:checked + .perms-toggle-slider::after { background: #4CAF50; transform: translateX(18px); }
 
+
+    /* ── Кастомные блоки главной ─────────────────────────────────────────────── */
+    .custom-block { background: #13161F; border-radius: 20px; margin-bottom: 20px; border: 1px solid #232732; overflow: hidden; }
+    .custom-block-header { background: #1A1E2A; padding: 14px 22px; font-weight: 800; font-size: 1.1rem; border-left: 4px solid #FFD700; display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+    .custom-block-title { display: flex; align-items: center; gap: 10px; color: #E0E4F0; }
+    .custom-block-title i { color: #FFD966; }
+    .custom-block-body { padding: 16px 22px; color: #C0C9E0; font-weight: 600; line-height: 1.7; font-size: 0.9rem; white-space: pre-wrap; }
+    .custom-block-actions { display: flex; gap: 8px; }
+    .add-block-btn { background: rgba(255,217,102,0.1); border: 1px dashed rgba(255,217,102,0.4); color: #FFD966; padding: 14px 22px; border-radius: 16px; cursor: pointer; font-weight: 800; font-size: 0.88rem; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.15s; margin-bottom: 20px; width: 100%; }
+    .add-block-btn:hover { background: rgba(255,217,102,0.16); border-color: #FFD966; }
+
+    /* ── Модалка кастомного блока ────────────────────────────────────────────── */
+    .custom-block-modal { display: none; position: fixed; inset: 0; z-index: 700; padding: 24px 20px; background: rgba(0,0,0,0.82); backdrop-filter: blur(6px); }
+    .custom-block-modal.open { display: flex; align-items: flex-start; justify-content: center; }
+    .custom-block-modal-card { background: #13161F; border: 1px solid rgba(255,215,0,0.25); border-radius: 24px; width: 100%; max-width: 680px; padding: 28px; box-shadow: 0 24px 80px rgba(0,0,0,0.7); }
+    .custom-block-modal-card h3 { font-size: 1.1rem; font-weight: 900; color: #FFD966; margin-bottom: 18px; display: flex; align-items: center; gap: 10px; }
+    .icon-picker { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0; }
+    .icon-opt { width: 36px; height: 36px; border-radius: 10px; background: #0C0F18; border: 1px solid #232732; color: #8A94B0; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; transition: 0.12s; }
+    .icon-opt:hover, .icon-opt.selected { background: rgba(255,217,102,0.12); border-color: rgba(255,217,102,0.5); color: #FFD966; }
+
     /* ── Просмотр профиля другого игрока ───────────────────────────────────── */
     .view-profile-page { display: none; position: fixed; inset: 0; z-index: 500; overflow-y: auto; padding: 32px 20px; }
     .view-profile-page.open { display: block; }
@@ -639,6 +659,30 @@
       <button class="dm-close" onclick="closeRankPermsModal()"><i class="fas fa-times"></i></button>
     </div>
     <div id="rankPermsContent"></div>
+  </div>
+</div>
+
+<!-- Модалка кастомного блока -->
+<div id="customBlockModal" class="custom-block-modal">
+  <div class="custom-block-modal-card">
+    <h3><i class="fas fa-cubes"></i> <span id="customBlockModalTitle">Добавить блок</span></h3>
+    <div class="profile-field">
+      <label>Заголовок блока</label>
+      <input type="text" id="cbTitle" placeholder="Например: Новости сервера">
+    </div>
+    <div class="profile-field">
+      <label>Иконка</label>
+      <div class="icon-picker" id="iconPicker"></div>
+      <input type="hidden" id="cbIcon" value="fas fa-star">
+    </div>
+    <div class="profile-field">
+      <label>Текст / содержимое</label>
+      <textarea id="cbBody" rows="8" style="min-height:160px;resize:vertical;" placeholder="Введите текст блока..."></textarea>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;">
+      <button class="profile-save-btn" onclick="saveCustomBlock()"><i class="fas fa-save"></i> Сохранить</button>
+      <button class="profile-cancel-btn" onclick="closeCustomBlockModal()">Отмена</button>
+    </div>
   </div>
 </div>
 
@@ -1629,6 +1673,7 @@
               </div>`).join("")}
           </div>
         </div>
+        ${renderCustomBlocksHTML()}
       </div>
       <div class="content-right">
         <div class="latest-card">
@@ -3037,6 +3082,134 @@
   }
 
 
+
+
+  // ─── КАСТОМНЫЕ БЛОКИ ГЛАВНОЙ (хранятся в Google Sheets) ──────────────────
+  const BLOCK_ICONS = [
+    'fas fa-star','fas fa-bullhorn','fas fa-newspaper','fas fa-trophy','fas fa-calendar-alt',
+    'fas fa-info-circle','fas fa-exclamation-circle','fas fa-bell','fas fa-crown','fas fa-fire',
+    'fas fa-heart','fas fa-shield-alt','fas fa-scroll','fas fa-map','fas fa-users',
+    'fas fa-gamepad','fas fa-bolt','fas fa-flag','fas fa-gift','fas fa-lock',
+  ];
+
+  let editingBlockId = null;
+  let cachedBlocks = [];         // кэш блоков в памяти
+  let blocksLoadedAt = 0;        // когда последний раз грузили
+
+  async function loadCustomBlocks(force = false) {
+    const age = Date.now() - blocksLoadedAt;
+    if (!force && age < 2 * 60 * 1000 && cachedBlocks.length >= 0 && blocksLoadedAt > 0) {
+      return cachedBlocks;
+    }
+    try {
+      const r = await api('listBlocks');
+      cachedBlocks = (r.blocks || []).sort((a, b) => (parseInt(a.order)||0) - (parseInt(b.order)||0));
+      blocksLoadedAt = Date.now();
+    } catch(e) {
+      console.error('loadCustomBlocks:', e);
+    }
+    return cachedBlocks;
+  }
+
+  function openCustomBlockModal(blockId) {
+    editingBlockId = blockId || null;
+    const block = blockId ? cachedBlocks.find(b => b.blockId === blockId) : null;
+
+    document.getElementById('customBlockModalTitle').innerText = block ? 'Редактировать блок' : 'Добавить блок';
+    document.getElementById('cbTitle').value = block ? (block.title || '') : '';
+    document.getElementById('cbBody').value  = block ? (block.body  || '') : '';
+    document.getElementById('cbIcon').value  = block ? (block.icon  || 'fas fa-star') : 'fas fa-star';
+
+    const picker = document.getElementById('iconPicker');
+    const curIcon = block ? (block.icon || 'fas fa-star') : 'fas fa-star';
+    picker.innerHTML = BLOCK_ICONS.map(ic =>
+      '<div class="icon-opt' + (ic === curIcon ? ' selected' : '') + '" onclick="selectBlockIcon(\'' + ic + '\')" title="' + ic + '">' +
+        '<i class="' + ic + '"></i>' +
+      '</div>'
+    ).join('');
+
+    document.getElementById('customBlockModal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeCustomBlockModal() {
+    document.getElementById('customBlockModal').classList.remove('open');
+    document.body.style.overflow = '';
+    editingBlockId = null;
+  }
+
+  function selectBlockIcon(icon) {
+    document.getElementById('cbIcon').value = icon;
+    document.querySelectorAll('.icon-opt').forEach(el => {
+      el.classList.toggle('selected', el.querySelector('i') && el.querySelector('i').className === icon);
+    });
+  }
+
+  async function saveCustomBlock() {
+    const title = document.getElementById('cbTitle').value.trim();
+    const body  = document.getElementById('cbBody').value.trim();
+    const icon  = document.getElementById('cbIcon').value || 'fas fa-star';
+    if (!title) { document.getElementById('cbTitle').focus(); return; }
+
+    const btn = document.querySelector('#customBlockModal .profile-save-btn');
+    if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Сохранение...'; }
+
+    try {
+      const blockId = editingBlockId || ('cb_' + Date.now());
+      const order = editingBlockId
+        ? ((cachedBlocks.find(b => b.blockId === editingBlockId) || {}).order || 0)
+        : cachedBlocks.length;
+
+      await apiChunked('saveBlock', { blockId, title, body, icon, order: String(order), actorId: USER_ID });
+
+      // Обновляем локальный кэш
+      blocksLoadedAt = 0; // инвалидируем кэш
+      await loadCustomBlocks(true);
+
+      closeCustomBlockModal();
+      showMain();
+    } catch(e) {
+      console.error(e);
+      alert('Ошибка сохранения блока');
+    } finally {
+      if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-save"></i> Сохранить'; }
+    }
+  }
+
+  async function deleteCustomBlock(id) {
+    if (!confirm('Удалить блок?')) return;
+    try {
+      await api('deleteBlock', { blockId: id, actorId: USER_ID });
+      blocksLoadedAt = 0;
+      await loadCustomBlocks(true);
+      showMain();
+    } catch(e) {
+      console.error(e);
+      alert('Ошибка удаления');
+    }
+  }
+
+  function renderCustomBlocksHTML() {
+    if (!cachedBlocks.length && !isLeader()) return '';
+    let html = '';
+    cachedBlocks.forEach(b => {
+      html += '<div class="custom-block">' +
+        '<div class="custom-block-header">' +
+          '<div class="custom-block-title"><i class="' + esc(b.icon || 'fas fa-star') + '"></i> ' + esc(b.title) + '</div>' +
+          (isLeader() ? '<div class="custom-block-actions">' +
+            '<button class="icon-btn" title="Редактировать" onclick="openCustomBlockModal(\'' + b.blockId + '\')"><i class="fas fa-edit"></i></button>' +
+            '<button class="icon-btn danger" title="Удалить" onclick="deleteCustomBlock(\'' + b.blockId + '\')"><i class="fas fa-trash-alt"></i></button>' +
+          '</div>' : '') +
+        '</div>' +
+        (b.body ? '<div class="custom-block-body">' + esc(b.body).replace(/\n/g, '<br>') + '</div>' : '') +
+      '</div>';
+    });
+    if (isLeader()) {
+      html += '<div class="add-block-btn" onclick="openCustomBlockModal()"><i class="fas fa-plus"></i> Добавить блок на главную</div>';
+    }
+    return html;
+  }
+
   // ─── ИНИЦИАЛИЗАЦИЯ ────────────────────────────────────────────────────────
   (async () => {
     cacheLoad();
@@ -3071,7 +3244,9 @@
       if (currentView.type === "main") showMain();
       renderFooterLinks();
       // Виджеты грузим с задержкой чтобы не блокировать основной контент
-      setTimeout(() => {
+      setTimeout(async () => {
+        await loadCustomBlocks(); // сначала блоки — они на главной
+        if (currentView.type === 'main') showMain(); // перерендер с блоками
         loadTeamOnline();
         loadLatestTopics();
       }, 300);
