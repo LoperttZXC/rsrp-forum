@@ -165,7 +165,7 @@
 
 
     /* ── Улучшенные уведомления ─────────────────────────────────────────────── */
-    .notif-panel { position: fixed; top: 70px; right: 24px; width: 360px; max-height: 480px; background: #0F1117; border: 1px solid rgba(255,217,102,0.2); border-radius: 20px; z-index: 800; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,217,102,0.05) inset; display: none; }
+    .notif-panel { position: fixed; top: 70px; left: 50%; transform: translateX(-50%); width: 360px; max-height: 480px; background: #0F1117; border: 1px solid rgba(255,217,102,0.2); border-radius: 20px; z-index: 800; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,217,102,0.05) inset; display: none; }
     .notif-panel.open { display: block; animation: fadeSlideDown 0.18s ease; }
     .notif-header { padding: 16px 20px; background: linear-gradient(135deg,#1A1E2A,#12141C); border-bottom: 1px solid #232732; display: flex; align-items: center; justify-content: space-between; }
     .notif-header-left { display: flex; align-items: center; gap: 10px; }
@@ -238,7 +238,7 @@
       .forum-nav { padding: 10px 16px; gap: 16px; font-size: 0.8rem; }
       .forum-main { padding: 14px 12px; gap: 18px; }
       .search-bar-wrap { padding: 10px 16px; }
-      .notif-panel { right: 8px; width: calc(100vw - 16px); }
+      .notif-panel { left: 8px; right: 8px; transform: none; width: auto; }
       .section-title { font-size: 1rem; padding: 12px 14px; }
       .category-item { padding: 12px 14px; }
       .topics-list { padding: 0 14px; }
@@ -2605,7 +2605,7 @@
   function getDMs(userId) {
     try {
       const all = JSON.parse(localStorage.getItem(DM_KEY)||'{}');
-      const key = [USER_ID, userId].sort().join('_');
+      const key = [USER_ID, userId].sort().join('|||');
       return all[key] || [];
     } catch(e) { return []; }
   }
@@ -2613,7 +2613,7 @@
   function saveDM(userId, msg) {
     try {
       const all = JSON.parse(localStorage.getItem(DM_KEY)||'{}');
-      const key = [USER_ID, userId].sort().join('_');
+      const key = [USER_ID, userId].sort().join('|||');
       if (!all[key]) all[key] = [];
       all[key].push(msg);
       if (all[key].length > 200) all[key].shift();
@@ -3176,7 +3176,7 @@
     for (const key of Object.keys(allDMs)) {
       const msgs = allDMs[key];
       if (!msgs || !msgs.length) continue;
-      const parts = key.split('_').filter(function(p){ return p.startsWith('u_'); });
+      const parts = key.split('|||');
       const otherId = parts.find(function(p){ return p !== USER_ID; });
       if (!otherId) continue;
       const lastMsg = msgs[msgs.length - 1];
